@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>IS2 Hub | Monochrome Pro</title>
+    <title>IS2 Hub | Pro Monochrome</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="style.css">
@@ -11,7 +11,7 @@
 <body class="ios-bg">
 
     <div class="fixed inset-0 overflow-hidden pointer-events-none z-[-1]">
-        <div class="absolute top-[-10%] left-[-10%] w-[70%] h-[70%] bg-zinc-500/10 rounded-full blur-[120px]"></div>
+        <div class="absolute top-[-10%] left-[-10%] w-[70%] h-[70%] bg-zinc-500/5 rounded-full blur-[120px]"></div>
         <div class="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-zinc-200/5 rounded-full blur-[120px]"></div>
     </div>
 
@@ -22,10 +22,10 @@
                 <h1 class="ios-title text-4xl">INFORMATION SYSTEM 2</h1>
             </div>
             <div class="flex items-center gap-4">
-                <button onclick="toggleThemeManually()" class="ios-icon-btn">
+                <button onclick="toggleThemeManually()" class="ios-icon-btn shadow-lg">
                     <span id="theme-icon">🌙</span>
                 </button>
-                <div class="ios-pill">
+                <div class="ios-pill shadow-lg">
                     <span class="ios-dot"></span>
                     <span class="text-[10px] font-black uppercase tracking-widest opacity-80">System Active</span>
                 </div>
@@ -69,7 +69,7 @@
                             <input type="url" id="taskLink" placeholder="https://..." class="ios-input w-full">
                         </div>
                     </div>
-                    <button onclick="simpanData()" id="btnSimpan" class="ios-primary-btn">Update Hub</button>
+                    <button onclick="simpanData()" id="btnSimpan" class="ios-primary-btn shadow-xl">Update Hub</button>
                 </section>
             </div>
 
@@ -92,7 +92,8 @@
         <div class="absolute inset-0 bg-black/80 backdrop-blur-md" onclick="closeDeleteModal()"></div>
         <div class="ios-card relative w-full max-w-xs p-10 text-center">
             <h3 class="text-2xl font-bold mb-3">Delete Task?</h3>
-            <div class="flex gap-4 mt-8">
+            <p class="text-sm opacity-50 mb-8">This action cannot be undone.</p>
+            <div class="flex gap-4">
                 <button onclick="closeDeleteModal()" class="flex-1 py-4 rounded-2xl bg-zinc-800 text-white font-bold">No</button>
                 <button id="confirmDeleteBtn" class="flex-1 py-4 rounded-2xl bg-white text-black font-bold">Yes</button>
             </div>
