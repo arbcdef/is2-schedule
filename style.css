@@ -5,92 +5,113 @@
 
 :root {
     --bg-main: #f5f5f7;
-    --card-bg: rgba(255, 255, 255, 0.5);
+    --card-bg: rgba(255, 255, 255, 0.55);
     --text-main: #000000;
-    --input-bg: rgba(0, 0, 0, 0.05);
-    --border-glass: rgba(255, 255, 255, 0.7);
+    --input-bg: rgba(0, 0, 0, 0.04);
+    --border-glass: rgba(255, 255, 255, 0.8);
 }
 
 [data-theme="dark"] {
     --bg-main: #000000;
-    --card-bg: rgba(28, 28, 30, 0.4);
+    --card-bg: rgba(28, 28, 30, 0.45);
     --text-main: #ffffff;
-    --input-bg: rgba(255, 255, 255, 0.1);
+    --input-bg: rgba(255, 255, 255, 0.08);
     --border-glass: rgba(255, 255, 255, 0.1);
 }
 
-body { background: var(--bg-main); color: var(--text-main); font-family: -apple-system, sans-serif; transition: 0.5s; }
+body { background: var(--bg-main); color: var(--text-main); font-family: -apple-system, sans-serif; overflow-x: hidden; }
 
-.ios-time { font-family: monospace; font-weight: 700; opacity: 0.5; font-size: 14px; }
-.ios-title { font-family: 'Akira Expanded', sans-serif !important; font-size: 26px; letter-spacing: -1px; }
+.ios-time { font-family: 'Akira Expanded', sans-serif; opacity: 0.3; font-size: 10px; }
+.ios-title { font-family: 'Akira Expanded', sans-serif !important; letter-spacing: -2px; }
 
-/* FIX GLASS CARD */
 .ios-card { 
     background: var(--card-bg) !important; 
-    backdrop-filter: blur(40px) saturate(210%); 
-    -webkit-backdrop-filter: blur(40px) saturate(210%);
-    border-radius: 30px; 
+    backdrop-filter: blur(40px) saturate(200%); 
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
+    border-radius: 35px; 
     border: 1px solid var(--border-glass); 
-    box-shadow: 0 8px 32px rgba(0,0,0,0.05);
+    box-shadow: 0 10px 50px rgba(0,0,0,0.02);
     color: var(--text-main) !important;
 }
 
-/* FIX INPUT VISIBILITY */
-.ios-label { font-size: 10px; font-weight: 900; opacity: 0.5; text-transform: uppercase; margin-left: 8px; }
+.ios-label { font-size: 10px; font-weight: 800; opacity: 0.4; text-transform: uppercase; margin-left: 10px; display: block; }
+
 .ios-input {
     background: var(--input-bg) !important;
-    border-radius: 14px;
-    padding: 14px;
-    border: 1px solid rgba(128,128,128,0.2);
-    color: var(--text-main) !important; /* Paksa teks terlihat */
-    font-size: 14px;
+    border-radius: 18px;
+    padding: 16px;
+    border: 1px solid rgba(128,128,128,0.1);
+    color: var(--text-main) !important;
+    font-size: 15px;
     font-weight: 600;
     outline: none;
-    width: 100%;
 }
 
 .ios-primary-btn {
     background: var(--text-main);
     color: var(--bg-main);
     width: 100%;
-    padding: 18px;
-    border-radius: 20px;
-    font-weight: 800;
+    padding: 20px;
+    border-radius: 22px;
+    font-weight: 900;
     text-transform: uppercase;
-    font-size: 11px;
-    transition: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    font-size: 12px;
+    letter-spacing: 1px;
 }
 
-.ios-primary-btn:active { transform: scale(0.95); }
-
-/* Dynamic Island */
+/* Dynamic Island Restore */
 .countdown-card {
     background: #000000 !important;
     color: #ffffff !important;
-    padding: 24px 30px;
-    border-radius: 30px;
+    padding: 30px 45px;
+    border-radius: 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
-/* Calendar Grid Fix */
-.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; max-width: 320px; }
-.day-cell { aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 12px; font-weight: 800; color: var(--text-main); }
-.today-glow { background: #007AFF !important; color: white !important; }
+/* Calendar Fix */
+.calendar-grid-large {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 15px;
+    width: 100%;
+}
 
-/* Timeline Item Fix */
-.priority-high { border-left: 6px solid #FF3B30 !important; }
-.priority-medium { border-left: 6px solid #FFCC00 !important; }
-.priority-low { border-left: 6px solid #8E8E93 !important; }
+.day-cell { 
+    aspect-ratio: 1/1; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    border-radius: 18px; 
+    font-size: 14px; 
+    font-weight: 800; 
+    color: var(--text-main);
+    background: var(--input-bg);
+}
 
-.ios-icon-btn { padding: 12px; background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-glass); }
-.ios-pill { background: var(--card-bg); padding: 8px 16px; border-radius: 20px; display: flex; align-items: center; gap: 8px; border: 1px solid var(--border-glass); }
-.ios-dot { width: 6px; height: 6px; background: #34C759; border-radius: 50%; box-shadow: 0 0 10px #34C759; }
+.today-glow { 
+    background: #007AFF !important; 
+    color: white !important; 
+    transform: scale(1.1);
+    box-shadow: 0 10px 20px rgba(0,122,255,0.4);
+}
 
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-.fade-in { animation: fadeIn 0.8s ease-out forwards; }
+.cal-high { border: 2px solid #FF3B30; color: #FF3B30 !important; }
+.cal-medium { border: 2px solid #FFCC00; color: #B28F00 !important; }
+.cal-low { border: 2px solid #8E8E93; color: #8E8E93 !important; }
 
-@keyframes iosSlide { from { transform: translateY(100%); } to { transform: translateY(0); } }
-.animate-ios-slide { animation: iosSlide 0.4s cubic-bezier(0.1, 0.9, 0.2, 1); }
+/* Feed Style */
+.priority-high { border-left: 10px solid #FF3B30 !important; }
+.priority-medium { border-left: 10px solid #FFCC00 !important; }
+.priority-low { border-left: 10px solid #8E8E93 !important; }
+
+.task-done { opacity: 0.25; filter: grayscale(1); transform: scale(0.98); }
+
+.ios-icon-btn { padding: 15px; background: var(--card-bg); border-radius: 20px; border: 1px solid var(--border-glass); }
+.ios-pill { background: var(--card-bg); padding: 10px 20px; border-radius: 22px; display: flex; align-items: center; gap: 10px; border: 1px solid var(--border-glass); }
+.ios-dot { width: 8px; height: 8px; background: #34C759; border-radius: 50%; box-shadow: 0 0 15px #34C759; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
