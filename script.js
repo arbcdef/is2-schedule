@@ -20,7 +20,7 @@ function updateClock() {
     document.getElementById('cal-day').innerText = now.toLocaleDateString('id-ID', { weekday: 'long' });
 }
 
-// Kalender Pintar (No. 4)
+// Logika Kalender Pintar (No. 4)
 function renderCalendar() {
     const container = document.getElementById('calendar-container');
     const label = document.getElementById('calendar-month-year');
@@ -41,7 +41,7 @@ function renderCalendar() {
     for (let d = 1; d <= daysInMonth; d++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         
-        // Cek apakah ada tugas yang BELUM DONE dan BELUM EXPIRED
+        // Cek tugas yang BELUM DONE dan tgl >= HARI INI
         const hasActiveTask = allTasks.some(t => t.tgl_deadline === dateStr && !t.is_done && t.tgl_deadline >= todayStr);
         
         const isToday = dateStr === todayStr ? 'today' : '';
@@ -73,6 +73,8 @@ async function muatData() {
 function renderCountdown(data) {
     const area = document.getElementById('next-deadline-area');
     const todayStr = new Date().toISOString().split('T')[0];
+    
+    // Cari tugas terdekat yang belum selesai dan belum kadaluarsa
     const upcoming = data.find(t => !t.is_done && t.tgl_deadline >= todayStr);
 
     if (upcoming) {
@@ -84,7 +86,7 @@ function renderCountdown(data) {
         area.innerHTML = `
             <div class="countdown-card shadow-2xl fade-in">
                 <div>
-                    <p class="text-[10px] font-black uppercase tracking-widest opacity-60 mb-1">Upcoming Milestone</p>
+                    <p class="text-[10px] font-black uppercase tracking-widest opacity-60 mb-1">Urgent Task</p>
                     <h2 class="text-2xl font-bold tracking-tight">${upcoming.content}</h2>
                 </div>
                 <div class="text-right">
@@ -92,13 +94,15 @@ function renderCountdown(data) {
                     <p class="text-[10px] opacity-60 italic">${upcoming.tgl_deadline}</p>
                 </div>
             </div>`;
-    } else { area.innerHTML = ""; }
+    } else {
+        area.innerHTML = ""; 
+    }
 }
 
 function renderFeed(data) {
     const list = document.getElementById('listData');
     if (!data.length) {
-        list.innerHTML = "<p class='text-center text-zinc-400 py-10 italic'>No active records.</p>";
+        list.innerHTML = "<p class='text-center text-zinc-400 py-10 italic'>No records found.</p>";
         return;
     }
 
@@ -129,20 +133,31 @@ async function simpanData() {
     const tgl = document.getElementById('tglDeadline').value;
     const teks = document.getElementById('isiData').value;
     
-    if(!teks || !tgl) return alert("Fill mandatory fields!");
+    if(!teks || !tgl || !prio) return alert("Fill all fields!");
 
     const btn = document.getElementById('btnSimpan');
     btn.innerText = "Syncing...";
-    
+    btn.disabled = true;
+
     const { error } = await supabaseClient.from('schedule').insert([{ 
-        category: cat, content: teks, tgl_deadline: tgl, priority: prio, is_done: false 
+        category: cat, 
+        content: teks, 
+        tgl_deadline: tgl, 
+        priority: prio, 
+        is_done: false 
     }]);
 
-    if(error) alert(error.message);
-    else { document.getElementById('isiData').value = ''; muatData(); }
+    if(error) {
+        alert("Error: " + error.message);
+    } else {
+        document.getElementById('isiData').value = '';
+        muatData();
+    }
     btn.innerText = "Update Hub";
+    btn.disabled = false;
 }
 
+// Modal Hapus
 function openDeleteModal(id) {
     deleteTargetId = id;
     document.getElementById('deleteModal').classList.replace('hidden', 'flex');
