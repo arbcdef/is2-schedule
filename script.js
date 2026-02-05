@@ -1,26 +1,27 @@
-// Konfigurasi Supabase
+// Konfigurasi Supabase dengan Key yang baru kamu berikan
 const SB_URL = "https://mycldrtubwstojeaumcg.supabase.co"; 
-const SB_KEY = "MASUKKAN_ANON_KEY_KAMU_DISINI";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15Y2xkcnR1YndzdG9qZWF1bWNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNzQwNTksImV4cCI6MjA4NTg1MDA1OX0.GHgglJHGQqDDRY-IcvhQeZyYZmR48J3arnby8IxZo9I";
 const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
 
 let eventDates = [];
 
-// Fix: Fungsi Theme Toggle yang lebih smooth
+// 1. THEME TOGGLE (LIGHT/DARK)
 function toggleTheme() {
     const html = document.documentElement;
     const icon = document.getElementById('theme-icon');
     const isLight = html.getAttribute('data-theme') === 'light';
     html.setAttribute('data-theme', isLight ? 'dark' : 'light');
     icon.innerText = isLight ? '☀️' : '🌙';
-    localStorage.setItem('theme', isLight ? 'dark' : 'light'); // Simpan pilihan user
+    localStorage.setItem('is2-theme', isLight ? 'dark' : 'light');
 }
 
-// Fix: Inisialisasi tema dari storage
-if (localStorage.getItem('theme') === 'dark') {
+// Cek tema terakhir yang dipilih user
+if (localStorage.getItem('is2-theme') === 'dark') {
     document.documentElement.setAttribute('data-theme', 'dark');
     document.getElementById('theme-icon').innerText = '☀️';
 }
 
+// 2. JAM & TANGGAL (HELVEtICA STYLE)
 function updateClock() {
     const now = new Date();
     const clockEl = document.getElementById('clock');
@@ -31,7 +32,7 @@ function updateClock() {
     document.getElementById('cal-day').innerText = now.toLocaleDateString('id-ID', { weekday: 'long' });
 }
 
-// Fix: Logika Kalender agar presisi dengan timezone lokal
+// 3. RENDER KALENDER AKADEMIK
 function renderCalendar() {
     const container = document.getElementById('calendar-container');
     const label = document.getElementById('calendar-month-year');
@@ -53,7 +54,6 @@ function renderCalendar() {
     }
 
     for (let d = 1; d <= daysInMonth; d++) {
-        // Fix: Format tanggal YYYY-MM-DD yang konsisten dengan DB
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         const isToday = (d === now.getDate() && month === now.getMonth()) ? 'today' : '';
         const hasEvent = eventDates.includes(dateStr) ? '<div class="event-dot"></div>' : '';
@@ -67,10 +67,11 @@ function renderCalendar() {
     }
 }
 
+// 4. DATABASE OPERATIONS (AMBIL DATA)
 async function muatData() {
     try {
-        const statusLabel = document.getElementById('label-status');
-        const dotStatus = document.getElementById('dot-status');
+        const statusLabel = document.querySelector('.status-label');
+        const dotStatus = document.querySelector('.dot');
         
         let { data, error } = await supabaseClient
             .from('schedule')
@@ -79,7 +80,7 @@ async function muatData() {
 
         if (error) throw error;
 
-        // Update indikator sukses
+        // Jika berhasil koneksi
         if(statusLabel) statusLabel.innerText = "SYSTEM ACTIVE";
         if(dotStatus) dotStatus.style.background = "#22c55e";
 
@@ -88,7 +89,7 @@ async function muatData() {
 
         const list = document.getElementById('listData');
         if (data.length === 0) {
-            list.innerHTML = "<p class='text-center text-zinc-400 py-10 italic text-sm'>No data entries found.</p>";
+            list.innerHTML = "<p class='text-center text-zinc-400 py-10 italic text-sm'>No records found.</p>";
             return;
         }
 
@@ -98,23 +99,26 @@ async function muatData() {
                     <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400">${item.category} • ${item.tgl_deadline || 'No Date'}</span>
                     <p class="font-bold text-base mt-1 tracking-tight">${item.content}</p>
                 </div>
-                <button onclick="hapusData(${item.id})" class="opacity-20 hover:opacity-100 transition text-sm px-2" title="Delete">✕</button>
+                <button onclick="hapusData(${item.id})" class="opacity-20 hover:opacity-100 transition text-sm px-2">✕</button>
             </div>
         `).join('');
     } catch (err) {
         console.error("Fetch error:", err);
-        document.getElementById('label-status').innerText = "OFFLINE";
-        document.getElementById('dot-status').style.background = "#ef4444";
+        const statusLabel = document.querySelector('.status-label');
+        const dotStatus = document.querySelector('.dot');
+        if(statusLabel) statusLabel.innerText = "OFFLINE";
+        if(dotStatus) dotStatus.style.background = "#ef4444";
     }
 }
 
+// 5. SIMPAN DATA KE SUPABASE
 async function simpanData() {
     const cat = document.getElementById('kategori').value;
     const tgl = document.getElementById('tglDeadline').value;
     const teks = document.getElementById('isiData').value;
     
     if(!teks || !tgl) {
-        alert("Please specify the date and description.");
+        alert("Wajib isi Tanggal dan Detail ya!");
         return;
     }
 
@@ -129,7 +133,7 @@ async function simpanData() {
     }]);
 
     if(error) {
-        alert("Sync failed: " + error.message);
+        alert("Gagal simpan: " + error.message);
     } else {
         document.getElementById('isiData').value = '';
         document.getElementById('tglDeadline').value = '';
@@ -140,16 +144,19 @@ async function simpanData() {
     muatData();
 }
 
+// 6. HAPUS DATA
 async function hapusData(id) {
-    if(confirm("Confirm deletion? This will sync for everyone.")) {
+    if(confirm("Hapus data ini?")) {
         const { error } = await supabaseClient.from('schedule').delete().eq('id', id);
-        if(error) alert("Delete failed");
+        if(error) alert("Gagal menghapus");
         muatData();
     }
 }
 
-// Init processes
+// Jalankan saat pertama kali buka
 setInterval(updateClock, 1000);
 updateClock();
 muatData();
-setInterval(muatData, 20000);
+
+// Cek data baru otomatis setiap 15 detik
+setInterval(muatData, 15000);
