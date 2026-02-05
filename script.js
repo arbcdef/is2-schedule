@@ -1,35 +1,89 @@
-// Ganti dengan kredensial Supabase kamu yang asli
+// ISI DENGAN KREDENSIAL SUPABASE KAMU
 const SB_URL = "https://mycldrtubwstojeaumcg.supabase.co"; 
-const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15Y2xkcnR1YndzdG9qZWF1bWNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNzQwNTksImV4cCI6MjA4NTg1MDA1OX0.GHgglJHGQqDDRY-IcvhQeZyYZmR48J3arnby8IxZo9I";
+const SB_KEY = "MASUKKAN_ANON_KEY_KAMU_DISINI";
 const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
 
+// State untuk menyimpan tanggal-tanggal event
+let eventDates = [];
+
+// 1. THEME TOGGLE LOGIC
+function toggleTheme() {
+    const html = document.documentElement;
+    const icon = document.getElementById('theme-icon');
+    if (html.getAttribute('data-theme') === 'light') {
+        html.setAttribute('data-theme', 'dark');
+        icon.innerText = '☀️';
+    } else {
+        html.setAttribute('data-theme', 'light');
+        icon.innerText = '🌙';
+    }
+}
+
+// 2. JAM & WIDGET HARI INI
 function updateClock() {
     const now = new Date();
-    document.getElementById('clock').innerText = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    document.getElementById('clock').innerText = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
     document.getElementById('cal-month').innerText = now.toLocaleDateString('id-ID', { month: 'short' });
     document.getElementById('cal-date').innerText = now.getDate();
     document.getElementById('cal-day').innerText = now.toLocaleDateString('id-ID', { weekday: 'long' });
 }
 
-async function muatData() {
-    let { data, error } = await supabaseClient.from('schedule').select('*').order('id', { ascending: false });
+// 3. RENDER KALENDER AKADEMIK
+function renderCalendar() {
+    const container = document.getElementById('calendar-container');
+    const label = document.getElementById('calendar-month-year');
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+
+    label.innerText = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
     
-    if (!error) {
-        document.getElementById('counter').innerText = `${data.length} item`;
-        const list = document.getElementById('listData');
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    container.innerHTML = '';
+
+    // Padding hari kosong
+    for (let i = 0; i < firstDay; i++) {
+        container.innerHTML += `<div></div>`;
+    }
+
+    // Hari dalam bulan
+    for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const isToday = d === now.getDate() ? 'today' : '';
+        const hasEvent = eventDates.includes(dateStr) ? '<div class="event-dot"></div>' : '';
         
+        container.innerHTML += `
+            <div class="day-cell ${isToday}">
+                ${d}
+                ${hasEvent}
+            </div>
+        `;
+    }
+}
+
+// 4. DATABASE OPERATIONS
+async function muatData() {
+    let { data, error } = await supabaseClient.from('schedule').select('*').order('tgl_deadline', { ascending: true });
+
+    if (!error) {
+        eventDates = data.map(item => item.tgl_deadline).filter(d => d); // Ambil list tanggal
+        renderCalendar(); // Gambar ulang kalender
+
+        const list = document.getElementById('listData');
         if (data.length === 0) {
-            list.innerHTML = "<p class='text-center text-slate-400 py-20'>Belum ada pengumuman.</p>";
+            list.innerHTML = "<p class='text-center text-zinc-400 py-10 italic'>No upcoming schedule.</p>";
             return;
         }
 
         list.innerHTML = data.map(item => `
-            <div class="info-card flex justify-between items-start group">
-                <div class="flex-grow">
-                    <span class="text-[10px] font-bold px-3 py-1 bg-blue-100 text-blue-600 rounded-full uppercase tracking-tighter">${item.category}</span>
-                    <p class="mt-4 text-slate-800 font-medium text-lg leading-relaxed">${item.content}</p>
+            <div class="bg-zinc-100/50 dark:bg-zinc-900/50 p-4 rounded-2xl flex justify-between items-center border border-zinc-200/20">
+                <div>
+                    <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400">${item.category} • ${item.tgl_deadline || 'No Date'}</span>
+                    <p class="font-medium text-sm mt-1">${item.content}</p>
                 </div>
-                <button onclick="hapusData(${item.id})" class="text-slate-300 hover:text-red-500 transition-colors p-2 text-2xl">✕</button>
+                <button onclick="hapusData(${item.id})" class="opacity-30 hover:opacity-100 transition text-xs">✕</button>
             </div>
         `).join('');
     }
@@ -37,36 +91,34 @@ async function muatData() {
 
 async function simpanData() {
     const cat = document.getElementById('kategori').value;
+    const tgl = document.getElementById('tglDeadline').value;
     const teks = document.getElementById('isiData').value;
-    if(!teks) return alert("Tuliskan sesuatu dulu!");
+    
+    if(!teks || !tgl) return alert("Please fill description and date!");
 
     const btn = document.getElementById('btnSimpan');
     btn.disabled = true;
-    btn.innerText = "Processing...";
+    
+    // Pastikan nama kolom di Supabase kamu adalah: category, content, tgl_deadline
+    await supabaseClient.from('schedule').insert([{ 
+        category: cat, 
+        content: teks, 
+        tgl_deadline: tgl 
+    }]);
 
-    const { error } = await supabaseClient.from('schedule').insert([{ category: cat, content: teks }]);
-    
-    if(error) {
-        alert("Error syncing data!");
-    } else {
-        document.getElementById('isiData').value = '';
-        muatData();
-    }
-    
+    document.getElementById('isiData').value = '';
     btn.disabled = false;
-    btn.innerText = "Sync to Cloud";
+    muatData();
 }
 
 async function hapusData(id) {
-    if(confirm("Hapus data ini untuk semua orang?")) {
+    if(confirm("Remove this entry?")) {
         await supabaseClient.from('schedule').delete().eq('id', id);
         muatData();
     }
 }
 
-// Inisialisasi
+// INIT
 setInterval(updateClock, 1000);
 updateClock();
 muatData();
-// Sinkronisasi otomatis setiap 15 detik
-setInterval(muatData, 15000);
