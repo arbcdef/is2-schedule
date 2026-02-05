@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jadwal Kuliah Sync</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-100 p-5">
+    <div class="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden">
+        <header class="bg-indigo-600 p-6 text-white text-center">
+            <h1 class="text-3xl font-bold">Portal Kuliah Kita</h1>
+            <p id="status" class="text-xs opacity-80 italic">Menghubungkan ke database...</p>
+        </header>
+
+        <div class="p-6 grid gap-6 md:grid-cols-2">
+            <div class="bg-slate-50 p-4 rounded-lg border">
+                <h2 class="font-bold mb-4 text-indigo-700">➕ Tambah Info Baru</h2>
+                <select id="kategori" class="w-full p-2 mb-2 border rounded text-sm">
+                    <option value="jadwal">Jadwal Matkul</option>
+                    <option value="tugas">Tugas Kuliah</option>
+                    <option value="kegiatan">Kegiatan Kampus</option>
+                </select>
+                <textarea id="isiData" placeholder="Contoh: Senin 08:00 - Kalkulus" class="w-full p-2 mb-2 border rounded text-sm h-24"></textarea>
+                <button onclick="simpanData()" id="btnSimpan" class="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition">Kirim ke Semua</button>
+            </div>
+
+            <div class="space-y-4">
+                <h2 class="font-bold text-slate-800 border-b-2 border-indigo-200 mb-2">📌 Informasi Terkini</h2>
+                <div id="listData" class="space-y-2 text-sm text-slate-700 max-h-[400px] overflow-y-auto p-1">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Kunci punya kamu sudah saya masukkan ke sini
+        const SB_URL = "https://mycldrtubwstojeaumcg.supabase.co"; 
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15Y2xkcnR1YndzdG9qZWF1bWNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNzQwNTksImV4cCI6MjA4NTg1MDA1OX0.GHgglJHGQqDDRY-IcvhQeZyYZmR48J3arnby8IxZo9I";
+        
+        const supabase = supabase.createClient(SB_URL, SB_KEY);
+
+        async function muatData() {
+            document.getElementById('status').innerText = "Memperbarui...";
+            // Memanggil tabel 'schedule' sesuai yang kamu buat di Supabase
+            let { data, error } = await supabase
+                .from('schedule')
+                .select('*')
+                .order('id', { ascending: false });
+
+            if (!error) {
+                const list = document.getElementById('listData');
+                list.innerHTML = data.map(item => `
+                    <div class="bg-white border-l-4 border-indigo-500 p-3 rounded shadow-sm relative">
+                        <div class="text-[10px] font-bold uppercase text-slate-400">${item.category}</div>
+                        <div>${item.content}</div>
+                        <button onclick="hapusData(${item.id})" class="absolute top-2 right-2 text-red-300 hover:text-red-600">✕</button>
+                    </div>
+                `).join('');
+                document.getElementById('status').innerText = "Terhubung ke Database";
+            }
+        }
+
+        async function simpanData() {
+            const cat = document.getElementById('kategori').value;
+            const teks = document.getElementById('isiData').value;
+            if(!teks) return alert("Isi data dulu!");
+
+            const btn = document.getElementById('btnSimpan');
+            btn.disabled = true;
+            btn.innerText = "Mengirim...";
+
+            await supabase.from('schedule').insert([{ category: cat, content: teks }]);
+
+            document.getElementById('isiData').value = '';
+            btn.disabled = false;
+            btn.innerText = "Kirim ke Semua";
+            muatData();
+        }
+
+        async function hapusData(id) {
+            if(confirm("Hapus data ini?")) {
+                await supabase.from('schedule').delete().eq('id', id);
+                muatData();
+            }
+        }
+
+        muatData();
+        setInterval(muatData, 10000); // Update otomatis tiap 10 detik
+    </script>
+</body>
+</html>
