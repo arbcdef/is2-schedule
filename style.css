@@ -4,66 +4,78 @@
 }
 
 :root {
-    --ios-bg: #F2F2F7;
-    --ios-card: #FFFFFF;
+    --ios-bg: linear-gradient(135deg, #f5f5f7 0%, #d2d2d7 100%);
+    --ios-card: rgba(255, 255, 255, 0.4); 
     --ios-text: #000000;
-    --ios-input: #E3E3E8;
-    --ios-accent: #007AFF;
-    --ios-border: rgba(0,0,0,0.05);
+    --ios-border: rgba(255, 255, 255, 0.7);
+    --ios-shadow: rgba(0, 0, 0, 0.04);
 }
 
 [data-theme="dark"] {
-    --ios-bg: #000000;
-    --ios-card: #1C1C1E;
+    --ios-bg: linear-gradient(135deg, #000000 0%, #1c1c1e 100%);
+    --ios-card: rgba(28, 28, 30, 0.35); 
     --ios-text: #FFFFFF;
-    --ios-input: #2C2C2E;
-    --ios-accent: #0A84FF;
-    --ios-border: rgba(255,255,255,0.05);
+    --ios-border: rgba(255, 255, 255, 0.1);
+    --ios-shadow: rgba(0, 0, 0, 0.4);
 }
 
-.ios-bg { background-color: var(--ios-bg); color: var(--ios-text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+body { background: var(--ios-bg); background-attachment: fixed; color: var(--ios-text); font-family: -apple-system, sans-serif; overflow-x: hidden; }
 
-/* Typo iOS Style */
-.ios-time { font-size: 14px; font-weight: 700; opacity: 0.5; font-variant-numeric: tabular-nums; }
-.ios-title { font-family: 'Akira Expanded', sans-serif !important; font-size: 28px; letter-spacing: -1px; }
+.ios-time { font-family: monospace; font-weight: 700; opacity: 0.5; font-size: 14px; }
+.ios-title { font-family: 'Akira Expanded', sans-serif !important; font-size: 26px; letter-spacing: -1px; }
 
-/* iOS Card Architecture */
+/* Glass Card iOS 26 */
 .ios-card { 
-    background: var(--ios-card); 
-    border-radius: 28px; 
+    background: var(--ios-card) !important; 
+    backdrop-filter: blur(35px) saturate(180%); 
+    -webkit-backdrop-filter: blur(35px) saturate(180%);
+    border-radius: 32px; 
     border: 1px solid var(--ios-border); 
-    box-shadow: 0 4px 24px rgba(0,0,0,0.02);
+    box-shadow: 0 10px 40px 0 var(--ios-shadow);
 }
 
+/* Glass Inputs */
 .ios-input {
-    background: var(--ios-input);
-    border-radius: 14px;
+    background: rgba(128, 128, 128, 0.08) !important;
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
     padding: 12px 16px;
-    border: none;
-    outline: none;
+    border: 1px solid rgba(128,128,128,0.1);
     color: var(--ios-text);
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
+    outline: none;
+    transition: 0.3s;
 }
+
+.ios-input:focus { background: rgba(128, 128, 128, 0.15) !important; border-color: var(--ios-text); }
 
 .ios-primary-btn {
     background: var(--ios-text);
     color: var(--ios-bg);
     width: 100%;
-    padding: 16px;
-    border-radius: 18px;
-    font-weight: 700;
-    transition: all 0.2s;
+    padding: 18px;
+    border-radius: 20px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 12px;
+    transition: 0.2s;
 }
 
-.ios-primary-btn:active { transform: scale(0.97); opacity: 0.8; }
+.ios-primary-btn:active { transform: scale(0.96); opacity: 0.9; }
 
-/* iOS UI Elements */
-.ios-icon-btn {
-    padding: 12px;
-    background: var(--ios-card);
-    border-radius: 16px;
-    border: 1px solid var(--ios-border);
+/* Dynamic Island */
+.countdown-card {
+    background: rgba(0, 0, 0, 0.85) !important;
+    backdrop-filter: blur(20px);
+    color: #fff;
+    padding: 24px 35px;
+    border-radius: 35px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid rgba(255,255,255,0.15);
 }
 
 .ios-pill {
@@ -76,32 +88,23 @@
     border: 1px solid var(--ios-border);
 }
 
-.ios-dot { width: 6px; height: 6px; background: #34C759; border-radius: 50%; box-shadow: 0 0 8px #34C759; }
+.ios-dot { width: 6px; height: 6px; background: #34C759; border-radius: 50%; box-shadow: 0 0 10px #34C759; }
 
-/* Timeline Item iOS style */
-.priority-high { border-left: 5px solid #FF3B30 !important; }
-.priority-medium { border-left: 5px solid #FFCC00 !important; }
-.priority-low { border-left: 5px solid #8E8E93 !important; }
+/* Priorities */
+.priority-high { border-left: 8px solid #FF3B30 !important; }
+.priority-medium { border-left: 8px solid #FFCC00 !important; }
+.priority-low { border-left: 8px solid #8E8E93 !important; }
+.task-done { opacity: 0.2; filter: grayscale(1); }
 
-.task-done { opacity: 0.3; filter: grayscale(1); }
+/* Calendar */
+.day-cell { aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 11px; font-weight: 800; transition: 0.3s; }
+.today-glow { background: #007AFF !important; color: white !important; box-shadow: 0 8px 16px rgba(0,122,255,0.3); }
+.cal-high { background: rgba(255, 59, 48, 0.2); color: #FF3B30; }
+.cal-medium { background: rgba(255, 204, 0, 0.2); color: #B28F00; }
+.cal-low { background: rgba(142, 142, 147, 0.2); color: #8E8E93; }
 
-/* Milestone Dynamic Island style */
-.countdown-card {
-    background: var(--ios-text);
-    color: var(--ios-bg);
-    padding: 24px 32px;
-    border-radius: 32px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-/* Calendar iOS Style */
-.day-cell { aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 11px; font-weight: 700; transition: 0.3s; }
-.today-glow { background: var(--ios-accent) !important; color: white !important; }
-.cal-high { background: rgba(255, 59, 48, 0.15); color: #FF3B30; }
-.cal-medium { background: rgba(255, 204, 0, 0.15); color: #B28F00; }
-.cal-low { background: rgba(142, 142, 147, 0.15); color: #8E8E93; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
 @keyframes iosSlide { from { transform: translateY(100%); } to { transform: translateY(0); } }
-.animate-ios-slide { animation: iosSlide 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.animate-ios-slide { animation: iosSlide 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
