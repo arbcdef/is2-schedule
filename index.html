@@ -14,7 +14,7 @@
         <header class="flex flex-col md:flex-row justify-between items-start md:items-center px-6 gap-4 fade-in">
             <div>
                 <h1 class="text-4xl font-bold tracking-tight main-title">Information System 2</h1>
-                <p id="clock" class="sub-text font-medium text-lg mt-1"></p>
+                <p id="clock" class="sub-text font-medium text-lg mt-1">00:00:00</p>
             </div>
             
             <div class="flex items-center gap-3">
@@ -49,7 +49,7 @@
                             <textarea id="isiData" placeholder="Enter description..." class="w-full glass-input p-3 h-24 resize-none"></textarea>
                         </div>
                     </div>
-                    <button onclick="simpanData()" id="btnSimpan" class="ios-btn-primary w-full">Update Hub</button>
+                    <button onclick="simpanData()" id="btnSimpan" class="ios-btn-primary w-full shadow-lg">Update Hub</button>
                 </div>
 
                 <div class="calendar-widget p-6 text-center shadow-xl">
@@ -66,16 +66,28 @@
                     <div class="grid grid-cols-7 gap-2 text-center text-[10px] font-black text-zinc-400 mb-4">
                         <div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
                     </div>
-                    <div id="calendar-container" class="grid grid-cols-7 gap-2 md:gap-3">
-                        </div>
+                    <div id="calendar-container" class="grid grid-cols-7 gap-2 md:gap-3"></div>
                 </div>
 
                 <div class="liquid-glass p-6 min-h-[300px]">
                     <h2 class="text-xl font-bold mb-6 title-text tracking-tight">Timeline Feed</h2>
                     <div id="listData" class="space-y-4">
-                        <p class="text-center text-zinc-400 py-10 italic">Connecting to database...</p>
+                        <p class="text-center text-zinc-400 py-10 italic">Connecting...</p>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-md"></div>
+        <div class="liquid-glass relative w-full max-w-xs p-8 text-center shadow-2xl" id="modalBox">
+            <div class="w-16 h-16 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">🗑️</div>
+            <h3 class="text-xl font-bold mb-2">Delete Record?</h3>
+            <p class="text-sm opacity-60 mb-6 font-medium">Data ini akan dihapus permanen dari server.</p>
+            <div class="flex gap-3">
+                <button onclick="closeDeleteModal()" class="flex-1 py-3 rounded-xl font-bold bg-zinc-200/50 dark:bg-zinc-800 text-sm">Cancel</button>
+                <button id="confirmDeleteBtn" class="flex-1 py-3 rounded-xl font-bold bg-red-600 text-white text-sm shadow-lg shadow-red-500/30">Delete</button>
             </div>
         </div>
     </div>
