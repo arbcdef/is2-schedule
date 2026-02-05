@@ -54,7 +54,7 @@ function renderFeed(data) {
                 <input type="checkbox" ${item.is_done ? 'checked' : ''} onclick="toggleDone(${item.id}, ${item.is_done})" class="w-5 h-5 cursor-pointer accent-black">
                 <div>
                     <span class="text-[9px] font-black opacity-40 uppercase">${item.category} • ${item.tgl_deadline}</span>
-                    <p class="font-bold text-base mt-0.5">${item.content}</p>
+                    <p class="font-bold text-base mt-0.5" style="color: var(--text-main)">${item.content}</p>
                     ${item.task_link ? `<a href="${item.task_link}" target="_blank" class="text-[10px] text-blue-500 font-bold mt-1 block">🔗 RESOURCE</a>` : ''}
                 </div>
             </div>
@@ -89,7 +89,6 @@ async function simpanData() {
     btn.disabled = false;
 }
 
-// FUNGSI KALENDER BARU DENGAN WARNA PRIORITAS
 function renderCalendar() {
     const container = document.getElementById('calendar-container');
     const label = document.getElementById('calendar-month-year');
@@ -105,8 +104,6 @@ function renderCalendar() {
     
     for (let d = 1; d <= daysInMonth; d++) {
         const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-        
-        // Cari tugas di tanggal ini
         const tasksOnDate = allTasks.filter(t => t.tgl_deadline === dateStr && !t.is_done);
         
         let priorityClass = "";
