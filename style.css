@@ -36,6 +36,12 @@ body { background-color: var(--bg-color); color: var(--text-main); transition: 0
     letter-spacing: -2px; /* Font ini lebar, jadi dirapatkan sedikit agar pro */
 }
 
+.main-title:hover {
+    text-shadow: 0 0 10px #ff3b30, 0 0 20px #ff3b30;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
 .liquid-glass { 
     background: var(--glass-bg); 
     backdrop-filter: blur(20px); 
