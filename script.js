@@ -36,7 +36,7 @@ function renderCountdown(data) {
         const diff = new Date(upcoming.tgl_deadline).getTime() - new Date().getTime();
         const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
         area.innerHTML = `
-            <div class="countdown-card fade-in shadow-xl">
+            <div class="countdown-card fade-in">
                 <div>
                     <p class="text-[10px] font-black opacity-40 uppercase tracking-widest mb-1">Coming Up</p>
                     <h2 class="text-xl font-bold tracking-tight">${upcoming.content}</h2>
@@ -56,7 +56,7 @@ function renderFeed(data) {
                 <input type="checkbox" ${item.is_done ? 'checked' : ''} onclick="toggleDone(${item.id}, ${item.is_done})" class="w-5 h-5 cursor-pointer accent-blue-500 rounded-full">
                 <div>
                     <span class="text-[9px] font-black opacity-30 uppercase">${item.category} • ${item.tgl_deadline}</span>
-                    <p class="font-bold text-base mt-0.5 leading-tight">${item.content}</p>
+                    <p class="font-bold text-base mt-0.5 leading-tight text-inherit">${item.content}</p>
                     ${item.task_link ? `<a href="${item.task_link}" target="_blank" class="text-[10px] text-blue-500 font-bold mt-1 block">LINK RESOURCE</a>` : ''}
                 </div>
             </div>
@@ -65,16 +65,16 @@ function renderFeed(data) {
     `).join('');
 }
 
-// Fixed Validation
+// FIX VALIDASI JS
 async function simpanData() {
     const cat = document.getElementById('kategori').value;
     const prio = document.getElementById('priority').value; 
     const tgl = document.getElementById('tglDeadline').value;
-    const teks = document.getElementById('isiData').value.trim(); 
+    const teks = document.getElementById('isiData').value.trim(); // Trim spasi
     const link = document.getElementById('taskLink').value; 
     
-    if(!teks) return alert("Task details are required.");
-    if(!tgl) return alert("Deadline date is required.");
+    if (!teks) return alert("Isi detail tugasnya dulu!");
+    if (!tgl) return alert("Pilih tanggal deadlinenya!");
 
     const btn = document.getElementById('btnSimpan');
     btn.innerText = "Syncing...";
@@ -88,6 +88,8 @@ async function simpanData() {
         document.getElementById('isiData').value = ''; 
         document.getElementById('tglDeadline').value = '';
         muatData(); 
+    } else {
+        alert("Gagal simpan: " + error.message);
     }
     btn.innerText = "Sync to Cloud";
     btn.disabled = false;
@@ -99,7 +101,7 @@ function renderCalendar() {
     const now = new Date();
     const todayStr = now.toISOString().split('T')[0];
     
-    label.innerText = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    label.innerText = now.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
     const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
 
