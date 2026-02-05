@@ -5,7 +5,6 @@ const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
 let allTasks = [];
 let deleteTargetId = null;
 
-// THEME & CLOCK
 function toggleThemeManually() {
     const html = document.documentElement;
     const isLight = html.getAttribute('data-theme') === 'light';
@@ -17,7 +16,6 @@ function updateClock() {
     document.getElementById('clock').innerText = new Date().toLocaleTimeString('id-ID');
 }
 
-// DATA OPERATIONS
 async function muatData() {
     try {
         let { data, error } = await supabaseClient.from('schedule').select('*').order('tgl_deadline', { ascending: true });
@@ -57,7 +55,7 @@ function renderFeed(data) {
                 <div>
                     <span class="text-[9px] font-black opacity-40 uppercase">${item.category} • ${item.tgl_deadline}</span>
                     <p class="font-bold text-base mt-0.5">${item.content}</p>
-                    ${item.task_link ? `<a href="${item.task_link}" target="_blank" class="text-[10px] text-blue-500 font-bold mt-1 block">🔗 LINK RESOURCE</a>` : ''}
+                    ${item.task_link ? `<a href="${item.task_link}" target="_blank" class="text-[10px] text-blue-500 font-bold mt-1 block">🔗 RESOURCE</a>` : ''}
                 </div>
             </div>
             <button onclick="openDeleteModal(${item.id})" class="opacity-20 hover:opacity-100 text-xl px-2">✕</button>
@@ -72,10 +70,10 @@ async function simpanData() {
     const teks = document.getElementById('isiData').value;
     const link = document.getElementById('taskLink').value; 
     
-    if(!teks || !tgl) return alert("Isi data dulu!");
+    if(!teks || !tgl) return alert("Fill all fields!");
 
     const btn = document.getElementById('btnSimpan');
-    btn.innerText = "Processing...";
+    btn.innerText = "Syncing...";
     btn.disabled = true;
 
     const { error } = await supabaseClient.from('schedule').insert([{ 
@@ -91,19 +89,35 @@ async function simpanData() {
     btn.disabled = false;
 }
 
+// FUNGSI KALENDER BARU DENGAN WARNA PRIORITAS
 function renderCalendar() {
     const container = document.getElementById('calendar-container');
     const label = document.getElementById('calendar-month-year');
     const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
+    
     label.innerText = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
     const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+
     container.innerHTML = '';
     for (let i = 0; i < firstDay; i++) container.innerHTML += `<div class="opacity-0"></div>`;
+    
     for (let d = 1; d <= daysInMonth; d++) {
         const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-        const hasEvent = allTasks.some(t => t.tgl_deadline === dateStr && !t.is_done);
-        container.innerHTML += `<div class="day-cell ${hasEvent ? 'has-event' : ''}">${d}</div>`;
+        
+        // Cari tugas di tanggal ini
+        const tasksOnDate = allTasks.filter(t => t.tgl_deadline === dateStr && !t.is_done);
+        
+        let priorityClass = "";
+        if (tasksOnDate.length > 0) {
+            if (tasksOnDate.some(t => t.priority === 'high')) priorityClass = "cal-high";
+            else if (tasksOnDate.some(t => t.priority === 'medium')) priorityClass = "cal-medium";
+            else priorityClass = "cal-low";
+        }
+
+        const isToday = dateStr === todayStr ? 'today-glow' : '';
+        container.innerHTML += `<div class="day-cell ${isToday} ${priorityClass}">${d}</div>`;
     }
 }
 
