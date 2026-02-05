@@ -3,41 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>IS2 | Hub iOS 26</title>
+    <title>IS2 Hub | iOS 26 Fix</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="ios-bg transition-all duration-700">
+<body class="ios-bg">
 
     <div class="fixed inset-0 overflow-hidden pointer-events-none z-[-1]">
-        <div class="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-blue-500/15 rounded-full blur-[120px]"></div>
-        <div class="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-purple-500/15 rounded-full blur-[120px]"></div>
+        <div class="absolute top-[-5%] left-[-5%] w-[50%] h-[50%] bg-blue-600/20 rounded-full blur-[100px]"></div>
+        <div class="absolute bottom-[-5%] right-[-5%] w-[50%] h-[50%] bg-purple-600/20 rounded-full blur-[100px]"></div>
     </div>
 
-    <div class="max-w-5xl mx-auto px-6 py-12 space-y-10 relative z-10">
-        <header class="flex justify-between items-end px-2 fade-in">
+    <div class="max-w-5xl mx-auto px-6 py-10 space-y-8 relative z-10">
+        <header class="flex justify-between items-end px-2">
             <div class="space-y-1">
                 <p id="clock" class="ios-time">00:00:00</p>
                 <h1 class="ios-title">IS2 Dashboard</h1>
             </div>
             <div class="flex items-center gap-3">
-                <button onclick="toggleThemeManually()" class="ios-icon-btn shadow-sm">
+                <button onclick="toggleThemeManually()" class="ios-icon-btn">
                     <span id="theme-icon">🌙</span>
                 </button>
                 <div class="ios-pill">
                     <span class="ios-dot"></span>
-                    <span class="text-[10px] font-bold tracking-widest uppercase opacity-70">Active</span>
+                    <span class="text-[10px] font-black uppercase tracking-widest">Active</span>
                 </div>
             </div>
         </header>
 
-        <div id="next-deadline-area" class="fade-in"></div>
+        <div id="next-deadline-area"></div>
 
         <main class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div class="lg:col-span-4 space-y-6 fade-in">
-                <section class="ios-card p-7 space-y-6">
-                    <h2 class="text-lg font-bold tracking-tight">New Entry</h2>
+            <div class="lg:col-span-4 space-y-6">
+                <section class="ios-card p-6 space-y-5">
+                    <h2 class="text-xl font-bold tracking-tight">New Entry</h2>
                     <div class="space-y-4">
                         <div class="grid grid-cols-2 gap-3">
                             <div class="space-y-1">
@@ -62,7 +62,7 @@
                         </div>
                         <div class="space-y-1">
                             <label class="ios-label">Detail</label>
-                            <textarea id="isiData" placeholder="Task description..." class="ios-input w-full h-24 pt-3 resize-none"></textarea>
+                            <textarea id="isiData" placeholder="Tulis tugas di sini..." class="ios-input w-full h-24 pt-3 resize-none"></textarea>
                         </div>
                         <div class="space-y-1">
                             <label class="ios-label">Resource</label>
@@ -73,15 +73,15 @@
                 </section>
             </div>
 
-            <div class="lg:col-span-8 space-y-8 fade-in">
-                <section class="ios-card p-7 min-h-[500px]">
-                    <h2 class="text-lg font-bold mb-6 tracking-tight">Timeline</h2>
+            <div class="lg:col-span-8 space-y-8">
+                <section class="ios-card p-6 min-h-[450px]">
+                    <h2 class="text-xl font-bold mb-6 tracking-tight">Timeline</h2>
                     <div id="listData" class="space-y-4"></div>
                 </section>
                 
                 <section class="ios-card p-8">
                     <h2 class="text-[10px] font-black opacity-30 uppercase tracking-[0.4em] text-center mb-8">Academic Calendar</h2>
-                    <div id="calendar-month-year" class="text-[11px] font-bold mb-6 text-center opacity-70"></div>
+                    <div id="calendar-month-year" class="text-xs font-bold mb-6 text-center opacity-70"></div>
                     <div id="calendar-container" class="calendar-grid mx-auto"></div>
                 </section>
             </div>
@@ -92,10 +92,10 @@
         <div class="absolute inset-0 bg-black/60 backdrop-blur-xl" onclick="closeDeleteModal()"></div>
         <div class="ios-card relative w-full max-w-sm p-8 text-center animate-ios-slide">
             <h3 class="text-xl font-bold mb-2">Delete Task?</h3>
-            <p class="text-sm opacity-50 mb-8">This action cannot be undone.</p>
+            <p class="text-sm opacity-50 mb-8">Data yang dihapus tidak bisa kembali.</p>
             <div class="flex flex-col gap-3">
-                <button id="confirmDeleteBtn" class="w-full py-4 rounded-2xl bg-red-500 text-white font-bold">Delete</button>
-                <button onclick="closeDeleteModal()" class="w-full py-4 rounded-2xl bg-zinc-200/50 dark:bg-zinc-800 font-bold">Cancel</button>
+                <button id="confirmDeleteBtn" class="w-full py-4 rounded-2xl bg-red-500 text-white font-bold active:scale-95 transition-transform">Delete</button>
+                <button onclick="closeDeleteModal()" class="w-full py-4 rounded-2xl bg-zinc-200/50 dark:bg-zinc-800 font-bold active:scale-95 transition-transform">Cancel</button>
             </div>
         </div>
     </div>
