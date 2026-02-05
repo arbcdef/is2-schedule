@@ -1,75 +1,76 @@
 :root {
     --ios-blue: #007AFF;
-    --glass-bg: rgba(255, 255, 255, 0.2);
-    --glass-border: rgba(255, 255, 255, 0.4);
+    --glass: rgba(255, 255, 255, 0.3);
 }
 
 body {
     font-family: 'SF Pro Display', sans-serif;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    background-image: url('https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&q=80&w=2000'); /* Latar belakang abstrak iOS style */
-    background-size: cover;
+    background: linear-gradient(135deg, #fce4ec 0%, #e1f5fe 100%);
     background-attachment: fixed;
     min-height: 100vh;
 }
 
+/* TEMA LIQUID GLASS */
 .liquid-glass {
-    background: var(--glass-bg);
-    backdrop-filter: blur(30px) saturate(200%);
-    -webkit-backdrop-filter: blur(30px) saturate(200%);
-    border: 1px solid var(--glass-border);
-    border-radius: 3rem;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
-}
-
-.calendar-widget {
-    background: linear-gradient(180deg, #ff4d4d 0%, #d40000 100%);
-    color: white;
+    background: var(--glass);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.4);
     border-radius: 2.5rem;
-    box-shadow: 0 15px 35px rgba(212, 0, 0, 0.25);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.calendar-widget:hover {
-    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.05);
 }
 
 .glass-input {
     background: rgba(255, 255, 255, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 1.5rem;
+    border-radius: 1.2rem;
     outline: none;
+    font-size: 0.9rem;
+}
+
+.ios-btn-primary {
+    background: var(--ios-blue);
+    color: white;
+    padding: 1rem;
+    border-radius: 1.5rem;
+    font-weight: 600;
     transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(0, 122, 255, 0.3);
 }
 
-.glass-input:focus {
-    background: rgba(255, 255, 255, 0.7);
-    border-color: var(--ios-blue);
-    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+.ios-btn-primary:active { transform: scale(0.95); }
+
+.calendar-widget {
+    background: linear-gradient(180deg, #ff3b30 0%, #ff2d55 100%);
+    color: white;
+    border-radius: 2.2rem;
+    box-shadow: 0 15px 30px rgba(255, 59, 48, 0.2);
 }
 
-.info-card {
-    background: rgba(255, 255, 255, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    border-radius: 2rem;
-    padding: 1.5rem;
-    transition: all 0.3s ease;
-    animation: slideIn 0.5s ease-out forwards;
+/* Gaya Kalender Akademik */
+.calendar-day-header { font-weight: 800; color: #8e8e93; margin-bottom: 5px; }
+.day-cell { 
+    height: 45px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    border-radius: 12px; 
+    background: rgba(255, 255, 255, 0.2);
+    position: relative;
 }
+.day-has-event { background: var(--ios-blue) !important; color: white; font-weight: bold; }
 
-.info-card:hover {
-    background: rgba(255, 255, 255, 0.8);
-    transform: translateX(5px);
+.status-pill {
+    background: rgba(255, 255, 255, 0.6);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
+.dot { width: 8px; height: 8px; background: #34c759; border-radius: 50%; animate: pulse 2s infinite; }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes slideIn {
-    from { opacity: 0; transform: translateX(-10px); }
-    to { opacity: 1; transform: translateX(0); }
-}
-
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 .fade-in { animation: fadeIn 0.8s ease-out forwards; }
