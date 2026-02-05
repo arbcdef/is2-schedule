@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>IS2 | Productivity Hub</title>
+    
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="style.css">
@@ -19,9 +21,6 @@
                 <p id="clock" class="font-medium text-lg mt-1 opacity-70">00:00:00</p>
             </div>
             <div class="flex items-center gap-3">
-                <button onclick="openInputModal()" class="bg-white text-black px-6 py-2 rounded-full font-black text-[10px] tracking-widest hover:scale-105 transition-all shadow-lg shadow-white/10">
-                    + ADD TASK
-                </button>
                 <button onclick="toggleThemeManually()" class="p-3 bg-zinc-100 dark:bg-zinc-800 rounded-full shadow-sm">
                     <span id="theme-icon">🌙</span>
                 </button>
@@ -35,73 +34,65 @@
         <div id="next-deadline-area" class="fade-in min-h-[100px]"></div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-4 space-y-6 fade-in">
+                <div class="liquid-glass p-6 space-y-4 shadow-xl border border-zinc-200 dark:border-zinc-800">
+                    <h2 class="text-xl font-bold tracking-tight">Add Task</h2>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="label-text-small">Category</label>
+                                <select id="kategori" class="w-full glass-input p-3 text-sm">
+                                    <option value="Assignment">Assignment</option>
+                                    <option value="Event">Event</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="label-text-small">Priority</label>
+                                <select id="priority" class="w-full glass-input p-3 text-sm">
+                                    <option value="low">Low</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="high">High</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="label-text-small">Deadline Date</label>
+                            <input type="date" id="tglDeadline" class="w-full glass-input p-3">
+                        </div>
+                        <div>
+                            <label class="label-text-small">Task Details</label>
+                            <textarea id="isiData" placeholder="What needs to be done?" class="w-full glass-input p-3 h-20 resize-none"></textarea>
+                        </div>
+                        <div>
+                            <label class="label-text-small">Resource Link</label>
+                            <input type="url" id="taskLink" placeholder="https://..." class="w-full glass-input p-3 text-sm">
+                        </div>
+                    </div>
+                    <button onclick="simpanData()" id="btnSimpan" class="btn-submit w-full">Update Hub</button>
+                </div>
+            </div>
+
             <div class="lg:col-span-8 space-y-6 fade-in">
                 <div class="liquid-glass p-6 min-h-[400px]">
                     <h2 class="text-xl font-bold mb-6 tracking-tight">Timeline Feed</h2>
                     <div id="listData" class="space-y-4"></div>
                 </div>
-            </div>
-
-            <div class="lg:col-span-4 space-y-6 fade-in">
+                
                 <div class="liquid-glass p-6">
                     <h2 class="text-xl font-bold mb-6 tracking-tight text-center">Calendar</h2>
-                    <div id="calendar-month-year" class="text-[10px] font-bold mb-4 opacity-40 uppercase text-center"></div>
+                    <div id="calendar-month-year" class="text-xs font-bold mb-4 opacity-40 uppercase text-center"></div>
                     <div id="calendar-container" class="grid grid-cols-7 gap-2"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="inputModal" class="fixed inset-0 z-[150] hidden items-center justify-center p-4">
-        <div class="absolute inset-0 bg-black/70 backdrop-blur-md" onclick="closeInputModal()"></div>
-        
-        <div class="liquid-glass relative w-full max-w-md p-8 shadow-2xl border border-white/5 animate-slide-up">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold tracking-tight">New Entry</h2>
-                <button onclick="closeInputModal()" class="text-2xl opacity-40 hover:opacity-100">✕</button>
-            </div>
-            
-            <div class="space-y-5">
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="label-text-small">Category</label>
-                        <select id="kategori" class="w-full glass-input p-4 text-sm">
-                            <option value="Assignment">Assignment</option>
-                            <option value="Event">Event</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="label-text-small">Priority</label>
-                        <select id="priority" class="w-full glass-input p-4 text-sm">
-                            <option value="low">Low</option>
-                            <option value="medium" selected>Medium</option>
-                            <option value="high">High</option>
-                        </select>
-                    </div>
-                </div>
-                <div>
-                    <label class="label-text-small">Deadline Date</label>
-                    <input type="date" id="tglDeadline" class="w-full glass-input p-4">
-                </div>
-                <div>
-                    <label class="label-text-small">Task Details</label>
-                    <textarea id="isiData" placeholder="What needs to be done?" class="w-full glass-input p-4 h-24 resize-none"></textarea>
-                </div>
-                <div>
-                    <label class="label-text-small">Link (Optional)</label>
-                    <input type="url" id="taskLink" placeholder="https://..." class="w-full glass-input p-4 text-sm">
-                </div>
-                <button onclick="simpanData()" id="btnSimpan" class="btn-submit w-full mt-2">Update Hub</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="deleteModal" class="fixed inset-0 z-[200] hidden items-center justify-center p-4">
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
-        <div class="liquid-glass relative w-full max-w-xs p-8 text-center bg-zinc-900">
+    <div id="deleteModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-md"></div>
+        <div class="liquid-glass relative w-full max-w-xs p-8 text-center">
             <h3 class="text-xl font-bold mb-4">Delete Task?</h3>
             <div class="flex gap-3">
-                <button onclick="closeDeleteModal()" class="flex-1 py-3 rounded-xl bg-zinc-800 font-bold">Cancel</button>
+                <button onclick="closeDeleteModal()" class="flex-1 py-3 rounded-xl bg-zinc-200 dark:bg-zinc-800 font-bold">Cancel</button>
                 <button id="confirmDeleteBtn" class="flex-1 py-3 rounded-xl bg-red-600 text-white font-bold">Delete</button>
             </div>
         </div>
