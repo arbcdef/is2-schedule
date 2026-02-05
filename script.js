@@ -36,7 +36,7 @@ function renderCountdown(data) {
         const diff = new Date(upcoming.tgl_deadline).getTime() - new Date().getTime();
         const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
         area.innerHTML = `
-            <div class="countdown-card fade-in">
+            <div class="countdown-card fade-in shadow-xl">
                 <div>
                     <p class="text-[10px] font-black opacity-40 uppercase tracking-widest mb-1">Coming Up</p>
                     <h2 class="text-xl font-bold tracking-tight">${upcoming.content}</h2>
@@ -65,14 +65,17 @@ function renderFeed(data) {
     `).join('');
 }
 
+// Fixed Validation
 async function simpanData() {
     const cat = document.getElementById('kategori').value;
     const prio = document.getElementById('priority').value; 
     const tgl = document.getElementById('tglDeadline').value;
-    const teks = document.getElementById('isiData').value;
+    const teks = document.getElementById('isiData').value.trim(); 
     const link = document.getElementById('taskLink').value; 
     
-    if(!teks || !tgl) return alert("Missing required fields.");
+    if(!teks) return alert("Task details are required.");
+    if(!tgl) return alert("Deadline date is required.");
+
     const btn = document.getElementById('btnSimpan');
     btn.innerText = "Syncing...";
     btn.disabled = true;
@@ -83,7 +86,7 @@ async function simpanData() {
 
     if(!error) { 
         document.getElementById('isiData').value = ''; 
-        document.getElementById('taskLink').value = ''; 
+        document.getElementById('tglDeadline').value = '';
         muatData(); 
     }
     btn.innerText = "Sync to Cloud";
