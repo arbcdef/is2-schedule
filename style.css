@@ -5,50 +5,49 @@
 
 :root {
     --ios-bg: linear-gradient(135deg, #f5f5f7 0%, #d2d2d7 100%);
-    --ios-card: rgba(255, 255, 255, 0.4); 
+    --ios-card: rgba(255, 255, 255, 0.45); 
     --ios-text: #000000;
     --ios-border: rgba(255, 255, 255, 0.7);
-    --ios-shadow: rgba(0, 0, 0, 0.04);
+    --ios-shadow: rgba(0, 0, 0, 0.03);
 }
 
 [data-theme="dark"] {
     --ios-bg: linear-gradient(135deg, #000000 0%, #1c1c1e 100%);
-    --ios-card: rgba(28, 28, 30, 0.35); 
+    --ios-card: rgba(28, 28, 30, 0.4); 
     --ios-text: #FFFFFF;
     --ios-border: rgba(255, 255, 255, 0.1);
     --ios-shadow: rgba(0, 0, 0, 0.4);
 }
 
-body { background: var(--ios-bg); background-attachment: fixed; color: var(--ios-text); font-family: -apple-system, sans-serif; overflow-x: hidden; }
+body { background: var(--ios-bg); background-attachment: fixed; color: var(--ios-text); font-family: -apple-system, sans-serif; min-height: 100vh; }
 
 .ios-time { font-family: monospace; font-weight: 700; opacity: 0.5; font-size: 14px; }
 .ios-title { font-family: 'Akira Expanded', sans-serif !important; font-size: 26px; letter-spacing: -1px; }
 
-/* Glass Card iOS 26 */
+/* Fixed Glass Card */
 .ios-card { 
     background: var(--ios-card) !important; 
-    backdrop-filter: blur(35px) saturate(180%); 
-    -webkit-backdrop-filter: blur(35px) saturate(180%);
+    backdrop-filter: blur(40px) saturate(200%); 
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
     border-radius: 32px; 
     border: 1px solid var(--ios-border); 
-    box-shadow: 0 10px 40px 0 var(--ios-shadow);
+    box-shadow: 0 10px 40px var(--ios-shadow);
+    color: var(--ios-text) !important;
 }
 
-/* Glass Inputs */
+/* Fix Input Visibility */
+.ios-label { font-size: 9px; font-weight: 900; opacity: 0.4; uppercase; margin-left: 8px; display: block; }
 .ios-input {
-    background: rgba(128, 128, 128, 0.08) !important;
+    background: rgba(128, 128, 128, 0.12) !important;
     backdrop-filter: blur(10px);
     border-radius: 16px;
     padding: 12px 16px;
-    border: 1px solid rgba(128,128,128,0.1);
-    color: var(--ios-text);
+    border: 1px solid rgba(128,128,128,0.2);
+    color: var(--ios-text) !important;
     font-size: 14px;
     font-weight: 600;
     outline: none;
-    transition: 0.3s;
 }
-
-.ios-input:focus { background: rgba(128, 128, 128, 0.15) !important; border-color: var(--ios-text); }
 
 .ios-primary-btn {
     background: var(--ios-text);
@@ -58,53 +57,58 @@ body { background: var(--ios-bg); background-attachment: fixed; color: var(--ios
     border-radius: 20px;
     font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    font-size: 12px;
+    font-size: 11px;
     transition: 0.2s;
 }
 
-.ios-primary-btn:active { transform: scale(0.96); opacity: 0.9; }
-
 /* Dynamic Island */
 .countdown-card {
-    background: rgba(0, 0, 0, 0.85) !important;
+    background: #000000 !important;
     backdrop-filter: blur(20px);
-    color: #fff;
+    color: #fff !important;
     padding: 24px 35px;
     border-radius: 35px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border: 1px solid rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.1);
 }
 
-.ios-pill {
-    background: var(--ios-card);
-    padding: 8px 16px;
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
+/* Calendar Fix */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
     gap: 8px;
-    border: 1px solid var(--ios-border);
+    max-width: 320px;
 }
 
-.ios-dot { width: 6px; height: 6px; background: #34C759; border-radius: 50%; box-shadow: 0 0 10px #34C759; }
+.day-cell { 
+    aspect-ratio: 1/1; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    border-radius: 50%; 
+    font-size: 11px; 
+    font-weight: 800; 
+    transition: 0.3s;
+    color: var(--ios-text);
+}
 
-/* Priorities */
+.today-glow { background: #007AFF !important; color: white !important; box-shadow: 0 5px 15px rgba(0,122,255,0.4); }
+.cal-high { background: rgba(255, 59, 48, 0.2); color: #FF3B30 !important; }
+.cal-medium { background: rgba(255, 204, 0, 0.2); color: #B28F00 !important; }
+.cal-low { background: rgba(142, 142, 147, 0.2); color: #8E8E93 !important; }
+
+/* Timeline Priorities */
 .priority-high { border-left: 8px solid #FF3B30 !important; }
 .priority-medium { border-left: 8px solid #FFCC00 !important; }
 .priority-low { border-left: 8px solid #8E8E93 !important; }
-.task-done { opacity: 0.2; filter: grayscale(1); }
 
-/* Calendar */
-.day-cell { aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 11px; font-weight: 800; transition: 0.3s; }
-.today-glow { background: #007AFF !important; color: white !important; box-shadow: 0 8px 16px rgba(0,122,255,0.3); }
-.cal-high { background: rgba(255, 59, 48, 0.2); color: #FF3B30; }
-.cal-medium { background: rgba(255, 204, 0, 0.2); color: #B28F00; }
-.cal-low { background: rgba(142, 142, 147, 0.2); color: #8E8E93; }
+.ios-icon-btn { padding: 12px; background: var(--ios-card); border-radius: 16px; border: 1px solid var(--ios-border); }
+.ios-pill { background: var(--ios-card); padding: 8px 16px; border-radius: 20px; display: flex; align-items: center; gap: 8px; border: 1px solid var(--ios-border); }
+.ios-dot { width: 6px; height: 6px; background: #34C759; border-radius: 50%; box-shadow: 0 0 10px #34C759; }
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-.fade-in { animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-
+.fade-in { animation: fadeIn 0.8s ease-out forwards; }
 @keyframes iosSlide { from { transform: translateY(100%); } to { transform: translateY(0); } }
-.animate-ios-slide { animation: iosSlide 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.animate-ios-slide { animation: iosSlide 0.4s cubic-bezier(0.1, 0.9, 0.2, 1); }
