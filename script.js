@@ -5,27 +5,33 @@ const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
 let allTasks = [];
 let deleteTargetId = null;
 
-// No. 3: Countdown Logic
-function updateCountdown(deadline) {
-    const target = new Date(deadline).getTime();
-    const now = new Date().getTime();
-    const diff = target - now;
-
-    if (diff < 0) return "Deadline Passed";
-    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    return `${d}d ${h}h remaining`;
+function toggleTheme() {
+    const html = document.documentElement;
+    const isLight = html.getAttribute('data-theme') === 'light';
+    html.setAttribute('data-theme', isLight ? 'dark' : 'light');
+    document.getElementById('theme-icon').innerText = isLight ? '☀️' : '🌙';
 }
 
+function updateClock() {
+    const now = new Date();
+    document.getElementById('clock').innerText = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    document.getElementById('cal-month').innerText = now.toLocaleDateString('id-ID', { month: 'short' });
+    document.getElementById('cal-date').innerText = now.getDate();
+    document.getElementById('cal-day').innerText = now.toLocaleDateString('id-ID', { weekday: 'long' });
+}
+
+// Kalender Pintar (No. 4)
 function renderCalendar() {
     const container = document.getElementById('calendar-container');
     const label = document.getElementById('calendar-month-year');
+    if (!container) return;
+
     const now = new Date();
     const todayStr = now.toISOString().split('T')[0];
-
-    label.innerText = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
     const year = now.getFullYear();
     const month = now.getMonth();
+    label.innerText = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
@@ -35,13 +41,13 @@ function renderCalendar() {
     for (let d = 1; d <= daysInMonth; d++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         
-        // No. 4: Logika Abu-abu hanya jika BELUM LEWAT dan BELUM SELESAI
-        const activeTask = allTasks.find(t => t.tgl_deadline === dateStr && !t.is_done && t.tgl_deadline >= todayStr);
+        // Cek apakah ada tugas yang BELUM DONE dan BELUM EXPIRED
+        const hasActiveTask = allTasks.some(t => t.tgl_deadline === dateStr && !t.is_done && t.tgl_deadline >= todayStr);
         
         const isToday = dateStr === todayStr ? 'today' : '';
-        const hasEvent = activeTask ? 'has-event' : '';
+        const eventClass = hasActiveTask ? 'has-event' : '';
         
-        container.innerHTML += `<div class="day-cell ${isToday} ${hasEvent}"><span>${d}</span></div>`;
+        container.innerHTML += `<div class="day-cell ${isToday} ${eventClass}"><span>${d}</span></div>`;
     }
 }
 
@@ -52,31 +58,38 @@ async function muatData() {
         allTasks = data;
 
         document.querySelector('.status-label').innerText = "SYSTEM ACTIVE";
-        document.querySelector('.dot').style.background = "#22c55e";
+        document.getElementById('status-dot').style.background = "#22c55e";
 
         renderCalendar();
         renderFeed(data);
         renderCountdown(data);
     } catch (err) {
         document.querySelector('.status-label').innerText = "OFFLINE";
+        document.getElementById('status-dot').style.background = "#ef4444";
     }
 }
 
+// Countdown Card (No. 3)
 function renderCountdown(data) {
     const area = document.getElementById('next-deadline-area');
-    const nowStr = new Date().toISOString().split('T')[0];
-    const upcoming = data.find(t => !t.is_done && t.tgl_deadline >= nowStr);
+    const todayStr = new Date().toISOString().split('T')[0];
+    const upcoming = data.find(t => !t.is_done && t.tgl_deadline >= todayStr);
 
     if (upcoming) {
+        const target = new Date(upcoming.tgl_deadline).getTime();
+        const diff = target - new Date().getTime();
+        const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+        const timerText = days <= 0 ? "Due Today" : `${days} days left`;
+
         area.innerHTML = `
-            <div class="countdown-card fade-in shadow-2xl">
+            <div class="countdown-card shadow-2xl fade-in">
                 <div>
-                    <p class="text-[10px] font-black uppercase tracking-widest opacity-70">Next Urgent Task</p>
-                    <h2 class="text-2xl font-bold">${upcoming.content}</h2>
+                    <p class="text-[10px] font-black uppercase tracking-widest opacity-60 mb-1">Upcoming Milestone</p>
+                    <h2 class="text-2xl font-bold tracking-tight">${upcoming.content}</h2>
                 </div>
                 <div class="text-right">
-                    <p class="text-3xl font-black">${updateCountdown(upcoming.tgl_deadline)}</p>
-                    <p class="text-[10px] opacity-70 italic">Due: ${upcoming.tgl_deadline}</p>
+                    <p class="text-3xl font-black">${timerText}</p>
+                    <p class="text-[10px] opacity-60 italic">${upcoming.tgl_deadline}</p>
                 </div>
             </div>`;
     } else { area.innerHTML = ""; }
@@ -84,18 +97,23 @@ function renderCountdown(data) {
 
 function renderFeed(data) {
     const list = document.getElementById('listData');
+    if (!data.length) {
+        list.innerHTML = "<p class='text-center text-zinc-400 py-10 italic'>No active records.</p>";
+        return;
+    }
+
     list.innerHTML = data.map(item => `
         <div class="liquid-glass p-5 flex justify-between items-center transition-all priority-${item.priority || 'low'} ${item.is_done ? 'task-done' : ''}">
             <div class="flex items-center gap-4">
                 <input type="checkbox" ${item.is_done ? 'checked' : ''} 
-                    onclick="toggleDone('${item.id}', ${item.is_done})" 
-                    class="w-5 h-5 accent-zinc-500">
+                    onclick="toggleDone(${item.id}, ${item.is_done})" 
+                    class="w-5 h-5 accent-zinc-500 cursor-pointer">
                 <div>
                     <span class="text-[9px] font-black uppercase text-zinc-400">${item.category} • ${item.tgl_deadline}</span>
                     <p class="font-bold text-base mt-0.5">${item.content}</p>
                 </div>
             </div>
-            <button onclick="openDeleteModal(${item.id})" class="opacity-20 hover:opacity-100 px-2 text-xl">✕</button>
+            <button onclick="openDeleteModal(${item.id})" class="opacity-20 hover:opacity-100 px-2 text-xl transition">✕</button>
         </div>
     `).join('');
 }
@@ -111,20 +129,20 @@ async function simpanData() {
     const tgl = document.getElementById('tglDeadline').value;
     const teks = document.getElementById('isiData').value;
     
-    if(!teks || !tgl) return alert("Fill all fields!");
+    if(!teks || !tgl) return alert("Fill mandatory fields!");
 
     const btn = document.getElementById('btnSimpan');
     btn.innerText = "Syncing...";
-    await supabaseClient.from('schedule').insert([{ 
+    
+    const { error } = await supabaseClient.from('schedule').insert([{ 
         category: cat, content: teks, tgl_deadline: tgl, priority: prio, is_done: false 
     }]);
-    
-    document.getElementById('isiData').value = '';
+
+    if(error) alert(error.message);
+    else { document.getElementById('isiData').value = ''; muatData(); }
     btn.innerText = "Update Hub";
-    muatData();
 }
 
-// Logic Modal Hapus
 function openDeleteModal(id) {
     deleteTargetId = id;
     document.getElementById('deleteModal').classList.replace('hidden', 'flex');
@@ -138,14 +156,6 @@ document.getElementById('confirmDeleteBtn').onclick = async () => {
     muatData();
 };
 
-function updateClock() {
-    const now = new Date();
-    document.getElementById('clock').innerText = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    document.getElementById('cal-month').innerText = now.toLocaleDateString('id-ID', { month: 'short' });
-    document.getElementById('cal-date').innerText = now.getDate();
-    document.getElementById('cal-day').innerText = now.toLocaleDateString('id-ID', { weekday: 'long' });
-}
-
-setInterval(() => { updateClock(); muatData(); }, 1000);
+setInterval(updateClock, 1000);
 updateClock();
 muatData();
