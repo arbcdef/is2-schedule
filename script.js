@@ -20,25 +20,28 @@ function renderCountdown() {
 
     if (next) {
         const diff = Math.ceil((new Date(next.tgl_deadline) - today) / (1000 * 60 * 60 * 24));
+        // Hardcoded inline styles untuk menjamin visibilitas
         area.innerHTML = `
-            <div class="countdown-card fade-in">
-                <div>
-                    <p class="text-[10px] font-black opacity-50 uppercase tracking-widest">Coming Up</p>
-                    <h2 class="text-xl font-bold truncate max-w-[200px] sm:max-w-md">${next.content}</h2>
+            <div class="countdown-card fade-in" style="background-color: #000 !important; color: #fff !important;">
+                <div style="color: #fff !important;">
+                    <p style="color: rgba(255,255,255,0.5) !important; font-size: 10px; font-weight: 900; text-transform: uppercase;">Next Milestone</p>
+                    <h2 style="color: #fff !important; font-size: 20px; font-weight: 800; margin: 0;">${next.content}</h2>
                 </div>
-                <div class="text-right">
-                    <p class="text-3xl font-black">${diff === 0 ? "TODAY" : diff + "D"}</p>
+                <div style="text-align: right; color: #fff !important;">
+                    <p style="color: #fff !important; font-size: 32px; font-weight: 900; margin: 0;">${diff === 0 ? "TODAY" : diff + "D"}</p>
                 </div>
             </div>`;
-    } else { area.innerHTML = ""; }
+    } else {
+        area.innerHTML = `<div class="countdown-card" style="justify-content: center; opacity: 0.5;"><p>No Upcoming Tasks</p></div>`;
+    }
 }
 
 function renderFeed() {
     const list = document.getElementById('listData');
     list.innerHTML = allTasks.map(t => `
-        <div class="ios-card p-5 flex justify-between items-center priority-${t.priority} ${t.is_done ? 'opacity-30' : ''}">
+        <div class="ios-card p-5 flex justify-between items-center ${t.is_done ? 'opacity-30' : ''}" style="border-left: 6px solid ${t.priority === 'high' ? '#ef4444' : t.priority === 'medium' ? '#f59e0b' : '#71717a'}">
             <div class="flex items-center gap-4">
-                <input type="checkbox" ${t.is_done ? 'checked' : ''} onclick="toggleDone(${t.id}, ${t.is_done})" class="w-5 h-5 accent-zinc-500">
+                <input type="checkbox" ${t.is_done ? 'checked' : ''} onclick="toggleDone(${t.id}, ${t.is_done})" class="w-5 h-5">
                 <div>
                     <p class="text-[10px] font-bold opacity-40 uppercase">${t.category} • ${t.tgl_deadline}</p>
                     <p class="font-bold">${t.content}</p>
@@ -54,10 +57,8 @@ function renderCalendar() {
     const label = document.getElementById('calendar-month-year');
     const now = new Date();
     label.innerText = now.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
-    
     const start = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
     const days = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-    
     container.innerHTML = '';
     for(let i=0; i<start; i++) container.innerHTML += '<div></div>';
     for(let d=1; d<=days; d++) {
@@ -71,15 +72,13 @@ function renderCalendar() {
 async function simpanData() {
     const text = document.getElementById('isiData').value;
     const date = document.getElementById('tglDeadline').value;
-    if(!text || !date) return alert("Isi dulu ajg");
-
+    if(!text || !date) return alert("Isi datanya dulu!");
     await supabaseClient.from('schedule').insert([{
         content: text, tgl_deadline: date, 
         category: document.getElementById('kategori').value,
         priority: document.getElementById('priority').value,
         is_done: false, task_link: document.getElementById('taskLink').value
     }]);
-    
     document.getElementById('isiData').value = '';
     muatData();
 }
