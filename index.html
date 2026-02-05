@@ -3,27 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IS-2 Hub | Monochrome Liquid</title>
+    <title>Information System 2 | Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="p-4 md:p-8 transition-colors duration-500">
 
     <div class="max-w-6xl mx-auto space-y-8">
-        <header class="flex justify-between items-center px-6 fade-in">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center px-6 gap-4 fade-in">
             <div>
-                <h1 class="text-4xl font-semibold tracking-tight header-text">IS-2 <span class="text-zinc-500">Hub</span></h1>
-                <p id="clock" class="sub-text font-medium"></p>
+                <h1 class="text-4xl font-bold tracking-tight header-text main-title">Information System 2</h1>
+                <p id="clock" class="sub-text font-medium text-lg mt-1"></p>
             </div>
             
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-3">
                 <button onclick="toggleTheme()" class="theme-toggle-btn shadow-sm">
                     <span id="theme-icon">🌙</span>
                 </button>
-                <div class="status-pill border border-zinc-200 dark:border-zinc-800">
-                    <span class="dot"></span> <span class="status-label">SYNCED</span>
+                <div class="status-pill">
+                    <span class="dot"></span> <span class="status-label">SYSTEM ACTIVE</span>
                 </div>
             </div>
         </header>
@@ -31,47 +30,52 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-4 space-y-6 fade-in">
                 <div class="liquid-glass p-6 space-y-4">
-                    <h2 class="text-xl font-semibold title-text">New Entry</h2>
-                    <div class="space-y-3">
-                        <label class="label-text">Category</label>
-                        <select id="kategori" class="w-full glass-input p-3 appearance-none">
-                            <option value="tugas">Task & Deadline</option>
-                            <option value="jadwal">Course Schedule</option>
-                            <option value="kegiatan">Class Event</option>
-                        </select>
+                    <h2 class="text-xl font-bold title-text tracking-tight">Add Record</h2>
+                    <div class="space-y-4">
+                        <div class="input-group">
+                            <label class="label-text">Category</label>
+                            <select id="kategori" class="w-full glass-input p-3 appearance-none cursor-pointer">
+                                <option value="tugas">Assignment & Deadline</option>
+                                <option value="jadwal">Course Schedule</option>
+                                <option value="kegiatan">Class Event</option>
+                            </select>
+                        </div>
 
-                        <label class="label-text">Due Date</label>
-                        <input type="date" id="tglDeadline" class="w-full glass-input p-3">
+                        <div class="input-group">
+                            <label class="label-text">Date</label>
+                            <input type="date" id="tglDeadline" class="w-full glass-input p-3">
+                        </div>
 
-                        <label class="label-text">Description</label>
-                        <textarea id="isiData" placeholder="Details here..." class="w-full glass-input p-3 h-24"></textarea>
+                        <div class="input-group">
+                            <label class="label-text">Details</label>
+                            <textarea id="isiData" placeholder="Enter description..." class="w-full glass-input p-3 h-24 resize-none"></textarea>
+                        </div>
                     </div>
-                    <button onclick="simpanData()" id="btnSimpan" class="ios-btn-primary w-full">Commit Changes</button>
+                    <button onclick="simpanData()" id="btnSimpan" class="ios-btn-primary w-full">Update Hub</button>
                 </div>
 
                 <div class="calendar-widget p-6 text-center">
-                    <p id="cal-month" class="text-sm font-black uppercase tracking-widest opacity-60"></p>
+                    <p id="cal-month" class="text-xs font-black uppercase tracking-[0.3em] opacity-60"></p>
                     <p id="cal-date" class="text-7xl font-bold my-1"></p>
-                    <p id="cal-day" class="text-lg font-medium opacity-70"></p>
+                    <p id="cal-day" class="text-base font-medium opacity-70"></p>
                 </div>
             </div>
 
             <div class="lg:col-span-8 space-y-6 fade-in">
                 <div class="liquid-glass p-6">
-                    <h2 class="text-xl font-semibold mb-4 title-text">Academic Calendar</h2>
-                    <div id="calendar-month-year" class="text-sm font-bold mb-4 opacity-50"></div>
-                    <div class="grid grid-cols-7 gap-2 text-center text-[10px] font-bold text-zinc-400 mb-2">
+                    <h2 class="text-xl font-bold mb-6 title-text tracking-tight text-center md:text-left">Academic Calendar</h2>
+                    <div id="calendar-month-year" class="text-xs font-bold mb-4 opacity-40 uppercase tracking-widest"></div>
+                    <div class="grid grid-cols-7 gap-2 text-center text-[10px] font-black text-zinc-400 mb-4 tracking-tighter">
                         <div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
                     </div>
-                    <div id="calendar-container" class="grid grid-cols-7 gap-2">
+                    <div id="calendar-container" class="grid grid-cols-7 gap-2 md:gap-3">
                         </div>
                 </div>
 
-                <div class="liquid-glass p-6 min-h-[300px]">
-                    <h2 class="text-xl font-semibold mb-6 title-text">Upcoming Feed</h2>
+                <div class="liquid-glass p-6 min-h-[400px]">
+                    <h2 class="text-xl font-bold mb-6 title-text tracking-tight">Timeline Feed</h2>
                     <div id="listData" class="space-y-4">
-                        <p class="text-center text-zinc-400 py-10 italic">Connecting to Hub...</p>
-                    </div>
+                        </div>
                 </div>
             </div>
         </div>
