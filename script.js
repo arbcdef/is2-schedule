@@ -1,11 +1,9 @@
-// Konfigurasi Supabase
 const SB_URL = "https://mycldrtubwstojeaumcg.supabase.co"; 
 const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15Y2xkcnR1YndzdG9qZWF1bWNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNzQwNTksImV4cCI6MjA4NTg1MDA1OX0.GHgglJHGQqDDRY-IcvhQeZyYZmR48J3arnby8IxZo9I";
 const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
 
 let eventDates = [];
 
-// Theme Toggle
 function toggleTheme() {
     const html = document.documentElement;
     const isLight = html.getAttribute('data-theme') === 'light';
@@ -13,7 +11,6 @@ function toggleTheme() {
     document.getElementById('theme-icon').innerText = isLight ? '☀️' : '🌙';
 }
 
-// Jam & Tanggal Widget
 function updateClock() {
     const now = new Date();
     const clockEl = document.getElementById('clock');
@@ -24,7 +21,6 @@ function updateClock() {
     document.getElementById('cal-day').innerText = now.toLocaleDateString('id-ID', { weekday: 'long' });
 }
 
-// Render Kalender
 function renderCalendar() {
     const container = document.getElementById('calendar-container');
     const label = document.getElementById('calendar-month-year');
@@ -44,23 +40,21 @@ function renderCalendar() {
     for (let d = 1; d <= daysInMonth; d++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         const isToday = (d === now.getDate() && month === now.getMonth()) ? 'today' : '';
-        const hasEvent = eventDates.includes(dateStr) ? '<div class="event-dot"></div>' : '';
         
-        container.innerHTML += `<div class="day-cell ${isToday}"><span>${d}</span>${hasEvent}</div>`;
+        // LOGIKA WARNA ABU-ABU JIKA ADA EVENT
+        const hasEvent = eventDates.includes(dateStr) ? 'has-event' : '';
+        
+        container.innerHTML += `<div class="day-cell ${isToday} ${hasEvent}"><span>${d}</span></div>`;
     }
 }
 
-// Ambil Data
 async function muatData() {
     try {
         let { data, error } = await supabaseClient.from('schedule').select('*').order('tgl_deadline', { ascending: true });
         if (error) throw error;
 
-        // Berhasil Connect
-        const statusEl = document.querySelector('.status-label');
-        const dotEl = document.querySelector('.dot');
-        if(statusEl) statusEl.innerText = "SYSTEM ACTIVE";
-        if(dotEl) dotEl.style.background = "#22c55e";
+        document.querySelector('.status-label').innerText = "SYSTEM ACTIVE";
+        document.querySelector('.dot').style.background = "#22c55e";
 
         eventDates = data.map(item => item.tgl_deadline).filter(d => d);
         renderCalendar();
@@ -77,17 +71,15 @@ async function muatData() {
                     <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400">${item.category} • ${item.tgl_deadline}</span>
                     <p class="font-bold text-base mt-1 tracking-tight">${item.content}</p>
                 </div>
-                <button onclick="hapusData(${item.id})" class="opacity-20 hover:opacity-100 px-2">✕</button>
+                <button onclick="hapusData(${item.id})" class="opacity-20 hover:opacity-100 px-2 transition">✕</button>
             </div>
         `).join('');
     } catch (err) {
-        console.error(err);
-        const statusEl = document.querySelector('.status-label');
-        if(statusEl) statusEl.innerText = "OFFLINE";
+        document.querySelector('.status-label').innerText = "OFFLINE";
+        document.querySelector('.dot').style.background = "#ef4444";
     }
 }
 
-// Simpan Data
 async function simpanData() {
     const cat = document.getElementById('kategori').value;
     const tgl = document.getElementById('tglDeadline').value;
@@ -104,18 +96,16 @@ async function simpanData() {
         tgl_deadline: tgl 
     }]);
 
-    if(error) {
-        alert("Gagal: " + error.message);
-    } else {
+    if(error) alert("Gagal: " + error.message);
+    else {
         document.getElementById('isiData').value = '';
         muatData();
     }
     btn.innerText = "Update Hub";
 }
 
-// Hapus Data
 async function hapusData(id) {
-    if(confirm("Hapus?")) {
+    if(confirm("Hapus data ini?")) {
         await supabaseClient.from('schedule').delete().eq('id', id);
         muatData();
     }
