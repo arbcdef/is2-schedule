@@ -59,7 +59,6 @@ body { background: var(--bg-main); color: var(--text-main); font-family: -apple-
     letter-spacing: 1px;
 }
 
-/* Dynamic Island Restore */
 .countdown-card {
     background: #000000 !important;
     color: #ffffff !important;
@@ -71,7 +70,6 @@ body { background: var(--bg-main); color: var(--text-main); font-family: -apple-
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
-/* Calendar Fix */
 .calendar-grid-large {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -102,7 +100,6 @@ body { background: var(--bg-main); color: var(--text-main); font-family: -apple-
 .cal-medium { border: 2px solid #FFCC00; color: #B28F00 !important; }
 .cal-low { border: 2px solid #8E8E93; color: #8E8E93 !important; }
 
-/* Feed Style */
 .priority-high { border-left: 10px solid #FF3B30 !important; }
 .priority-medium { border-left: 10px solid #FFCC00 !important; }
 .priority-low { border-left: 10px solid #8E8E93 !important; }
