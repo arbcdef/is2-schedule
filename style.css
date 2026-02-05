@@ -1,48 +1,26 @@
-* { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; box-sizing: border-box; }
+* { font-family: 'Helvetica Neue', Arial, sans-serif; box-sizing: border-box; }
+[data-theme="light"] { --bg-color: #fbfbfb; --glass-bg: rgba(255, 255, 255, 0.7); --text-main: #000; --input-bg: #f5f5f7; --accent: #000; }
+[data-theme="dark"] { --bg-color: #000; --glass-bg: rgba(28, 28, 30, 0.8); --text-main: #f5f5f7; --input-bg: #1c1c1e; --accent: #fff; }
 
-[data-theme="light"] { --bg-color: #fbfbfb; --glass-bg: rgba(255, 255, 255, 0.7); --text-main: #000; --text-sub: #6e6e73; --input-bg: #f5f5f7; --accent: #000; }
-[data-theme="dark"] { --bg-color: #000; --glass-bg: rgba(28, 28, 30, 0.8); --text-main: #f5f5f7; --text-sub: #86868b; --input-bg: #1c1c1e; --accent: #fff; }
-
-body { background-color: var(--bg-color); color: var(--text-main); transition: background 0.5s ease; margin: 0; }
-
-.liquid-glass {
-    background: var(--glass-bg);
-    backdrop-filter: blur(30px) saturate(180%);
-    -webkit-backdrop-filter: blur(30px) saturate(180%);
-    border: 1px solid rgba(128,128,128,0.2);
-    border-radius: 2rem;
-}
-
+body { background-color: var(--bg-color); color: var(--text-main); }
+.liquid-glass { background: var(--glass-bg); backdrop-filter: blur(30px); border: 1px solid rgba(128,128,128,0.2); border-radius: 2rem; }
 .glass-input { background: var(--input-bg); border: none; border-radius: 1rem; color: var(--text-main); outline: none; }
-.ios-btn-primary { background: var(--accent); color: var(--bg-color); padding: 1rem; border-radius: 1.2rem; font-weight: 700; transition: 0.2s; }
-.ios-btn-primary:active { transform: scale(0.97); }
+.ios-btn-primary { background: var(--accent); color: var(--bg-color); padding: 1rem; border-radius: 1.2rem; font-weight: 700; }
 
-.calendar-widget { background: var(--accent); color: var(--bg-color); border-radius: 2rem; transition: 0.3s; }
-
-/* No. 1: PRIORITAS VISUAL */
+/* PRIORITAS VISUAL */
 .priority-high { border-left: 6px solid #ef4444 !important; }
 .priority-medium { border-left: 6px solid #f59e0b !important; }
 .priority-low { border-left: 6px solid #8e8e93 !important; }
 
-/* No. 4: TASK SELESAI */
-.task-done { opacity: 0.35; filter: grayscale(1); transform: scale(0.98); }
+/* TASK DONE */
+.task-done { opacity: 0.3; filter: grayscale(1); }
 .task-done p { text-decoration: line-through; }
 
-.day-cell { aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 0.8rem; background: var(--input-bg); transition: 0.3s; }
+.day-cell { aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: var(--input-bg); }
 .has-event { background: #8E8E93 !important; color: white !important; font-weight: bold; }
-.today { background: var(--accent) !important; color: var(--bg-color) !important; box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+.today { background: var(--accent) !important; color: var(--bg-color) !important; }
 
-/* No. 3: COUNTDOWN CARD */
-.countdown-card {
-    background: linear-gradient(135deg, #8e8e93, #48484a);
-    color: white; border-radius: 2.2rem; padding: 1.8rem 2.2rem;
-    display: flex; justify-content: space-between; align-items: center;
-    border: 1px solid rgba(255,255,255,0.1);
-}
+.countdown-card { background: linear-gradient(135deg, #8e8e93, #48484a); color: white; border-radius: 2rem; padding: 1.5rem 2rem; display: flex; justify-content: space-between; align-items: center; }
 
-.status-pill { background: var(--input-bg); padding: 8px 16px; border-radius: 12px; font-size: 9px; font-weight: 900; display: flex; align-items: center; gap: 8px; }
-.dot { width: 6px; height: 6px; border-radius: 50%; background: #71717a; }
-.label-text { font-size: 0.65rem; font-weight: 800; color: var(--text-sub); text-transform: uppercase; margin-bottom: 0.5rem; display: block; }
-
-@keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-.fade-in { animation: fadeIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn 0.8s ease-out forwards; }
