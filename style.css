@@ -15,20 +15,24 @@
 
 body { background: var(--bg-color); color: var(--text-main); font-family: sans-serif; transition: 0.5s; overflow-x: hidden; }
 .main-title { font-family: 'Akira Expanded', sans-serif !important; text-transform: uppercase; letter-spacing: -2px; }
-.liquid-glass { background: var(--glass-bg); backdrop-filter: blur(25px); border-radius: 2rem; border: 1px solid rgba(128,128,128,0.15); }
-.glass-input { background: var(--input-bg); border-radius: 1.2rem; color: var(--text-main); border: none; outline: none; }
+.liquid-glass { background: var(--glass-bg); backdrop-filter: blur(20px); border-radius: 2rem; border: 1px solid rgba(128,128,128,0.1); }
+.glass-input { background: var(--input-bg); border-radius: 1rem; color: var(--text-main); border: none; outline: none; }
 .btn-submit { background: var(--btn-bg); color: var(--btn-text); padding: 1.2rem; border-radius: 1.5rem; font-weight: 800; transition: 0.2s; }
-.countdown-card { background: var(--text-main); color: var(--bg-color); padding: 2.5rem; border-radius: 2.5rem; display: flex; justify-content: space-between; align-items: center; }
-.label-text-small { font-size: 10px; font-weight: 800; text-transform: uppercase; opacity: 0.5; margin-bottom: 6px; display: block; }
+.countdown-card { background: var(--text-main); color: var(--bg-color); padding: 2rem; border-radius: 2.5rem; display: flex; justify-content: space-between; align-items: center; }
+.label-text-small { font-size: 10px; font-weight: 800; text-transform: uppercase; opacity: 0.5; margin-bottom: 4px; display: block; }
+
+/* FEED PRIORITY */
 .priority-high { border-left: 6px solid #ff3b30; }
 .priority-medium { border-left: 6px solid #ffcc00; }
 .priority-low { border-left: 6px solid #8e8e93; }
 .task-done { opacity: 0.3; filter: grayscale(1); text-decoration: line-through; }
-.day-cell { aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: rgba(128,128,128,0.1); font-size: 0.7rem; font-weight: bold; }
-.has-event { border: 2px solid var(--text-main); }
+
+/* CALENDAR PRIORITY COLORS */
+.day-cell { aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: rgba(128,128,128,0.05); font-size: 0.7rem; font-weight: bold; transition: 0.3s; }
+.cal-high { background: rgba(255, 59, 48, 0.2) !important; border: 1px solid #ff3b30 !important; color: #ff3b30; }
+.cal-medium { background: rgba(255, 204, 0, 0.2) !important; border: 1px solid #ffcc00 !important; color: #ffcc00; }
+.cal-low { background: rgba(142, 142, 147, 0.2) !important; border: 1px solid #8e8e93 !important; color: #8e8e93; }
+.today-glow { background: var(--text-main) !important; color: var(--bg-color) !important; box-shadow: 0 0 15px rgba(255,255,255,0.2); }
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 .fade-in { animation: fadeIn 0.6s ease-out forwards; }
-
-@keyframes slideUp { from { opacity: 0; transform: translateY(50px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
-.animate-slide-up { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
