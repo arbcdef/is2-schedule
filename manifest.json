@@ -1,0 +1,16 @@
+{
+  "name": "IS2 Productivity Hub",
+  "short_name": "IS2 Hub",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "description": "Information System 2 Academic Command Center",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
