@@ -1,22 +1,19 @@
-/* VARIABEL WARNA SOLID iOS 26 */
 [data-theme="light"] {
-    --bg-color: #F2F2F7;
-    --glass-bg: rgba(255, 255, 255, 0.4);
-    --text-main: #1C1C1E;
-    --text-sub: #8E8E93;
-    --input-bg: rgba(255, 255, 255, 0.6);
+    --bg-color: #FFFFFF;
+    --glass-bg: rgba(244, 244, 245, 0.4);
+    --text-main: #09090b;
+    --text-sub: #71717a;
+    --input-bg: rgba(244, 244, 245, 0.6);
+    --accent: #09090b;
 }
 
 [data-theme="dark"] {
-    --bg-color: #000000;
-    --glass-bg: rgba(28, 28, 30, 0.5);
-    --text-main: #FFFFFF;
-    --text-sub: #AEAEB2;
-    --input-bg: rgba(44, 44, 46, 0.6);
-}
-
-:root {
-    --ios-blue: #007AFF;
+    --bg-color: #09090b;
+    --glass-bg: rgba(24, 24, 27, 0.5);
+    --text-main: #fafafa;
+    --text-sub: #a1a1aa;
+    --input-bg: rgba(39, 39, 42, 0.6);
+    --accent: #fafafa;
 }
 
 body {
@@ -25,12 +22,11 @@ body {
     color: var(--text-main);
 }
 
-/* LIQUID GLASS STYLE */
 .liquid-glass {
     background: var(--glass-bg);
-    backdrop-filter: blur(40px) saturate(200%);
-    -webkit-backdrop-filter: blur(40px) saturate(200%);
-    border: 0.5px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(40px) saturate(150%);
+    -webkit-backdrop-filter: blur(40px) saturate(150%);
+    border: 1px solid rgba(128, 128, 128, 0.1);
     border-radius: 2.5rem;
 }
 
@@ -39,19 +35,23 @@ body {
     border: none;
     border-radius: 1rem;
     color: var(--text-main);
-    outline: none;
 }
 
 .ios-btn-primary {
-    background: var(--ios-blue);
-    color: white;
+    background: var(--accent);
+    color: var(--bg-color);
     padding: 1rem;
     border-radius: 1.5rem;
     font-weight: 600;
-    box-shadow: 0 10px 20px rgba(0, 122, 255, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* THEME TOGGLE BUTTON */
+.calendar-widget {
+    background: var(--accent);
+    color: var(--bg-color);
+    border-radius: 2.2rem;
+}
+
 .theme-toggle-btn {
     background: var(--glass-bg);
     width: 45px;
@@ -60,47 +60,50 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(128, 128, 128, 0.1);
 }
 
-/* CALENDAR STYLING */
 .day-cell {
     aspect-ratio: 1/1;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
+    border-radius: 14px;
     font-size: 0.8rem;
-    transition: 0.3s;
+    position: relative;
+    background: var(--input-bg);
 }
 
 .event-dot {
-    width: 4px;
-    height: 4px;
-    background: var(--ios-blue);
+    width: 5px;
+    height: 5px;
+    background: var(--text-sub);
     border-radius: 50%;
-    position: absolute;
-    bottom: 4px;
+    margin-top: 2px;
 }
 
 .today {
-    background: #FF3B30 !important;
-    color: white !important;
-    font-weight: bold;
+    outline: 2px solid var(--accent);
+    font-weight: 900;
 }
 
-.calendar-widget {
-    background: linear-gradient(180deg, #FF3B30 0%, #FF2D55 100%);
-    color: white;
-    border-radius: 2.2rem;
+.status-pill {
+    background: var(--glass-bg);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
-/* TEXT HELPERS */
+.dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; }
+
 .title-text { color: var(--text-main); }
 .sub-text { color: var(--text-sub); }
-.label-text { font-size: 0.7rem; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-left: 0.5rem; }
+.label-text { font-size: 0.65rem; font-weight: 800; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.05em; margin-left: 0.5rem; }
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 .fade-in { animation: fadeIn 0.8s ease-out forwards; }
