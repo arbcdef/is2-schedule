@@ -4,65 +4,104 @@
 }
 
 :root {
-    --bg-color: #fbfbfb; 
-    --text-main: #1a1a1a; 
-    --glass-bg: #ffffff;
-    --input-bg: #f3f3f3; 
-    --btn-bg: #000000; 
-    --btn-text: #ffffff;
-    --border-color: rgba(0, 0, 0, 0.1); /* Border terlihat di light mode */
+    --ios-bg: #F2F2F7;
+    --ios-card: #FFFFFF;
+    --ios-text: #000000;
+    --ios-input: #E3E3E8;
+    --ios-accent: #007AFF;
+    --ios-border: rgba(0,0,0,0.05);
 }
 
 [data-theme="dark"] {
-    --bg-color: #000000; 
-    --text-main: #ffffff; 
-    --glass-bg: rgba(28,28,30,0.8);
-    --input-bg: #1c1c1e; 
-    --btn-bg: #ffffff; 
-    --btn-text: #000000;
-    --border-color: rgba(255, 255, 255, 0.1);
+    --ios-bg: #000000;
+    --ios-card: #1C1C1E;
+    --ios-text: #FFFFFF;
+    --ios-input: #2C2C2E;
+    --ios-accent: #0A84FF;
+    --ios-border: rgba(255,255,255,0.05);
 }
 
-body { background: var(--bg-color); color: var(--text-main); font-family: sans-serif; transition: 0.5s; overflow-x: hidden; }
+.ios-bg { background-color: var(--ios-bg); color: var(--ios-text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
-.main-title { font-family: 'Akira Expanded', sans-serif !important; text-transform: uppercase; letter-spacing: -2px; }
+/* Typo iOS Style */
+.ios-time { font-size: 14px; font-weight: 700; opacity: 0.5; font-variant-numeric: tabular-nums; }
+.ios-title { font-family: 'Akira Expanded', sans-serif !important; font-size: 28px; letter-spacing: -1px; }
 
-/* FIX BORDER & SHADOW */
-.liquid-glass { 
-    background: var(--glass-bg); 
-    backdrop-filter: blur(20px); 
-    border-radius: 2rem; 
-    border: 1px solid var(--border-color); /* Menjamin border muncul di light mode */
-    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+/* iOS Card Architecture */
+.ios-card { 
+    background: var(--ios-card); 
+    border-radius: 28px; 
+    border: 1px solid var(--ios-border); 
+    box-shadow: 0 4px 24px rgba(0,0,0,0.02);
 }
 
-.glass-input { background: var(--input-bg); border-radius: 1rem; color: var(--text-main); border: 1px solid var(--border-color); outline: none; }
-
-.btn-submit { background: var(--btn-bg); color: var(--btn-text); padding: 1.2rem; border-radius: 1.5rem; font-weight: 800; transition: 0.2s; }
-
-.countdown-card { background: var(--btn-bg); color: var(--btn-text); padding: 2.5rem; border-radius: 2.5rem; display: flex; justify-content: space-between; align-items: center; }
-
-.label-text-small { font-size: 10px; font-weight: 800; text-transform: uppercase; opacity: 0.5; margin-bottom: 4px; display: block; }
-
-/* FIX STATUS PILL CONTRAST */
-.status-pill {
-    background: var(--input-bg);
-    color: var(--text-main); /* Sekarang teks berwarna hitam di light mode */
-    border: 1px solid var(--border-color);
+.ios-input {
+    background: var(--ios-input);
+    border-radius: 14px;
+    padding: 12px 16px;
+    border: none;
+    outline: none;
+    color: var(--ios-text);
+    font-size: 14px;
+    font-weight: 500;
 }
 
-/* PRIORITY FEED */
-.priority-high { border-left: 6px solid #ff3b30 !important; }
-.priority-medium { border-left: 6px solid #ffcc00 !important; }
-.priority-low { border-left: 6px solid #8e8e93 !important; }
-.task-done { opacity: 0.3; filter: grayscale(1); text-decoration: line-through; }
+.ios-primary-btn {
+    background: var(--ios-text);
+    color: var(--ios-bg);
+    width: 100%;
+    padding: 16px;
+    border-radius: 18px;
+    font-weight: 700;
+    transition: all 0.2s;
+}
 
-/* CALENDAR COLORS */
-.day-cell { aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: rgba(128,128,128,0.05); font-size: 0.7rem; font-weight: bold; transition: 0.3s; color: var(--text-main); }
-.cal-high { background: rgba(255, 59, 48, 0.2) !important; border: 1px solid #ff3b30 !important; color: #ff3b30; }
-.cal-medium { background: rgba(255, 204, 0, 0.2) !important; border: 1px solid #ffcc00 !important; color: #ffcc00; }
-.cal-low { background: rgba(142, 142, 147, 0.2) !important; border: 1px solid #8e8e93 !important; color: #8e8e93; }
-.today-glow { background: var(--text-main) !important; color: var(--bg-color) !important; box-shadow: 0 0 15px rgba(128,128,128,0.3); }
+.ios-primary-btn:active { transform: scale(0.97); opacity: 0.8; }
 
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-.fade-in { animation: fadeIn 0.6s ease-out forwards; }
+/* iOS UI Elements */
+.ios-icon-btn {
+    padding: 12px;
+    background: var(--ios-card);
+    border-radius: 16px;
+    border: 1px solid var(--ios-border);
+}
+
+.ios-pill {
+    background: var(--ios-card);
+    padding: 8px 16px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--ios-border);
+}
+
+.ios-dot { width: 6px; height: 6px; background: #34C759; border-radius: 50%; box-shadow: 0 0 8px #34C759; }
+
+/* Timeline Item iOS style */
+.priority-high { border-left: 5px solid #FF3B30 !important; }
+.priority-medium { border-left: 5px solid #FFCC00 !important; }
+.priority-low { border-left: 5px solid #8E8E93 !important; }
+
+.task-done { opacity: 0.3; filter: grayscale(1); }
+
+/* Milestone Dynamic Island style */
+.countdown-card {
+    background: var(--ios-text);
+    color: var(--ios-bg);
+    padding: 24px 32px;
+    border-radius: 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Calendar iOS Style */
+.day-cell { aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 11px; font-weight: 700; transition: 0.3s; }
+.today-glow { background: var(--ios-accent) !important; color: white !important; }
+.cal-high { background: rgba(255, 59, 48, 0.15); color: #FF3B30; }
+.cal-medium { background: rgba(255, 204, 0, 0.15); color: #B28F00; }
+.cal-low { background: rgba(142, 142, 147, 0.15); color: #8E8E93; }
+
+@keyframes iosSlide { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.animate-ios-slide { animation: iosSlide 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
