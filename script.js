@@ -5,13 +5,11 @@ const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
 let allTasks = [];
 let deleteTargetId = null;
 
-// No. 7: Auto Theme
 function applyAutoTheme() {
     const hour = new Date().getHours();
     const html = document.documentElement;
     const themeIcon = document.getElementById('theme-icon');
     
-    // Malam 18:00 - 06:00
     if (hour >= 18 || hour < 6) {
         html.setAttribute('data-theme', 'dark');
         if(themeIcon) themeIcon.innerText = '🌙';
@@ -70,7 +68,6 @@ function renderCountdown(data) {
     } else { area.innerHTML = ""; }
 }
 
-// No. 8: Render Feed dengan Link
 function renderFeed(data) {
     const list = document.getElementById('listData');
     if(!list) return;
@@ -107,7 +104,6 @@ async function simpanData() {
     btn.innerText = "Syncing...";
     btn.disabled = true;
 
-    // Pastikan is_done dan task_link ada di DB
     const { error } = await supabaseClient.from('schedule').insert([{ 
         category: cat, content: teks, tgl_deadline: tgl, priority: prio, is_done: false, task_link: link 
     }]);
