@@ -15,7 +15,7 @@
     --input-bg: #27272a;
 }
 
-body { color: var(--text-color); font-family: -apple-system, sans-serif; transition: background 0.3s; }
+body { color: var(--text-color); font-family: -apple-system, sans-serif; }
 
 .ios-time { font-family: 'Akira'; opacity: 0.3; font-size: 10px; }
 .ios-title { font-family: 'Akira'; letter-spacing: -1px; }
@@ -28,7 +28,7 @@ body { color: var(--text-color); font-family: -apple-system, sans-serif; transit
     border: 1px solid rgba(128,128,128,0.1); 
 }
 
-.ios-label { font-size: 10px; font-weight: 800; opacity: 0.5; margin-left: 4px; }
+.ios-label { font-size: 10px; font-weight: 800; opacity: 0.5; margin-left: 4px; display: block; }
 
 .ios-input {
     background: var(--input-bg);
@@ -51,7 +51,7 @@ body { color: var(--text-color); font-family: -apple-system, sans-serif; transit
     text-transform: uppercase;
 }
 
-/* FIX DYNAMIC ISLAND */
+/* FIX DYNAMIC ISLAND - DIPAKSA HITAM & TEKS PUTIH */
 .countdown-card {
     background: #000000 !important;
     color: #ffffff !important;
@@ -61,11 +61,11 @@ body { color: var(--text-color); font-family: -apple-system, sans-serif; transit
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    min-height: 100px;
 }
 
-.countdown-card h2, .countdown-card p { color: #ffffff !important; }
+.countdown-card * { color: #ffffff !important; }
 
-/* FIX CALENDAR */
 .calendar-grid { 
     display: grid; 
     grid-template-columns: repeat(7, 1fr); 
@@ -85,15 +85,6 @@ body { color: var(--text-color); font-family: -apple-system, sans-serif; transit
 }
 
 .today-glow { background: var(--text-color) !important; color: var(--card-bg) !important; }
-
-/* Priority Feed */
-.priority-high { border-left: 6px solid #ef4444 !important; }
-.priority-medium { border-left: 6px solid #f59e0b !important; }
-.priority-low { border-left: 6px solid #71717a !important; }
-
-.ios-icon-btn { padding: 12px; background: var(--card-bg); border-radius: 16px; }
-.ios-pill { background: var(--card-bg); padding: 8px 16px; border-radius: 20px; display: flex; align-items: center; gap: 8px; }
-.ios-dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; }
 
 .fade-in { animation: fadeIn 0.6s ease-out; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
