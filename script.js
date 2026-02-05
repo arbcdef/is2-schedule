@@ -20,7 +20,6 @@ function updateClock() {
     document.getElementById('cal-day').innerText = now.toLocaleDateString('id-ID', { weekday: 'long' });
 }
 
-// Logika Kalender Pintar (No. 4)
 function renderCalendar() {
     const container = document.getElementById('calendar-container');
     const label = document.getElementById('calendar-month-year');
@@ -41,7 +40,7 @@ function renderCalendar() {
     for (let d = 1; d <= daysInMonth; d++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         
-        // Cek tugas yang BELUM DONE dan tgl >= HARI INI
+        // No. 4: Hilang jika is_done true atau sudah lewat
         const hasActiveTask = allTasks.some(t => t.tgl_deadline === dateStr && !t.is_done && t.tgl_deadline >= todayStr);
         
         const isToday = dateStr === todayStr ? 'today' : '';
@@ -65,59 +64,44 @@ async function muatData() {
         renderCountdown(data);
     } catch (err) {
         document.querySelector('.status-label').innerText = "OFFLINE";
-        document.getElementById('status-dot').style.background = "#ef4444";
     }
 }
 
-// Countdown Card (No. 3)
 function renderCountdown(data) {
     const area = document.getElementById('next-deadline-area');
     const todayStr = new Date().toISOString().split('T')[0];
-    
-    // Cari tugas terdekat yang belum selesai dan belum kadaluarsa
     const upcoming = data.find(t => !t.is_done && t.tgl_deadline >= todayStr);
 
     if (upcoming) {
-        const target = new Date(upcoming.tgl_deadline).getTime();
-        const diff = target - new Date().getTime();
+        const diff = new Date(upcoming.tgl_deadline).getTime() - new Date().getTime();
         const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-        const timerText = days <= 0 ? "Due Today" : `${days} days left`;
-
         area.innerHTML = `
             <div class="countdown-card shadow-2xl fade-in">
                 <div>
-                    <p class="text-[10px] font-black uppercase tracking-widest opacity-60 mb-1">Urgent Task</p>
-                    <h2 class="text-2xl font-bold tracking-tight">${upcoming.content}</h2>
+                    <p class="text-[10px] font-black opacity-60">NEXT DEADLINE</p>
+                    <h2 class="text-2xl font-bold">${upcoming.content}</h2>
                 </div>
                 <div class="text-right">
-                    <p class="text-3xl font-black">${timerText}</p>
-                    <p class="text-[10px] opacity-60 italic">${upcoming.tgl_deadline}</p>
+                    <p class="text-3xl font-black">${days <= 0 ? "Today" : days + " Days Left"}</p>
                 </div>
             </div>`;
-    } else {
-        area.innerHTML = ""; 
-    }
+    } else { area.innerHTML = ""; }
 }
 
 function renderFeed(data) {
     const list = document.getElementById('listData');
-    if (!data.length) {
-        list.innerHTML = "<p class='text-center text-zinc-400 py-10 italic'>No records found.</p>";
-        return;
-    }
-
     list.innerHTML = data.map(item => `
         <div class="liquid-glass p-5 flex justify-between items-center transition-all priority-${item.priority || 'low'} ${item.is_done ? 'task-done' : ''}">
             <div class="flex items-center gap-4">
                 <input type="checkbox" ${item.is_done ? 'checked' : ''} 
                     onclick="toggleDone(${item.id}, ${item.is_done})" 
-                    class="w-5 h-5 accent-zinc-500 cursor-pointer">
+                    class="w-5 h-5 cursor-pointer">
                 <div>
-                    <span class="text-[9px] font-black uppercase text-zinc-400">${item.category} • ${item.tgl_deadline}</span>
-                    <p class="font-bold text-base mt-0.5">${item.content}</p>
+                    <span class="text-[9px] font-black opacity-40 uppercase">${item.category} • ${item.tgl_deadline}</span>
+                    <p class="font-bold text-base">${item.content}</p>
                 </div>
             </div>
-            <button onclick="openDeleteModal(${item.id})" class="opacity-20 hover:opacity-100 px-2 text-xl transition">✕</button>
+            <button onclick="openDeleteModal(${item.id})" class="opacity-20 hover:opacity-100 px-2 text-xl">✕</button>
         </div>
     `).join('');
 }
@@ -129,35 +113,28 @@ async function toggleDone(id, currentStatus) {
 
 async function simpanData() {
     const cat = document.getElementById('kategori').value;
-    const prio = document.getElementById('priority').value;
+    const prio = document.getElementById('priority').value; 
     const tgl = document.getElementById('tglDeadline').value;
     const teks = document.getElementById('isiData').value;
     
-    if(!teks || !tgl || !prio) return alert("Fill all fields!");
+    // Validasi input agar tidak error
+    if(!teks || !tgl) return alert("Fill all fields!");
 
     const btn = document.getElementById('btnSimpan');
     btn.innerText = "Syncing...";
     btn.disabled = true;
 
+    // Pastikan kolom is_done dan priority sudah ada di Supabase
     const { error } = await supabaseClient.from('schedule').insert([{ 
-        category: cat, 
-        content: teks, 
-        tgl_deadline: tgl, 
-        priority: prio, 
-        is_done: false 
+        category: cat, content: teks, tgl_deadline: tgl, priority: prio, is_done: false 
     }]);
 
-    if(error) {
-        alert("Error: " + error.message);
-    } else {
-        document.getElementById('isiData').value = '';
-        muatData();
-    }
+    if(error) alert("Error: " + error.message);
+    else { document.getElementById('isiData').value = ''; muatData(); }
     btn.innerText = "Update Hub";
     btn.disabled = false;
 }
 
-// Modal Hapus
 function openDeleteModal(id) {
     deleteTargetId = id;
     document.getElementById('deleteModal').classList.replace('hidden', 'flex');
