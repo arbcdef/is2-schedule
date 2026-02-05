@@ -4,12 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>IS2 | Productivity Hub</title>
-    
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="style.css">
@@ -23,7 +19,7 @@
                 <p id="clock" class="font-medium text-lg mt-1 opacity-70">00:00:00</p>
             </div>
             <div class="flex items-center gap-3">
-                <button onclick="openInputModal()" class="bg-white text-black px-6 py-2 rounded-full font-black text-xs tracking-widest hover:scale-105 transition-all shadow-lg">
+                <button onclick="openInputModal()" class="bg-white text-black px-6 py-2 rounded-full font-black text-[10px] tracking-widest hover:scale-105 transition-all shadow-lg shadow-white/10">
                     + ADD TASK
                 </button>
                 <button onclick="toggleThemeManually()" class="p-3 bg-zinc-100 dark:bg-zinc-800 rounded-full shadow-sm">
@@ -57,11 +53,12 @@
     </div>
 
     <div id="inputModal" class="fixed inset-0 z-[150] hidden items-center justify-center p-4">
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-lg" onclick="closeInputModal()"></div>
-        <div class="liquid-glass relative w-full max-w-md p-8 shadow-2xl border border-zinc-200 dark:border-zinc-800 animate-slide-up">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-md" onclick="closeInputModal()"></div>
+        
+        <div class="liquid-glass relative w-full max-w-md p-8 shadow-2xl border border-white/5 animate-slide-up">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-2xl font-bold tracking-tight">New Entry</h2>
-                <button onclick="closeInputModal()" class="text-2xl opacity-50 hover:opacity-100">✕</button>
+                <button onclick="closeInputModal()" class="text-2xl opacity-40 hover:opacity-100">✕</button>
             </div>
             
             <div class="space-y-5">
@@ -100,11 +97,11 @@
     </div>
 
     <div id="deleteModal" class="fixed inset-0 z-[200] hidden items-center justify-center p-4">
-        <div class="absolute inset-0 bg-black/40 backdrop-blur-md"></div>
-        <div class="liquid-glass relative w-full max-w-xs p-8 text-center bg-white dark:bg-zinc-900">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div class="liquid-glass relative w-full max-w-xs p-8 text-center bg-zinc-900">
             <h3 class="text-xl font-bold mb-4">Delete Task?</h3>
             <div class="flex gap-3">
-                <button onclick="closeDeleteModal()" class="flex-1 py-3 rounded-xl bg-zinc-200 dark:bg-zinc-800 font-bold">Cancel</button>
+                <button onclick="closeDeleteModal()" class="flex-1 py-3 rounded-xl bg-zinc-800 font-bold">Cancel</button>
                 <button id="confirmDeleteBtn" class="flex-1 py-3 rounded-xl bg-red-600 text-white font-bold">Delete</button>
             </div>
         </div>
