@@ -5,11 +5,27 @@ const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
 let allTasks = [];
 let deleteTargetId = null;
 
-function toggleTheme() {
+// NO. 7: AUTO DARK/LIGHT MODE Berdasarkan Jam
+function applyAutoTheme() {
+    const hour = new Date().getHours();
+    const html = document.documentElement;
+    const themeIcon = document.getElementById('theme-icon');
+    
+    // Malam (18:00 - 05:59) -> Dark | Siang (06:00 - 17:59) -> Light
+    if (hour >= 18 || hour < 6) {
+        html.setAttribute('data-theme', 'dark');
+        if(themeIcon) themeIcon.innerText = '🌙';
+    } else {
+        html.setAttribute('data-theme', 'light');
+        if(themeIcon) themeIcon.innerText = '☀️';
+    }
+}
+
+function toggleThemeManually() {
     const html = document.documentElement;
     const isLight = html.getAttribute('data-theme') === 'light';
     html.setAttribute('data-theme', isLight ? 'dark' : 'light');
-    document.getElementById('theme-icon').innerText = isLight ? '☀️' : '🌙';
+    document.getElementById('theme-icon').innerText = isLight ? '🌙' : '☀️';
 }
 
 function updateClock() {
@@ -39,13 +55,9 @@ function renderCalendar() {
 
     for (let d = 1; d <= daysInMonth; d++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-        
-        // No. 4: Hilang jika is_done true atau sudah lewat
         const hasActiveTask = allTasks.some(t => t.tgl_deadline === dateStr && !t.is_done && t.tgl_deadline >= todayStr);
-        
         const isToday = dateStr === todayStr ? 'today' : '';
         const eventClass = hasActiveTask ? 'has-event' : '';
-        
         container.innerHTML += `<div class="day-cell ${isToday} ${eventClass}"><span>${d}</span></div>`;
     }
 }
@@ -55,15 +67,11 @@ async function muatData() {
         let { data, error } = await supabaseClient.from('schedule').select('*').order('tgl_deadline', { ascending: true });
         if (error) throw error;
         allTasks = data;
-
-        document.querySelector('.status-label').innerText = "SYSTEM ACTIVE";
-        document.getElementById('status-dot').style.background = "#22c55e";
-
         renderCalendar();
         renderFeed(data);
         renderCountdown(data);
     } catch (err) {
-        document.querySelector('.status-label').innerText = "OFFLINE";
+        console.error("Fetch error:", err);
     }
 }
 
@@ -76,18 +84,19 @@ function renderCountdown(data) {
         const diff = new Date(upcoming.tgl_deadline).getTime() - new Date().getTime();
         const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
         area.innerHTML = `
-            <div class="countdown-card shadow-2xl fade-in">
+            <div class="countdown-card bg-zinc-900 dark:bg-zinc-100 text-white dark:text-black p-8 rounded-[2rem] flex justify-between items-center shadow-2xl">
                 <div>
-                    <p class="text-[10px] font-black opacity-60">NEXT DEADLINE</p>
-                    <h2 class="text-2xl font-bold">${upcoming.content}</h2>
+                    <p class="text-[10px] font-black opacity-50 uppercase tracking-widest">Upcoming Milestone</p>
+                    <h2 class="text-3xl font-bold tracking-tight">${upcoming.content}</h2>
                 </div>
                 <div class="text-right">
-                    <p class="text-3xl font-black">${days <= 0 ? "Today" : days + " Days Left"}</p>
+                    <p class="text-4xl font-black">${days <= 0 ? "Due Today" : days + " Days"}</p>
                 </div>
             </div>`;
     } else { area.innerHTML = ""; }
 }
 
+// NO. 8: Render Link Tugas
 function renderFeed(data) {
     const list = document.getElementById('listData');
     list.innerHTML = data.map(item => `
@@ -95,10 +104,14 @@ function renderFeed(data) {
             <div class="flex items-center gap-4">
                 <input type="checkbox" ${item.is_done ? 'checked' : ''} 
                     onclick="toggleDone(${item.id}, ${item.is_done})" 
-                    class="w-5 h-5 cursor-pointer">
+                    class="w-5 h-5 cursor-pointer accent-black dark:accent-white">
                 <div>
                     <span class="text-[9px] font-black opacity-40 uppercase">${item.category} • ${item.tgl_deadline}</span>
-                    <p class="font-bold text-base">${item.content}</p>
+                    <p class="font-bold text-base mt-0.5">${item.content}</p>
+                    ${item.task_link ? `
+                        <a href="${item.task_link}" target="_blank" class="text-[10px] text-blue-500 hover:underline flex items-center gap-1 mt-1 font-bold">
+                            🔗 RESOURCE LINK
+                        </a>` : ''}
                 </div>
             </div>
             <button onclick="openDeleteModal(${item.id})" class="opacity-20 hover:opacity-100 px-2 text-xl">✕</button>
@@ -116,21 +129,30 @@ async function simpanData() {
     const prio = document.getElementById('priority').value; 
     const tgl = document.getElementById('tglDeadline').value;
     const teks = document.getElementById('isiData').value;
+    const link = document.getElementById('taskLink').value; // Ambil Link (No. 8)
     
-    // Validasi input agar tidak error
-    if(!teks || !tgl) return alert("Fill all fields!");
+    if(!teks || !tgl) return alert("Fill mandatory fields!");
 
     const btn = document.getElementById('btnSimpan');
     btn.innerText = "Syncing...";
     btn.disabled = true;
 
-    // Pastikan kolom is_done dan priority sudah ada di Supabase
+    // Pastikan kolom task_link sudah ada di Supabase
     const { error } = await supabaseClient.from('schedule').insert([{ 
-        category: cat, content: teks, tgl_deadline: tgl, priority: prio, is_done: false 
+        category: cat, 
+        content: teks, 
+        tgl_deadline: tgl, 
+        priority: prio, 
+        is_done: false,
+        task_link: link 
     }]);
 
     if(error) alert("Error: " + error.message);
-    else { document.getElementById('isiData').value = ''; muatData(); }
+    else { 
+        document.getElementById('isiData').value = '';
+        document.getElementById('taskLink').value = '';
+        muatData(); 
+    }
     btn.innerText = "Update Hub";
     btn.disabled = false;
 }
@@ -148,6 +170,8 @@ document.getElementById('confirmDeleteBtn').onclick = async () => {
     muatData();
 };
 
+// INITIALIZE
+applyAutoTheme(); // Terapkan tema otomatis saat buka (No. 7)
 setInterval(updateClock, 1000);
 updateClock();
 muatData();
