@@ -31,15 +31,19 @@ function renderCountdown(data) {
     const area = document.getElementById('next-deadline-area');
     const today = new Date();
     today.setHours(0,0,0,0);
+    
+    // Ambil tugas terdekat yang belum selesai
     const upcoming = data.find(t => !t.is_done && new Date(t.tgl_deadline) >= today);
 
     if (upcoming) {
-        const diffDays = Math.ceil((new Date(upcoming.tgl_deadline) - today) / (1000 * 60 * 60 * 24));
+        const deadlineDate = new Date(upcoming.tgl_deadline);
+        const diffDays = Math.ceil((deadlineDate - today) / (1000 * 60 * 60 * 24));
+        
         area.innerHTML = `
             <div class="countdown-card fade-in">
-                <div>
+                <div class="space-y-1">
                     <p class="text-[10px] font-black opacity-40 uppercase tracking-[0.3em]">Next Milestone</p>
-                    <h2 class="text-2xl font-bold uppercase">${upcoming.content}</h2>
+                    <h2 class="text-2xl font-bold tracking-tight uppercase">${upcoming.content}</h2>
                 </div>
                 <div class="text-right">
                     <p class="text-4xl font-black">${diffDays === 0 ? "TODAY" : diffDays + " DAYS"}</p>
@@ -51,15 +55,16 @@ function renderCountdown(data) {
 function renderFeed(data) {
     const list = document.getElementById('listData');
     list.innerHTML = data.map(item => `
-        <div class="ios-card p-6 flex justify-between items-center priority-${item.priority} ${item.is_done ? 'opacity-30 grayscale' : ''}">
+        <div class="ios-card p-6 flex justify-between items-center transition-all priority-${item.priority} ${item.is_done ? 'task-done' : ''}">
             <div class="flex items-center gap-5">
-                <input type="checkbox" ${item.is_done ? 'checked' : ''} onclick="toggleDone(${item.id}, ${item.is_done})" class="w-6 h-6 accent-zinc-500">
+                <input type="checkbox" ${item.is_done ? 'checked' : ''} onclick="toggleDone(${item.id}, ${item.is_done})" class="w-6 h-6 cursor-pointer accent-zinc-500 rounded-full">
                 <div>
-                    <span class="text-[10px] font-black opacity-30 uppercase">${item.category} • ${item.tgl_deadline}</span>
+                    <span class="text-[10px] font-black opacity-30 uppercase tracking-widest">${item.category} • ${item.tgl_deadline}</span>
                     <p class="font-bold text-lg mt-1">${item.content}</p>
+                    ${item.task_link ? `<a href="${item.task_link}" target="_blank" class="text-[10px] text-zinc-500 font-bold mt-2 inline-block underline">RESOURCE LINK</a>` : ''}
                 </div>
             </div>
-            <button onclick="openDeleteModal(${item.id})" class="opacity-20 hover:opacity-100 text-xl px-4">✕</button>
+            <button onclick="openDeleteModal(${item.id})" class="opacity-10 hover:opacity-100 transition-opacity text-xl px-4">✕</button>
         </div>
     `).join('');
 }
@@ -67,12 +72,14 @@ function renderFeed(data) {
 async function simpanData() {
     const teks = document.getElementById('isiData').value.trim();
     const tgl = document.getElementById('tglDeadline').value;
-    if (!teks || !tgl) return alert("Fill Task & Date!");
+    
+    if (!teks || !tgl) return alert("Task details and Deadline are required!");
 
     const btn = document.getElementById('btnSimpan');
     btn.innerText = "Syncing...";
-    
-    await supabaseClient.from('schedule').insert([{ 
+    btn.disabled = true;
+
+    const { error } = await supabaseClient.from('schedule').insert([{ 
         category: document.getElementById('kategori').value, 
         content: teks, 
         tgl_deadline: tgl, 
@@ -81,9 +88,12 @@ async function simpanData() {
         task_link: document.getElementById('taskLink').value 
     }]);
 
-    document.getElementById('isiData').value = '';
+    if(!error) { 
+        document.getElementById('isiData').value = ''; 
+        muatData(); 
+    }
     btn.innerText = "Update Hub";
-    muatData();
+    btn.disabled = false;
 }
 
 function renderCalendar() {
@@ -91,23 +101,34 @@ function renderCalendar() {
     const label = document.getElementById('calendar-month-year');
     const now = new Date();
     label.innerText = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
     const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+
     container.innerHTML = '';
     for (let i = 0; i < firstDay; i++) container.innerHTML += `<div class="opacity-0"></div>`;
+    
     for (let d = 1; d <= daysInMonth; d++) {
         const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         const tasksOnDate = allTasks.filter(t => t.tgl_deadline === dateStr && !t.is_done);
-        let pClass = tasksOnDate.length > 0 ? "cal-high" : "";
+        let pClass = tasksOnDate.length > 0 ? "border-2 border-zinc-500" : "";
         const isToday = (dateStr === new Date().toISOString().split('T')[0]) ? 'today-glow' : '';
         container.innerHTML += `<div class="day-cell ${isToday} ${pClass}">${d}</div>`;
     }
 }
 
-async function toggleDone(id, status) { await supabaseClient.from('schedule').update({ is_done: !status }).eq('id', id); muatData(); }
+async function toggleDone(id, status) {
+    await supabaseClient.from('schedule').update({ is_done: !status }).eq('id', id);
+    muatData();
+}
+
 function openDeleteModal(id) { deleteTargetId = id; document.getElementById('deleteModal').classList.replace('hidden', 'flex'); }
 function closeDeleteModal() { document.getElementById('deleteModal').classList.replace('flex', 'hidden'); }
-document.getElementById('confirmDeleteBtn').onclick = async () => { await supabaseClient.from('schedule').delete().eq('id', deleteTargetId); closeDeleteModal(); muatData(); };
+document.getElementById('confirmDeleteBtn').onclick = async () => {
+    await supabaseClient.from('schedule').delete().eq('id', deleteTargetId);
+    closeDeleteModal();
+    muatData();
+};
 
 setInterval(updateClock, 1000);
 updateClock();
