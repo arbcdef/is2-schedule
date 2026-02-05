@@ -1,8 +1,6 @@
-/* Image of the CSS Box Model with font-family inheritance */
 * {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
-    box-sizing: border-box;
 }
 
 [data-theme="light"] {
@@ -26,7 +24,6 @@
 body {
     background-color: var(--bg-color);
     color: var(--text-main);
-    overflow-x: hidden;
 }
 
 .main-title { letter-spacing: -0.04em; }
@@ -37,20 +34,13 @@ body {
     -webkit-backdrop-filter: blur(35px) saturate(160%);
     border: 1px solid rgba(128, 128, 128, 0.15);
     border-radius: 2rem;
-    position: relative;
-    z-index: 1;
 }
 
 .glass-input {
     background: var(--input-bg);
-    border: 2px solid transparent;
+    border: none;
     border-radius: 0.8rem;
     color: var(--text-main);
-    transition: border-color 0.3s;
-}
-
-.glass-input:focus {
-    border-color: var(--text-sub);
 }
 
 .ios-btn-primary {
@@ -59,40 +49,56 @@ body {
     padding: 1rem;
     border-radius: 1.2rem;
     font-weight: 700;
-    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.ios-btn-primary:active { transform: scale(0.96); }
+
+.calendar-widget {
+    background: var(--accent);
+    color: var(--bg-color);
+    border-radius: 2rem;
 }
 
 .day-cell {
     aspect-ratio: 1/1;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
     border-radius: 12px;
     font-size: 0.8rem;
     background: var(--input-bg);
+    transition: all 0.3s ease;
+}
+
+/* WARN ABU-ABU UNTUK TANGGAL BERJADWAL */
+.has-event {
+    background: #8E8E93 !important;
+    color: white !important;
+    font-weight: 800;
 }
 
 .today {
     background: var(--accent) !important;
     color: var(--bg-color) !important;
+    font-weight: 900;
+    box-shadow: 0 0 15px rgba(128, 128, 128, 0.3);
 }
 
-.event-dot {
-    width: 4px;
-    height: 4px;
-    background: var(--accent);
-    border-radius: 50%;
-    margin-top: 2px;
-    box-shadow: 0 0 5px var(--accent);
+.status-pill {
+    background: var(--input-bg);
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-size: 9px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.dot { 
-    width: 8px; 
-    height: 8px; 
-    background: #71717a; 
-    border-radius: 50%; 
-}
+.dot { width: 6px; height: 6px; background: #71717a; border-radius: 50%; }
+
+.label-text { font-size: 0.6rem; font-weight: 800; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.4rem; display: block; }
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 .fade-in { animation: fadeIn 0.8s ease-out forwards; }
