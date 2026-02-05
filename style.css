@@ -1,116 +1,43 @@
-/* IMPORT FONT AKIRA EXPANDED */
 @font-face {
     font-family: 'Akira Expanded';
     src: url('https://db.onlinewebfonts.com/t/90ef26d19b78864459f2762a043532f9.woff2') format('woff2');
-    font-weight: bold;
-    font-style: normal;
-    font-display: swap;
+    font-weight: bold; font-display: swap;
 }
 
 :root {
-    --bg-color: #fbfbfb;
-    --text-main: #000000;
-    --glass-bg: rgba(255, 255, 255, 0.8);
-    --input-bg: #f3f3f3;
-    --btn-bg: #000000;
-    --btn-text: #ffffff;
-    --accent: #8e8e93;
+    --bg-color: #fbfbfb; --text-main: #000; --glass-bg: rgba(255,255,255,0.8);
+    --input-bg: #f3f3f3; --btn-bg: #000; --btn-text: #fff;
 }
 
 [data-theme="dark"] {
-    --bg-color: #000000;
-    --text-main: #ffffff;
-    --glass-bg: rgba(28, 28, 30, 0.8);
-    --input-bg: #1c1c1e;
-    --btn-bg: #ffffff;
-    --btn-text: #000000;
-    --accent: #3a3a3c;
+    --bg-color: #000; --text-main: #fff; --glass-bg: rgba(28,28,30,0.8);
+    --input-bg: #1c1c1e; --btn-bg: #fff; --btn-text: #000;
 }
 
-body { background-color: var(--bg-color); color: var(--text-main); transition: 0.3s ease; font-family: 'Helvetica Neue', Arial, sans-serif; }
+body { background: var(--bg-color); color: var(--text-main); font-family: sans-serif; overflow-x: hidden; }
 
-/* PENERAPAN FONT AKIRA */
-.main-title {
-    font-family: 'Akira Expanded', sans-serif !important;
-    text-transform: uppercase;
-    letter-spacing: -2px; /* Font ini lebar, jadi dirapatkan sedikit agar pro */
-}
+.main-title { font-family: 'Akira Expanded', sans-serif !important; text-transform: uppercase; letter-spacing: -2px; }
 
-.main-title:hover {
-    text-shadow: 0 0 10px #ff3b30, 0 0 20px #ff3b30;
-    transition: 0.3s;
-    cursor: pointer;
-}
+.liquid-glass { background: var(--glass-bg); backdrop-filter: blur(20px); border-radius: 2rem; border: 1px solid rgba(128,128,128,0.1); }
 
-.liquid-glass { 
-    background: var(--glass-bg); 
-    backdrop-filter: blur(20px); 
-    border-radius: 2rem; 
-}
+.glass-input { background: var(--input-bg); border-radius: 1rem; color: var(--text-main); border: none; outline: none; }
 
-.glass-input { 
-    background: var(--input-bg); 
-    border: 1px solid rgba(128,128,128,0.2);
-    border-radius: 1rem; 
-    color: var(--text-main);
-    outline: none;
-}
-
-.label-text-small {
-    font-size: 10px;
-    font-weight: 800;
-    text-transform: uppercase;
-    opacity: 0.5;
-    margin-bottom: 4px;
-    display: block;
-}
-
-.btn-submit {
-    background: var(--btn-bg);
-    color: var(--btn-text);
-    padding: 1.2rem;
-    border-radius: 1.5rem;
-    font-weight: 800;
-    transition: transform 0.2s;
-}
-
+.btn-submit { background: var(--btn-bg); color: var(--btn-text); padding: 1.2rem; border-radius: 1.5rem; font-weight: 800; transition: 0.2s; }
 .btn-submit:active { transform: scale(0.95); }
 
-.countdown-card {
-    background: var(--text-main);
-    color: var(--bg-color);
-    padding: 2.5rem;
-    border-radius: 2.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.2);
-}
+.countdown-card { background: var(--text-main); color: var(--bg-color); padding: 2rem; border-radius: 2.5rem; display: flex; justify-content: space-between; align-items: center; }
 
-.calendar-widget {
-    background: var(--text-main);
-    color: var(--bg-color);
-    border-radius: 2rem;
-}
+.label-text-small { font-size: 10px; font-weight: 800; text-transform: uppercase; opacity: 0.5; display: block; margin-bottom: 4px; }
 
-.day-cell { 
-    aspect-ratio: 1/1; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    border-radius: 12px; 
-    background: rgba(128,128,128,0.1); 
-    font-size: 0.8rem;
-}
-
-.has-event { background: var(--accent) !important; color: white !important; font-weight: 900; }
-.today { background: #ff3b30 !important; color: white !important; font-weight: 900; }
-
-.priority-high { border-left: 6px solid #ff3b30 !important; }
-.priority-medium { border-left: 6px solid #ffcc00 !important; }
-.priority-low { border-left: 6px solid #8e8e93 !important; }
+.priority-high { border-left: 6px solid #ff3b30; }
+.priority-medium { border-left: 6px solid #ffcc00; }
+.priority-low { border-left: 6px solid #8e8e93; }
 
 .task-done { opacity: 0.3; filter: grayscale(1); text-decoration: line-through; }
+
+.day-cell { aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; border-radius: 10px; background: rgba(128,128,128,0.1); font-size: 0.7rem; }
+.today { background: #ff3b30 !important; color: white !important; font-weight: bold; }
+.has-event { border: 2px solid var(--text-main); }
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 .fade-in { animation: fadeIn 0.6s ease-out forwards; }
