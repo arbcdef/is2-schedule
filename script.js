@@ -5,12 +5,12 @@ const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
 let allTasks = [];
 let deleteTargetId = null;
 
-// FUNGSI MODAL REVISI
+// LOGIKA MODAL
 function openInputModal() {
     const modal = document.getElementById('inputModal');
     modal.classList.remove('hidden');
     modal.classList.add('flex');
-    if (window.navigator.vibrate) window.navigator.vibrate(30);
+    if (window.navigator.vibrate) window.navigator.vibrate(20);
 }
 
 function closeInputModal() {
@@ -20,13 +20,6 @@ function closeInputModal() {
 }
 
 // THEME & CLOCK
-function applyAutoTheme() {
-    const hour = new Date().getHours();
-    const html = document.documentElement;
-    if (hour >= 18 || hour < 6) { html.setAttribute('data-theme', 'dark'); document.getElementById('theme-icon').innerText = '🌙'; }
-    else { html.setAttribute('data-theme', 'light'); document.getElementById('theme-icon').innerText = '☀️'; }
-}
-
 function toggleThemeManually() {
     const html = document.documentElement;
     const isLight = html.getAttribute('data-theme') === 'light';
@@ -78,7 +71,7 @@ function renderFeed(data) {
                 <div>
                     <span class="text-[9px] font-black opacity-40 uppercase">${item.category} • ${item.tgl_deadline}</span>
                     <p class="font-bold text-base mt-0.5">${item.content}</p>
-                    ${item.task_link ? `<a href="${item.task_link}" target="_blank" class="text-[10px] text-blue-500 font-bold mt-1 block">🔗 LINK RESOURCE</a>` : ''}
+                    ${item.task_link ? `<a href="${item.task_link}" target="_blank" class="text-[10px] text-blue-500 font-bold mt-1 block">🔗 LINK</a>` : ''}
                 </div>
             </div>
             <button onclick="openDeleteModal(${item.id})" class="opacity-20 hover:opacity-100 text-xl px-2">✕</button>
@@ -94,8 +87,7 @@ async function simpanData() {
     const link = document.getElementById('taskLink').value; 
     
     if(!teks || !tgl) return alert("Fill data!");
-    if (window.navigator.vibrate) window.navigator.vibrate(50);
-
+    
     const btn = document.getElementById('btnSimpan');
     btn.innerText = "Syncing...";
     btn.disabled = true;
@@ -104,11 +96,10 @@ async function simpanData() {
         category: cat, content: teks, tgl_deadline: tgl, priority: prio, is_done: false, task_link: link 
     }]);
 
-    if(error) alert(error.message);
-    else { 
+    if(!error) { 
         document.getElementById('isiData').value = ''; 
         document.getElementById('taskLink').value = ''; 
-        closeInputModal(); // Tutup setelah simpan
+        closeInputModal(); // Tutup modal setelah simpan
         muatData(); 
     }
     btn.innerText = "Update Hub";
@@ -119,36 +110,31 @@ function renderCalendar() {
     const container = document.getElementById('calendar-container');
     const label = document.getElementById('calendar-month-year');
     const now = new Date();
-    const todayStr = now.toISOString().split('T')[0];
     label.innerText = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
     const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-
     container.innerHTML = '';
     for (let i = 0; i < firstDay; i++) container.innerHTML += `<div class="opacity-0"></div>`;
     for (let d = 1; d <= daysInMonth; d++) {
         const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         const hasEvent = allTasks.some(t => t.tgl_deadline === dateStr && !t.is_done);
-        container.innerHTML += `<div class="day-cell ${dateStr === todayStr ? 'today' : ''} ${hasEvent ? 'has-event' : ''}">${d}</div>`;
+        container.innerHTML += `<div class="day-cell ${hasEvent ? 'has-event' : ''}">${d}</div>`;
     }
 }
 
 async function toggleDone(id, status) {
-    if (window.navigator.vibrate) window.navigator.vibrate(30);
     await supabaseClient.from('schedule').update({ is_done: !status }).eq('id', id);
     muatData();
 }
 
-function openDeleteModal(id) { deleteTargetId = id; document.getElementById('deleteModal').classList.replace('hidden', 'flex'); }
-function closeDeleteModal() { document.getElementById('deleteModal').classList.replace('flex', 'hidden'); }
+function openDeleteModal(id) { deleteTargetId = id; document.getElementById('deleteModal').classList.remove('hidden'); document.getElementById('deleteModal').classList.add('flex'); }
+function closeDeleteModal() { document.getElementById('deleteModal').classList.add('hidden'); document.getElementById('deleteModal').classList.remove('flex'); }
 document.getElementById('confirmDeleteBtn').onclick = async () => {
     await supabaseClient.from('schedule').delete().eq('id', deleteTargetId);
     closeDeleteModal();
     muatData();
 };
 
-applyAutoTheme();
 setInterval(updateClock, 1000);
 updateClock();
 muatData();
