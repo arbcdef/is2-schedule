@@ -27,7 +27,6 @@ async function muatData() {
     } catch (err) { console.error(err); }
 }
 
-// RESTORE REMAINING DAYS
 function renderCountdown(data) {
     const area = document.getElementById('next-deadline-area');
     const today = new Date();
