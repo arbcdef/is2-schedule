@@ -1,48 +1,51 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IS-2 Smart Hub | iOS 26 Edition</title>
+    <title>IS-2 Hub | iOS 26 Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="p-4 md:p-8">
+<body class="p-4 md:p-8 transition-colors duration-500">
 
     <div class="max-w-6xl mx-auto space-y-8">
         <header class="flex justify-between items-center px-6 fade-in">
             <div>
-                <h1 class="text-4xl font-semibold tracking-tight text-slate-900">IS-2 <span class="text-blue-600">Hub</span></h1>
-                <p id="clock" class="text-slate-500 font-medium"></p>
+                <h1 class="text-4xl font-semibold tracking-tight header-text">IS-2 <span class="text-blue-600">Hub</span></h1>
+                <p id="clock" class="sub-text font-medium"></p>
             </div>
-            <div class="status-pill">
-                <span class="dot"></span> SYNCED
+            
+            <div class="flex items-center gap-4">
+                <button onclick="toggleTheme()" class="theme-toggle-btn">
+                    <span id="theme-icon">🌙</span>
+                </button>
+                <div class="status-pill">
+                    <span class="dot"></span> <span class="status-label">SYNCED</span>
+                </div>
             </div>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            
             <div class="lg:col-span-4 space-y-6 fade-in">
                 <div class="liquid-glass p-6 space-y-4">
-                    <h2 class="text-xl font-semibold text-slate-800">Input Kegiatan</h2>
-                    
+                    <h2 class="text-xl font-semibold title-text">Input Kegiatan</h2>
                     <div class="space-y-3">
-                        <label class="text-xs font-bold text-slate-400 uppercase ml-2">Kategori</label>
+                        <label class="label-text">Kategori</label>
                         <select id="kategori" class="w-full glass-input p-3">
                             <option value="tugas">🔥 Deadline Tugas</option>
                             <option value="jadwal">📅 Jadwal Kuliah</option>
                             <option value="kegiatan">🌟 Event Kelas</option>
                         </select>
 
-                        <label class="text-xs font-bold text-slate-400 uppercase ml-2">Tanggal Pelaksanaan</label>
-                        <input type="date" id="tglDeadline" class="w-full glass-input p-3 text-slate-700">
+                        <label class="label-text">Tanggal Deadline/Event</label>
+                        <input type="date" id="tglDeadline" class="w-full glass-input p-3">
 
-                        <label class="text-xs font-bold text-slate-400 uppercase ml-2">Keterangan</label>
-                        <textarea id="isiData" placeholder="Contoh: Kuis Matematika..." class="w-full glass-input p-3 h-24"></textarea>
+                        <label class="label-text">Keterangan</label>
+                        <textarea id="isiData" placeholder="Contoh: Kuis Kimia Dasar..." class="w-full glass-input p-3 h-24"></textarea>
                     </div>
-
                     <button onclick="simpanData()" id="btnSimpan" class="ios-btn-primary w-full">Update Hub</button>
                 </div>
 
@@ -55,19 +58,21 @@
 
             <div class="lg:col-span-8 space-y-6 fade-in">
                 <div class="liquid-glass p-6">
-                    <h2 class="text-xl font-semibold mb-4 text-slate-800">Kalender Akademik</h2>
-                    <div id="calendar-container" class="grid grid-cols-7 gap-2 text-center text-xs">
+                    <h2 class="text-xl font-semibold mb-4 title-text">Kalender Akademik</h2>
+                    <div class="grid grid-cols-7 gap-2 text-center text-[10px] font-bold text-slate-400 mb-2">
+                        <div>MNG</div><div>SEN</div><div>SEL</div><div>RAB</div><div>KAM</div><div>JUM</div><div>SAB</div>
+                    </div>
+                    <div id="calendar-container" class="grid grid-cols-7 gap-2">
                         </div>
                 </div>
 
                 <div class="liquid-glass p-6 min-h-[300px]">
-                    <h2 class="text-xl font-semibold mb-6">Mendatang</h2>
+                    <h2 class="text-xl font-semibold mb-6 title-text">Daftar Deadline</h2>
                     <div id="listData" class="space-y-4">
-                        <p class="text-center text-slate-400 py-10">Memuat data...</p>
+                        <p class="text-center text-slate-400 py-10">Menghubungkan Database...</p>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
