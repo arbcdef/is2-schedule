@@ -21,12 +21,12 @@
                 <p id="clock" class="font-medium text-lg mt-1 opacity-70">00:00:00</p>
             </div>
             <div class="flex items-center gap-3">
-                <button onclick="toggleThemeManually()" class="p-3 bg-zinc-100 dark:bg-zinc-800 rounded-full shadow-sm">
+                <button onclick="toggleThemeManually()" class="p-3 bg-zinc-100 dark:bg-zinc-800 rounded-full shadow-sm border border-zinc-200 dark:border-zinc-700">
                     <span id="theme-icon">🌙</span>
                 </button>
-                <div class="status-pill px-4 py-2 rounded-xl flex items-center gap-2 bg-zinc-100 dark:bg-zinc-800">
+                <div class="status-pill px-4 py-2 rounded-xl flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-green-500"></span> 
-                    <span class="text-[10px] font-black uppercase">SYSTEM ACTIVE</span>
+                    <span class="text-[10px] font-black uppercase tracking-wider">SYSTEM ACTIVE</span>
                 </div>
             </div>
         </header>
@@ -35,7 +35,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-4 space-y-6 fade-in">
-                <div class="liquid-glass p-6 space-y-4 shadow-xl border border-zinc-200 dark:border-zinc-800">
+                <div class="liquid-glass p-6 space-y-4">
                     <h2 class="text-xl font-bold tracking-tight">Add Task</h2>
                     <div class="space-y-4">
                         <div class="grid grid-cols-2 gap-3">
@@ -79,8 +79,8 @@
                 </div>
                 
                 <div class="liquid-glass p-6">
-                    <h2 class="text-xl font-bold mb-6 tracking-tight text-center">Academic Calendar</h2>
-                    <div id="calendar-month-year" class="text-xs font-bold mb-4 opacity-40 uppercase text-center"></div>
+                    <h2 class="text-xl font-bold mb-6 tracking-tight text-center uppercase tracking-widest text-[14px]">Academic Calendar</h2>
+                    <div id="calendar-month-year" class="text-[10px] font-bold mb-4 opacity-50 uppercase text-center"></div>
                     <div id="calendar-container" class="grid grid-cols-7 gap-2"></div>
                 </div>
             </div>
@@ -88,11 +88,11 @@
     </div>
 
     <div id="deleteModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
-        <div class="absolute inset-0 bg-black/40 backdrop-blur-md"></div>
-        <div class="liquid-glass relative w-full max-w-xs p-8 text-center bg-zinc-900">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-md"></div>
+        <div class="liquid-glass relative w-full max-w-xs p-8 text-center bg-white dark:bg-zinc-900 border-none shadow-2xl">
             <h3 class="text-xl font-bold mb-4">Delete Task?</h3>
             <div class="flex gap-3">
-                <button onclick="closeDeleteModal()" class="flex-1 py-3 rounded-xl bg-zinc-800 font-bold">Cancel</button>
+                <button onclick="closeDeleteModal()" class="flex-1 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 font-bold">Cancel</button>
                 <button id="confirmDeleteBtn" class="flex-1 py-3 rounded-xl bg-red-600 text-white font-bold">Delete</button>
             </div>
         </div>
