@@ -5,13 +5,13 @@ const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
 let allTasks = [];
 let deleteTargetId = null;
 
-// NO. 7: AUTO DARK/LIGHT MODE Berdasarkan Jam
+// No. 7: Auto Theme
 function applyAutoTheme() {
     const hour = new Date().getHours();
     const html = document.documentElement;
     const themeIcon = document.getElementById('theme-icon');
     
-    // Malam (18:00 - 05:59) -> Dark | Siang (06:00 - 17:59) -> Light
+    // Malam 18:00 - 06:00
     if (hour >= 18 || hour < 6) {
         html.setAttribute('data-theme', 'dark');
         if(themeIcon) themeIcon.innerText = '🌙';
@@ -34,6 +34,92 @@ function updateClock() {
     document.getElementById('cal-month').innerText = now.toLocaleDateString('id-ID', { month: 'short' });
     document.getElementById('cal-date').innerText = now.getDate();
     document.getElementById('cal-day').innerText = now.toLocaleDateString('id-ID', { weekday: 'long' });
+}
+
+async function muatData() {
+    try {
+        let { data, error } = await supabaseClient.from('schedule').select('*').order('tgl_deadline', { ascending: true });
+        if (error) throw error;
+        allTasks = data;
+        renderCalendar();
+        renderFeed(data);
+        renderCountdown(data);
+    } catch (err) {
+        console.error("Database Error:", err.message);
+    }
+}
+
+function renderCountdown(data) {
+    const area = document.getElementById('next-deadline-area');
+    const todayStr = new Date().toISOString().split('T')[0];
+    const upcoming = data.find(t => !t.is_done && t.tgl_deadline >= todayStr);
+
+    if (upcoming) {
+        const diff = new Date(upcoming.tgl_deadline).getTime() - new Date().getTime();
+        const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+        area.innerHTML = `
+            <div class="countdown-card fade-in">
+                <div>
+                    <p class="text-[10px] font-black opacity-60 uppercase tracking-widest">Upcoming Milestone</p>
+                    <h2 class="text-3xl font-bold tracking-tight">${upcoming.content}</h2>
+                </div>
+                <div class="text-right">
+                    <p class="text-4xl font-black">${days <= 0 ? "Today" : days + " Days"}</p>
+                </div>
+            </div>`;
+    } else { area.innerHTML = ""; }
+}
+
+// No. 8: Render Feed dengan Link
+function renderFeed(data) {
+    const list = document.getElementById('listData');
+    if(!list) return;
+    list.innerHTML = data.map(item => `
+        <div class="liquid-glass p-5 flex justify-between items-center transition-all priority-${item.priority || 'low'} ${item.is_done ? 'task-done' : ''}">
+            <div class="flex items-center gap-4">
+                <input type="checkbox" ${item.is_done ? 'checked' : ''} 
+                    onclick="toggleDone(${item.id}, ${item.is_done})" 
+                    class="w-5 h-5 cursor-pointer accent-zinc-800">
+                <div>
+                    <span class="text-[9px] font-black opacity-40 uppercase">${item.category} • ${item.tgl_deadline}</span>
+                    <p class="font-bold text-base mt-0.5">${item.content}</p>
+                    ${item.task_link ? `
+                        <a href="${item.task_link}" target="_blank" class="text-[10px] text-blue-500 hover:underline flex items-center gap-1 mt-1 font-bold">
+                            🔗 RESOURCE LINK
+                        </a>` : ''}
+                </div>
+            </div>
+            <button onclick="openDeleteModal(${item.id})" class="opacity-20 hover:opacity-100 px-2 text-xl">✕</button>
+        </div>
+    `).join('');
+}
+
+async function simpanData() {
+    const cat = document.getElementById('kategori').value;
+    const prio = document.getElementById('priority').value; 
+    const tgl = document.getElementById('tglDeadline').value;
+    const teks = document.getElementById('isiData').value;
+    const link = document.getElementById('taskLink').value; 
+    
+    if(!teks || !tgl) return alert("Please fill task and date!");
+
+    const btn = document.getElementById('btnSimpan');
+    btn.innerText = "Syncing...";
+    btn.disabled = true;
+
+    // Pastikan is_done dan task_link ada di DB
+    const { error } = await supabaseClient.from('schedule').insert([{ 
+        category: cat, content: teks, tgl_deadline: tgl, priority: prio, is_done: false, task_link: link 
+    }]);
+
+    if(error) alert("Error: " + error.message);
+    else { 
+        document.getElementById('isiData').value = '';
+        document.getElementById('taskLink').value = '';
+        muatData(); 
+    }
+    btn.innerText = "Update Hub";
+    btn.disabled = false;
 }
 
 function renderCalendar() {
@@ -62,99 +148,9 @@ function renderCalendar() {
     }
 }
 
-async function muatData() {
-    try {
-        let { data, error } = await supabaseClient.from('schedule').select('*').order('tgl_deadline', { ascending: true });
-        if (error) throw error;
-        allTasks = data;
-        renderCalendar();
-        renderFeed(data);
-        renderCountdown(data);
-    } catch (err) {
-        console.error("Fetch error:", err);
-    }
-}
-
-function renderCountdown(data) {
-    const area = document.getElementById('next-deadline-area');
-    const todayStr = new Date().toISOString().split('T')[0];
-    const upcoming = data.find(t => !t.is_done && t.tgl_deadline >= todayStr);
-
-    if (upcoming) {
-        const diff = new Date(upcoming.tgl_deadline).getTime() - new Date().getTime();
-        const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-        area.innerHTML = `
-            <div class="countdown-card bg-zinc-900 dark:bg-zinc-100 text-white dark:text-black p-8 rounded-[2rem] flex justify-between items-center shadow-2xl">
-                <div>
-                    <p class="text-[10px] font-black opacity-50 uppercase tracking-widest">Upcoming Milestone</p>
-                    <h2 class="text-3xl font-bold tracking-tight">${upcoming.content}</h2>
-                </div>
-                <div class="text-right">
-                    <p class="text-4xl font-black">${days <= 0 ? "Due Today" : days + " Days"}</p>
-                </div>
-            </div>`;
-    } else { area.innerHTML = ""; }
-}
-
-// NO. 8: Render Link Tugas
-function renderFeed(data) {
-    const list = document.getElementById('listData');
-    list.innerHTML = data.map(item => `
-        <div class="liquid-glass p-5 flex justify-between items-center transition-all priority-${item.priority || 'low'} ${item.is_done ? 'task-done' : ''}">
-            <div class="flex items-center gap-4">
-                <input type="checkbox" ${item.is_done ? 'checked' : ''} 
-                    onclick="toggleDone(${item.id}, ${item.is_done})" 
-                    class="w-5 h-5 cursor-pointer accent-black dark:accent-white">
-                <div>
-                    <span class="text-[9px] font-black opacity-40 uppercase">${item.category} • ${item.tgl_deadline}</span>
-                    <p class="font-bold text-base mt-0.5">${item.content}</p>
-                    ${item.task_link ? `
-                        <a href="${item.task_link}" target="_blank" class="text-[10px] text-blue-500 hover:underline flex items-center gap-1 mt-1 font-bold">
-                            🔗 RESOURCE LINK
-                        </a>` : ''}
-                </div>
-            </div>
-            <button onclick="openDeleteModal(${item.id})" class="opacity-20 hover:opacity-100 px-2 text-xl">✕</button>
-        </div>
-    `).join('');
-}
-
 async function toggleDone(id, currentStatus) {
     await supabaseClient.from('schedule').update({ is_done: !currentStatus }).eq('id', id);
     muatData();
-}
-
-async function simpanData() {
-    const cat = document.getElementById('kategori').value;
-    const prio = document.getElementById('priority').value; 
-    const tgl = document.getElementById('tglDeadline').value;
-    const teks = document.getElementById('isiData').value;
-    const link = document.getElementById('taskLink').value; // Ambil Link (No. 8)
-    
-    if(!teks || !tgl) return alert("Fill mandatory fields!");
-
-    const btn = document.getElementById('btnSimpan');
-    btn.innerText = "Syncing...";
-    btn.disabled = true;
-
-    // Pastikan kolom task_link sudah ada di Supabase
-    const { error } = await supabaseClient.from('schedule').insert([{ 
-        category: cat, 
-        content: teks, 
-        tgl_deadline: tgl, 
-        priority: prio, 
-        is_done: false,
-        task_link: link 
-    }]);
-
-    if(error) alert("Error: " + error.message);
-    else { 
-        document.getElementById('isiData').value = '';
-        document.getElementById('taskLink').value = '';
-        muatData(); 
-    }
-    btn.innerText = "Update Hub";
-    btn.disabled = false;
 }
 
 function openDeleteModal(id) {
@@ -170,8 +166,7 @@ document.getElementById('confirmDeleteBtn').onclick = async () => {
     muatData();
 };
 
-// INITIALIZE
-applyAutoTheme(); // Terapkan tema otomatis saat buka (No. 7)
+applyAutoTheme();
 setInterval(updateClock, 1000);
 updateClock();
 muatData();
