@@ -3,25 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <title>Information System 2 | Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="style.css?v=1.1">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="p-4 md:p-8 transition-colors duration-500">
+
     <div class="max-w-6xl mx-auto space-y-8">
         <header class="flex flex-col md:flex-row justify-between items-start md:items-center px-6 gap-4 fade-in">
             <div>
                 <h1 class="text-4xl font-bold tracking-tight main-title">Information System 2</h1>
-                <p id="clock" class="sub-text font-medium text-lg mt-1">00:00:00</p>
+                <p id="clock" class="sub-text font-medium text-lg mt-1"></p>
             </div>
+            
             <div class="flex items-center gap-3">
-                <button onclick="toggleTheme()" class="theme-toggle-btn shadow-sm" aria-label="Toggle Theme">
+                <button onclick="toggleTheme()" class="theme-toggle-btn">
                     <span id="theme-icon">🌙</span>
                 </button>
                 <div class="status-pill">
-                    <span id="dot-status" class="dot"></span> <span id="label-status" class="status-label">INITIALIZING</span>
+                    <span class="dot"></span> <span class="status-label">INITIALIZING</span>
                 </div>
             </div>
         </header>
@@ -34,9 +35,9 @@
                         <div class="input-group">
                             <label class="label-text">Category</label>
                             <select id="kategori" class="w-full glass-input p-3 appearance-none cursor-pointer">
-                                <option value="tugas">Assignment & Deadline</option>
-                                <option value="jadwal">Course Schedule</option>
-                                <option value="kegiatan">Class Event</option>
+                                <option value="Assignment">Assignment & Deadline</option>
+                                <option value="Schedule">Course Schedule</option>
+                                <option value="Event">Class Event</option>
                             </select>
                         </div>
                         <div class="input-group">
@@ -51,7 +52,7 @@
                     <button onclick="simpanData()" id="btnSimpan" class="ios-btn-primary w-full">Update Hub</button>
                 </div>
 
-                <div class="calendar-widget p-6 text-center">
+                <div class="calendar-widget p-6 text-center shadow-xl">
                     <p id="cal-month" class="text-xs font-black uppercase tracking-[0.3em] opacity-60"></p>
                     <p id="cal-date" class="text-7xl font-bold my-1"></p>
                     <p id="cal-day" class="text-base font-medium opacity-70"></p>
@@ -61,19 +62,24 @@
             <div class="lg:col-span-8 space-y-6 fade-in">
                 <div class="liquid-glass p-6">
                     <h2 class="text-xl font-bold mb-6 title-text tracking-tight">Academic Calendar</h2>
-                    <div id="calendar-month-year" class="text-xs font-bold mb-4 opacity-40 uppercase tracking-widest"></div>
+                    <div id="calendar-month-year" class="text-xs font-bold mb-4 opacity-40 uppercase tracking-widest text-center"></div>
                     <div class="grid grid-cols-7 gap-2 text-center text-[10px] font-black text-zinc-400 mb-4">
                         <div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
                     </div>
-                    <div id="calendar-container" class="grid grid-cols-7 gap-2 md:gap-3"></div>
+                    <div id="calendar-container" class="grid grid-cols-7 gap-2 md:gap-3">
+                        </div>
                 </div>
-                <div class="liquid-glass p-6 min-h-[400px]">
-                    <h2 class="text-xl font-bold mb-6 title-text tracking-tight text-center md:text-left">Timeline Feed</h2>
-                    <div id="listData" class="space-y-4"></div>
+
+                <div class="liquid-glass p-6 min-h-[300px]">
+                    <h2 class="text-xl font-bold mb-6 title-text tracking-tight">Timeline Feed</h2>
+                    <div id="listData" class="space-y-4">
+                        <p class="text-center text-zinc-400 py-10 italic">Connecting to database...</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <script src="script.js?v=1.1"></script>
+
+    <script src="script.js"></script>
 </body>
 </html>
