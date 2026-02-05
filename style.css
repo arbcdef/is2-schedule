@@ -1,31 +1,45 @@
+/* VARIABEL WARNA SOLID iOS 26 */
+[data-theme="light"] {
+    --bg-color: #F2F2F7;
+    --glass-bg: rgba(255, 255, 255, 0.4);
+    --text-main: #1C1C1E;
+    --text-sub: #8E8E93;
+    --input-bg: rgba(255, 255, 255, 0.6);
+}
+
+[data-theme="dark"] {
+    --bg-color: #000000;
+    --glass-bg: rgba(28, 28, 30, 0.5);
+    --text-main: #FFFFFF;
+    --text-sub: #AEAEB2;
+    --input-bg: rgba(44, 44, 46, 0.6);
+}
+
 :root {
     --ios-blue: #007AFF;
-    --glass: rgba(255, 255, 255, 0.3);
 }
 
 body {
     font-family: 'SF Pro Display', sans-serif;
-    background: linear-gradient(135deg, #fce4ec 0%, #e1f5fe 100%);
-    background-attachment: fixed;
-    min-height: 100vh;
+    background-color: var(--bg-color);
+    color: var(--text-main);
 }
 
-/* TEMA LIQUID GLASS */
+/* LIQUID GLASS STYLE */
 .liquid-glass {
-    background: var(--glass);
-    backdrop-filter: blur(40px) saturate(180%);
-    -webkit-backdrop-filter: blur(40px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    background: var(--glass-bg);
+    backdrop-filter: blur(40px) saturate(200%);
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
+    border: 0.5px solid rgba(255, 255, 255, 0.2);
     border-radius: 2.5rem;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.05);
 }
 
 .glass-input {
-    background: rgba(255, 255, 255, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 1.2rem;
+    background: var(--input-bg);
+    border: none;
+    border-radius: 1rem;
+    color: var(--text-main);
     outline: none;
-    font-size: 0.9rem;
 }
 
 .ios-btn-primary {
@@ -34,43 +48,59 @@ body {
     padding: 1rem;
     border-radius: 1.5rem;
     font-weight: 600;
-    transition: all 0.3s ease;
-    box-shadow: 0 8px 20px rgba(0, 122, 255, 0.3);
+    box-shadow: 0 10px 20px rgba(0, 122, 255, 0.3);
 }
 
-.ios-btn-primary:active { transform: scale(0.95); }
-
-.calendar-widget {
-    background: linear-gradient(180deg, #ff3b30 0%, #ff2d55 100%);
-    color: white;
-    border-radius: 2.2rem;
-    box-shadow: 0 15px 30px rgba(255, 59, 48, 0.2);
-}
-
-/* Gaya Kalender Akademik */
-.calendar-day-header { font-weight: 800; color: #8e8e93; margin-bottom: 5px; }
-.day-cell { 
-    height: 45px; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    border-radius: 12px; 
-    background: rgba(255, 255, 255, 0.2);
-    position: relative;
-}
-.day-has-event { background: var(--ios-blue) !important; color: white; font-weight: bold; }
-
-.status-pill {
-    background: rgba(255, 255, 255, 0.6);
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 10px;
-    font-weight: 800;
+/* THEME TOGGLE BUTTON */
+.theme-toggle-btn {
+    background: var(--glass-bg);
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
-    gap: 6px;
+    justify-content: center;
+    font-size: 1.2rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
-.dot { width: 8px; height: 8px; background: #34c759; border-radius: 50%; animate: pulse 2s infinite; }
+
+/* CALENDAR STYLING */
+.day-cell {
+    aspect-ratio: 1/1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 0.8rem;
+    transition: 0.3s;
+}
+
+.event-dot {
+    width: 4px;
+    height: 4px;
+    background: var(--ios-blue);
+    border-radius: 50%;
+    position: absolute;
+    bottom: 4px;
+}
+
+.today {
+    background: #FF3B30 !important;
+    color: white !important;
+    font-weight: bold;
+}
+
+.calendar-widget {
+    background: linear-gradient(180deg, #FF3B30 0%, #FF2D55 100%);
+    color: white;
+    border-radius: 2.2rem;
+}
+
+/* TEXT HELPERS */
+.title-text { color: var(--text-main); }
+.sub-text { color: var(--text-sub); }
+.label-text { font-size: 0.7rem; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-left: 0.5rem; }
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 .fade-in { animation: fadeIn 0.8s ease-out forwards; }
