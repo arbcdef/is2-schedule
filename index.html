@@ -2,98 +2,81 @@
 <html lang="id" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IS2 | Productivity Hub</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>IS2 | Hub</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#000000">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="p-4 md:p-8 transition-colors duration-500">
+<body class="ios-bg transition-all duration-700">
 
-    <div class="max-w-6xl mx-auto space-y-8">
-        <header class="flex flex-col md:flex-row justify-between items-start md:items-center px-6 gap-4 fade-in">
-            <div>
-                <h1 class="text-4xl font-bold tracking-tighter main-title">Information System 2</h1>
-                <p id="clock" class="font-medium text-lg mt-1 opacity-70">00:00:00</p>
+    <div class="max-w-5xl mx-auto px-6 py-12 space-y-10">
+        <header class="flex justify-between items-end px-2 fade-in">
+            <div class="space-y-1">
+                <p id="clock" class="ios-time">00:00</p>
+                <h1 class="ios-title">IS2 Dashboard</h1>
             </div>
             <div class="flex items-center gap-3">
-                <button onclick="toggleThemeManually()" class="p-3 bg-zinc-100 dark:bg-zinc-800 rounded-full shadow-sm border border-zinc-200 dark:border-zinc-700">
+                <button onclick="toggleThemeManually()" class="ios-icon-btn">
                     <span id="theme-icon">🌙</span>
                 </button>
-                <div class="status-pill px-4 py-2 rounded-xl flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-green-500"></span> 
-                    <span class="text-[10px] font-black uppercase tracking-wider">SYSTEM ACTIVE</span>
+                <div class="ios-pill">
+                    <span class="ios-dot"></span>
+                    <span class="text-[10px] font-bold tracking-widest uppercase opacity-70">Active</span>
                 </div>
             </div>
         </header>
 
-        <div id="next-deadline-area" class="fade-in min-h-[100px]"></div>
+        <div id="next-deadline-area" class="fade-in"></div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-4 space-y-6 fade-in">
-                <div class="liquid-glass p-6 space-y-4">
-                    <h2 class="text-xl font-bold tracking-tight">Add Task</h2>
+                <section class="ios-card p-7 space-y-6">
+                    <h2 class="text-lg font-semibold tracking-tight">New Task</h2>
                     <div class="space-y-4">
                         <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="label-text-small">Category</label>
-                                <select id="kategori" class="w-full glass-input p-3 text-sm">
-                                    <option value="Assignment">Assignment</option>
-                                    <option value="Event">Event</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="label-text-small">Priority</label>
-                                <select id="priority" class="w-full glass-input p-3 text-sm">
-                                    <option value="low">Low</option>
-                                    <option value="medium" selected>Medium</option>
-                                    <option value="high">High</option>
-                                </select>
-                            </div>
+                            <select id="kategori" class="ios-input">
+                                <option value="Assignment">Assignment</option>
+                                <option value="Event">Event</option>
+                            </select>
+                            <select id="priority" class="ios-input">
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High</option>
+                            </select>
                         </div>
-                        <div>
-                            <label class="label-text-small">Deadline Date</label>
-                            <input type="date" id="tglDeadline" class="w-full glass-input p-3">
-                        </div>
-                        <div>
-                            <label class="label-text-small">Task Details</label>
-                            <textarea id="isiData" placeholder="What needs to be done?" class="w-full glass-input p-3 h-20 resize-none"></textarea>
-                        </div>
-                        <div>
-                            <label class="label-text-small">Resource Link</label>
-                            <input type="url" id="taskLink" placeholder="https://..." class="w-full glass-input p-3 text-sm">
-                        </div>
+                        <input type="date" id="tglDeadline" class="ios-input w-full">
+                        <textarea id="isiData" placeholder="What's the task?" class="ios-input w-full h-24 pt-3 resize-none"></textarea>
+                        <input type="url" id="taskLink" placeholder="Resource link (optional)" class="ios-input w-full">
                     </div>
-                    <button onclick="simpanData()" id="btnSimpan" class="btn-submit w-full">Update Hub</button>
-                </div>
+                    <button onclick="simpanData()" id="btnSimpan" class="ios-primary-btn">Update Hub</button>
+                </section>
             </div>
 
-            <div class="lg:col-span-8 space-y-6 fade-in">
-                <div class="liquid-glass p-6 min-h-[400px]">
-                    <h2 class="text-xl font-bold mb-6 tracking-tight">Timeline Feed</h2>
-                    <div id="listData" class="space-y-4"></div>
-                </div>
+            <div class="lg:col-span-8 space-y-8 fade-in">
+                <section class="ios-card p-7 min-h-[400px]">
+                    <h2 class="text-lg font-semibold mb-6 tracking-tight">Timeline</h2>
+                    <div id="listData" class="space-y-3"></div>
+                </section>
                 
-                <div class="liquid-glass p-6">
-                    <h2 class="text-xl font-bold mb-6 tracking-tight text-center uppercase tracking-widest text-[14px]">Academic Calendar</h2>
-                    <div id="calendar-month-year" class="text-[10px] font-bold mb-4 opacity-50 uppercase text-center"></div>
-                    <div id="calendar-container" class="grid grid-cols-7 gap-2"></div>
-                </div>
+                <section class="ios-card p-8">
+                    <h2 class="text-[10px] font-black opacity-30 uppercase tracking-[0.3em] text-center mb-6">Academic Calendar</h2>
+                    <div id="calendar-month-year" class="text-[11px] font-bold mb-4 text-center opacity-60"></div>
+                    <div id="calendar-container" class="grid grid-cols-7 gap-2 max-w-[300px] mx-auto"></div>
+                </section>
             </div>
-        </div>
+        </main>
     </div>
 
-    <div id="deleteModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-md"></div>
-        <div class="liquid-glass relative w-full max-w-xs p-8 text-center bg-white dark:bg-zinc-900 border-none shadow-2xl">
-            <h3 class="text-xl font-bold mb-4">Delete Task?</h3>
-            <div class="flex gap-3">
-                <button onclick="closeDeleteModal()" class="flex-1 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 font-bold">Cancel</button>
-                <button id="confirmDeleteBtn" class="flex-1 py-3 rounded-xl bg-red-600 text-white font-bold">Delete</button>
+    <div id="deleteModal" class="fixed inset-0 z-[100] hidden items-end justify-center pb-10 px-6">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-md" onclick="closeDeleteModal()"></div>
+        <div class="ios-card relative w-full max-w-sm p-8 text-center animate-ios-slide">
+            <h3 class="text-xl font-bold mb-2">Delete Task?</h3>
+            <p class="text-sm opacity-50 mb-6">This will be permanently removed.</p>
+            <div class="flex flex-col gap-3">
+                <button id="confirmDeleteBtn" class="w-full py-4 rounded-2xl bg-red-500 text-white font-bold">Delete</button>
+                <button onclick="closeDeleteModal()" class="w-full py-4 rounded-2xl bg-zinc-100 dark:bg-zinc-800 font-bold">Cancel</button>
             </div>
         </div>
     </div>
