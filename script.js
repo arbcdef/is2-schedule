@@ -3,6 +3,7 @@ const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
 
 let eventDates = [];
+let deleteTargetId = null;
 
 function toggleTheme() {
     const html = document.documentElement;
@@ -13,9 +14,7 @@ function toggleTheme() {
 
 function updateClock() {
     const now = new Date();
-    const clockEl = document.getElementById('clock');
-    if(clockEl) clockEl.innerText = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    
+    document.getElementById('clock').innerText = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     document.getElementById('cal-month').innerText = now.toLocaleDateString('id-ID', { month: 'short' });
     document.getElementById('cal-date').innerText = now.getDate();
     document.getElementById('cal-day').innerText = now.toLocaleDateString('id-ID', { weekday: 'long' });
@@ -24,8 +23,6 @@ function updateClock() {
 function renderCalendar() {
     const container = document.getElementById('calendar-container');
     const label = document.getElementById('calendar-month-year');
-    if (!container) return;
-
     const now = new Date();
     const year = now.getFullYear();
     const month = now.getMonth();
@@ -40,10 +37,7 @@ function renderCalendar() {
     for (let d = 1; d <= daysInMonth; d++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         const isToday = (d === now.getDate() && month === now.getMonth()) ? 'today' : '';
-        
-        // LOGIKA WARNA ABU-ABU JIKA ADA EVENT
         const hasEvent = eventDates.includes(dateStr) ? 'has-event' : '';
-        
         container.innerHTML += `<div class="day-cell ${isToday} ${hasEvent}"><span>${d}</span></div>`;
     }
 }
@@ -71,7 +65,7 @@ async function muatData() {
                     <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400">${item.category} • ${item.tgl_deadline}</span>
                     <p class="font-bold text-base mt-1 tracking-tight">${item.content}</p>
                 </div>
-                <button onclick="hapusData(${item.id})" class="opacity-20 hover:opacity-100 px-2 transition">✕</button>
+                <button onclick="openDeleteModal(${item.id})" class="opacity-20 hover:opacity-100 px-2 transition text-lg">✕</button>
             </div>
         `).join('');
     } catch (err) {
@@ -84,31 +78,38 @@ async function simpanData() {
     const cat = document.getElementById('kategori').value;
     const tgl = document.getElementById('tglDeadline').value;
     const teks = document.getElementById('isiData').value;
-    
-    if(!teks || !tgl) return alert("Wajib isi tanggal dan detail!");
+    if(!teks || !tgl) return alert("Isi tanggal dan detail!");
 
     const btn = document.getElementById('btnSimpan');
     btn.innerText = "Syncing...";
+    const { error } = await supabaseClient.from('schedule').insert([{ category: cat, content: teks, tgl_deadline: tgl }]);
     
-    const { error } = await supabaseClient.from('schedule').insert([{ 
-        category: cat, 
-        content: teks, 
-        tgl_deadline: tgl 
-    }]);
-
     if(error) alert("Gagal: " + error.message);
-    else {
-        document.getElementById('isiData').value = '';
-        muatData();
-    }
+    else { document.getElementById('isiData').value = ''; muatData(); }
     btn.innerText = "Update Hub";
 }
 
-async function hapusData(id) {
-    if(confirm("Hapus data ini?")) {
-        await supabaseClient.from('schedule').delete().eq('id', id);
-        muatData();
-    }
+// POP-UP LOGIC
+function openDeleteModal(id) {
+    deleteTargetId = id;
+    const modal = document.getElementById('deleteModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.getElementById('confirmDeleteBtn').onclick = confirmHapus;
+}
+
+function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.replace('flex', 'hidden');
+    deleteTargetId = null;
+}
+
+async function confirmHapus() {
+    const btn = document.getElementById('confirmDeleteBtn');
+    btn.innerText = "Deleting...";
+    await supabaseClient.from('schedule').delete().eq('id', deleteTargetId);
+    closeDeleteModal();
+    btn.innerText = "Delete";
+    muatData();
 }
 
 setInterval(updateClock, 1000);
