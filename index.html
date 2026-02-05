@@ -16,32 +16,37 @@
                 <h1 class="text-4xl font-bold tracking-tight main-title">Information System 2</h1>
                 <p id="clock" class="sub-text font-medium text-lg mt-1">00:00:00</p>
             </div>
-            <div class="status-pill">
-                <span class="dot"></span> <span class="status-label">INITIALIZING</span>
+            <div class="flex items-center gap-3">
+                <button onclick="toggleTheme()" class="theme-toggle-btn p-2 bg-zinc-100 dark:bg-zinc-800 rounded-full shadow-sm">
+                    <span id="theme-icon">🌙</span>
+                </button>
+                <div class="status-pill">
+                    <span class="dot" id="status-dot"></span> <span class="status-label">INITIALIZING</span>
+                </div>
             </div>
         </header>
 
-        <div id="next-deadline-area" class="fade-in"></div>
+        <div id="next-deadline-area" class="fade-in min-h-[100px]"></div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-4 space-y-6 fade-in">
-                <div class="liquid-glass p-6 space-y-4">
+                <div class="liquid-glass p-6 space-y-4 shadow-xl">
                     <h2 class="text-xl font-bold tracking-tight">Add Task</h2>
                     <div class="space-y-4">
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="label-text">Category</label>
-                                <select id="kategori" class="w-full glass-input p-3 text-sm">
+                                <select id="kategori" class="w-full glass-input p-3 text-sm appearance-none">
                                     <option value="Assignment">Assignment</option>
                                     <option value="Event">Event</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="label-text">Priority</label>
-                                <select id="priority" class="w-full glass-input p-3 text-sm">
+                                <select id="priority" class="w-full glass-input p-3 text-sm appearance-none">
                                     <option value="low">Low</option>
                                     <option value="medium">Medium</option>
-                                    <option value="high">High 🔥</option>
+                                    <option value="high">High</option>
                                 </select>
                             </div>
                         </div>
@@ -54,7 +59,7 @@
                             <textarea id="isiData" placeholder="What needs to be done?" class="w-full glass-input p-3 h-20 resize-none"></textarea>
                         </div>
                     </div>
-                    <button onclick="simpanData()" id="btnSimpan" class="ios-btn-primary w-full">Update Hub</button>
+                    <button onclick="simpanData()" id="btnSimpan" class="ios-btn-primary w-full shadow-lg">Update Hub</button>
                 </div>
 
                 <div class="calendar-widget p-6 text-center shadow-xl">
@@ -74,9 +79,11 @@
                     <div id="calendar-container" class="grid grid-cols-7 gap-2"></div>
                 </div>
 
-                <div class="liquid-glass p-6 min-h-[300px]">
+                <div class="liquid-glass p-6 min-h-[400px]">
                     <h2 class="text-xl font-bold mb-6 tracking-tight">Timeline Feed</h2>
-                    <div id="listData" class="space-y-4"></div>
+                    <div id="listData" class="space-y-4">
+                        <p class="text-center text-zinc-400 py-10 italic">Connecting to database...</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -87,8 +94,8 @@
         <div class="liquid-glass relative w-full max-w-xs p-8 text-center" id="modalBox">
             <h3 class="text-xl font-bold mb-4">Delete Task?</h3>
             <div class="flex gap-3">
-                <button onclick="closeDeleteModal()" class="flex-1 py-3 rounded-xl bg-zinc-200 dark:bg-zinc-800">Cancel</button>
-                <button id="confirmDeleteBtn" class="flex-1 py-3 rounded-xl bg-red-600 text-white font-bold">Delete</button>
+                <button onclick="closeDeleteModal()" class="flex-1 py-3 rounded-xl bg-zinc-200 dark:bg-zinc-800 font-bold">Cancel</button>
+                <button id="confirmDeleteBtn" class="flex-1 py-3 rounded-xl bg-red-600 text-white font-bold shadow-lg shadow-red-500/30">Delete</button>
             </div>
         </div>
     </div>
