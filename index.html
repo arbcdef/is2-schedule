@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>IS2 Hub | Full Restore</title>
+    <title>IS2 Hub | Monochrome Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="style.css">
@@ -11,21 +11,21 @@
 <body class="ios-bg">
 
     <div class="fixed inset-0 overflow-hidden pointer-events-none z-[-1]">
-        <div class="absolute top-[-5%] left-[-5%] w-[60%] h-[60%] bg-blue-600/10 rounded-full blur-[120px]"></div>
-        <div class="absolute bottom-[-5%] right-[-5%] w-[60%] h-[60%] bg-purple-600/10 rounded-full blur-[120px]"></div>
+        <div class="absolute top-[-10%] left-[-10%] w-[70%] h-[70%] bg-zinc-500/10 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-zinc-200/5 rounded-full blur-[120px]"></div>
     </div>
 
     <div class="max-w-6xl mx-auto px-6 py-10 space-y-10 relative z-10">
         <header class="flex justify-between items-end px-2">
             <div class="space-y-1">
                 <p id="clock" class="ios-time">00:00:00</p>
-                <h1 class="ios-title text-4xl">INFORMATION SYSTEM 2 HUB</h1>
+                <h1 class="ios-title text-4xl">INFORMATION SYSTEM 2</h1>
             </div>
             <div class="flex items-center gap-4">
-                <button onclick="toggleThemeManually()" class="ios-icon-btn shadow-lg">
+                <button onclick="toggleThemeManually()" class="ios-icon-btn">
                     <span id="theme-icon">🌙</span>
                 </button>
-                <div class="ios-pill shadow-lg">
+                <div class="ios-pill">
                     <span class="ios-dot"></span>
                     <span class="text-[10px] font-black uppercase tracking-widest opacity-80">System Active</span>
                 </div>
@@ -69,15 +69,13 @@
                             <input type="url" id="taskLink" placeholder="https://..." class="ios-input w-full">
                         </div>
                     </div>
-                    <button onclick="simpanData()" id="btnSimpan" class="ios-primary-btn shadow-2xl">Update Hub</button>
+                    <button onclick="simpanData()" id="btnSimpan" class="ios-primary-btn">Update Hub</button>
                 </section>
             </div>
 
             <div class="lg:col-span-8 space-y-10">
                 <section class="ios-card p-8 min-h-[500px]">
-                    <div class="flex justify-between items-center mb-8">
-                        <h2 class="text-2xl font-bold tracking-tight">Timeline Feed</h2>
-                    </div>
+                    <h2 class="text-2xl font-bold tracking-tight mb-8">Timeline Feed</h2>
                     <div id="listData" class="space-y-5"></div>
                 </section>
                 
@@ -91,13 +89,12 @@
     </div>
 
     <div id="deleteModal" class="fixed inset-0 z-[100] hidden items-center justify-center px-6">
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-md" onclick="closeDeleteModal()"></div>
-        <div class="ios-card relative w-full max-w-xs p-10 text-center scale-up">
-            <h3 class="text-2xl font-bold mb-3">Delete?</h3>
-            <p class="text-sm opacity-50 mb-8">This action is permanent.</p>
-            <div class="flex gap-4">
-                <button onclick="closeDeleteModal()" class="flex-1 py-4 rounded-2xl bg-zinc-200/50 dark:bg-zinc-800 font-bold">No</button>
-                <button id="confirmDeleteBtn" class="flex-1 py-4 rounded-2xl bg-red-500 text-white font-bold shadow-lg shadow-red-500/30">Yes</button>
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-md" onclick="closeDeleteModal()"></div>
+        <div class="ios-card relative w-full max-w-xs p-10 text-center">
+            <h3 class="text-2xl font-bold mb-3">Delete Task?</h3>
+            <div class="flex gap-4 mt-8">
+                <button onclick="closeDeleteModal()" class="flex-1 py-4 rounded-2xl bg-zinc-800 text-white font-bold">No</button>
+                <button id="confirmDeleteBtn" class="flex-1 py-4 rounded-2xl bg-white text-black font-bold">Yes</button>
             </div>
         </div>
     </div>
