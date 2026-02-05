@@ -5,20 +5,6 @@ const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
 let allTasks = [];
 let deleteTargetId = null;
 
-// LOGIKA MODAL
-function openInputModal() {
-    const modal = document.getElementById('inputModal');
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-    if (window.navigator.vibrate) window.navigator.vibrate(20);
-}
-
-function closeInputModal() {
-    const modal = document.getElementById('inputModal');
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
-}
-
 // THEME & CLOCK
 function toggleThemeManually() {
     const html = document.documentElement;
@@ -71,7 +57,7 @@ function renderFeed(data) {
                 <div>
                     <span class="text-[9px] font-black opacity-40 uppercase">${item.category} • ${item.tgl_deadline}</span>
                     <p class="font-bold text-base mt-0.5">${item.content}</p>
-                    ${item.task_link ? `<a href="${item.task_link}" target="_blank" class="text-[10px] text-blue-500 font-bold mt-1 block">🔗 LINK</a>` : ''}
+                    ${item.task_link ? `<a href="${item.task_link}" target="_blank" class="text-[10px] text-blue-500 font-bold mt-1 block">🔗 LINK RESOURCE</a>` : ''}
                 </div>
             </div>
             <button onclick="openDeleteModal(${item.id})" class="opacity-20 hover:opacity-100 text-xl px-2">✕</button>
@@ -86,10 +72,10 @@ async function simpanData() {
     const teks = document.getElementById('isiData').value;
     const link = document.getElementById('taskLink').value; 
     
-    if(!teks || !tgl) return alert("Fill data!");
-    
+    if(!teks || !tgl) return alert("Isi data dulu!");
+
     const btn = document.getElementById('btnSimpan');
-    btn.innerText = "Syncing...";
+    btn.innerText = "Processing...";
     btn.disabled = true;
 
     const { error } = await supabaseClient.from('schedule').insert([{ 
@@ -99,7 +85,6 @@ async function simpanData() {
     if(!error) { 
         document.getElementById('isiData').value = ''; 
         document.getElementById('taskLink').value = ''; 
-        closeInputModal(); // Tutup modal setelah simpan
         muatData(); 
     }
     btn.innerText = "Update Hub";
@@ -127,8 +112,8 @@ async function toggleDone(id, status) {
     muatData();
 }
 
-function openDeleteModal(id) { deleteTargetId = id; document.getElementById('deleteModal').classList.remove('hidden'); document.getElementById('deleteModal').classList.add('flex'); }
-function closeDeleteModal() { document.getElementById('deleteModal').classList.add('hidden'); document.getElementById('deleteModal').classList.remove('flex'); }
+function openDeleteModal(id) { deleteTargetId = id; document.getElementById('deleteModal').classList.replace('hidden', 'flex'); }
+function closeDeleteModal() { document.getElementById('deleteModal').classList.replace('flex', 'hidden'); }
 document.getElementById('confirmDeleteBtn').onclick = async () => {
     await supabaseClient.from('schedule').delete().eq('id', deleteTargetId);
     closeDeleteModal();
