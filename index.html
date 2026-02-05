@@ -3,91 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadwal Kuliah Sync</title>
+    <title>IS-2 Hub | iOS 26 Liquid Glass</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* CSS: Efek Liquid Glass & Animasi */
+        :root {
+            --ios-blue: #007AFF;
+        }
+        body {
+            font-family: 'SF Pro Display', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        .liquid-glass {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px) saturate(160%);
+            -webkit-backdrop-filter: blur(20px) saturate(160%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 2.5rem;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
+        .calendar-widget {
+            background: linear-gradient(180deg, #FF3B30 0%, #FF2D55 100%);
+            color: white;
+            border-radius: 2rem;
+            transition: transform 0.3s ease;
+        }
+        .calendar-widget:hover {
+            transform: scale(1.05);
+        }
+        .glass-input {
+            background: rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 1.2rem;
+            transition: all 0.3s ease;
+        }
+        .glass-input:focus {
+            background: rgba(255, 255, 255, 0.5);
+            border-color: var(--ios-blue);
+            outline: none;
+        }
+        /* Animasi muncul halus */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+    </style>
 </head>
-<body class="bg-slate-100 p-5">
-    <div class="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden">
-        <header class="bg-indigo-600 p-6 text-white text-center">
-            <h1 class="text-3xl font-bold">Portal Kuliah Kita</h1>
-            <p id="status" class="text-xs opacity-80 italic">Menghubungkan ke database...</p>
+<body class="p-6">
+
+    <div class="max-w-5xl mx-auto space-y-8">
+        <header class="flex justify-between items-center px-4 fade-in">
+            <div>
+                <h1 class="text-3xl font-semibold tracking-tight text-slate-800">IS-2 <span class="text-blue-600">Smart Hub</span></h1>
+                <p id="clock" class="text-slate-500 font-medium"></p>
+            </div>
+            <div id="status-indicator" class="flex items-center gap-2 text-xs font-semibold bg-white/50 px-4 py-2 rounded-full">
+                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Live Sync
+            </div>
         </header>
 
-        <div class="p-6 grid gap-6 md:grid-cols-2">
-            <div class="bg-slate-50 p-4 rounded-lg border">
-                <h2 class="font-bold mb-4 text-indigo-700">➕ Tambah Info Baru</h2>
-                <select id="kategori" class="w-full p-2 mb-2 border rounded text-sm">
-                    <option value="jadwal">Jadwal Matkul</option>
-                    <option value="tugas">Tugas Kuliah</option>
-                    <option value="kegiatan">Kegiatan Kampus</option>
-                </select>
-                <textarea id="isiData" placeholder="Contoh: Senin 08:00 - Kalkulus" class="w-full p-2 mb-2 border rounded text-sm h-24"></textarea>
-                <button onclick="simpanData()" id="btnSimpan" class="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition">Kirim ke Semua</button>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <div class="lg:col-span-4 space-y-8 fade-in" style="animation-delay: 0.1s;">
+                <div class="calendar-widget p-6 shadow-xl text-center">
+                    <p id="cal-month" class="text-sm font-bold uppercase tracking-widest opacity-80"></p>
+                    <p id="cal-date" class="text-7xl font-bold my-2"></p>
+                    <p id="cal-day" class="text-lg font-medium opacity-90"></p>
+                </div>
+
+                <div class="liquid-glass p-6 space-y-4">
+                    <h3 class="text-lg font-semibold px-1">Tambah Info</h3>
+                    <select id="kategori" class="w-full glass-input p-3 text-sm font-medium">
+                        <option value="jadwal">📅 Jadwal Kuliah</option>
+                        <option value="tugas">🔥 Deadline Tugas</option>
+                        <option value="kegiatan">🌟 Kegiatan Kelas</option>
+                    </select>
+                    <textarea id="isiData" placeholder="Tulis jadwal atau tugas..." class="w-full glass-input p-4 h-28 text-sm"></textarea>
+                    <button onclick="simpanData()" id="btnSimpan" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg hover:bg-blue-700 active:scale-95 transition-all">Update Database</button>
+                </div>
             </div>
 
-            <div class="space-y-4">
-                <h2 class="font-bold text-slate-800 border-b-2 border-indigo-200 mb-2">📌 Informasi Terkini</h2>
-                <div id="listData" class="space-y-2 text-sm text-slate-700 max-h-[400px] overflow-y-auto p-1">
+            <div class="lg:col-span-8 fade-in" style="animation-delay: 0.2s;">
+                <div class="liquid-glass p-8 min-h-[500px]">
+                    <h2 class="text-2xl font-semibold mb-6">Informasi Terbaru</h2>
+                    <div id="listData" class="space-y-4">
+                        <p class="text-slate-400 animate-pulse text-center mt-20">Mengambil data dari Supabase...</p>
                     </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Kunci punya kamu sudah saya masukkan ke sini
         const SB_URL = "https://mycldrtubwstojeaumcg.supabase.co"; 
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15Y2xkcnR1YndzdG9qZWF1bWNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNzQwNTksImV4cCI6MjA4NTg1MDA1OX0.GHgglJHGQqDDRY-IcvhQeZyYZmR48J3arnby8IxZo9I";
-        
-        const supabase = supabase.createClient(SB_URL, SB_KEY);
+        const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
 
+        // Update Waktu & Kalender
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('cal-month').innerText = now.toLocaleDateString('id-ID', { month: 'short' });
+            document.getElementById('cal-date').innerText = now.getDate();
+            document.getElementById('cal-day').innerText = now.toLocaleDateString('id-ID', { weekday: 'long' });
+        }
+
+        // Ambil Data dari Database
         async function muatData() {
-            document.getElementById('status').innerText = "Memperbarui...";
-            // Memanggil tabel 'schedule' sesuai yang kamu buat di Supabase
-            let { data, error } = await supabase
+            let { data, error } = await supabaseClient
                 .from('schedule')
                 .select('*')
                 .order('id', { ascending: false });
 
             if (!error) {
                 const list = document.getElementById('listData');
+                if (data.length === 0) {
+                    list.innerHTML = "<p class='text-center text-slate-400 py-20'>Belum ada informasi hari ini.</p>";
+                    return;
+                }
                 list.innerHTML = data.map(item => `
-                    <div class="bg-white border-l-4 border-indigo-500 p-3 rounded shadow-sm relative">
-                        <div class="text-[10px] font-bold uppercase text-slate-400">${item.category}</div>
-                        <div>${item.content}</div>
-                        <button onclick="hapusData(${item.id})" class="absolute top-2 right-2 text-red-300 hover:text-red-600">✕</button>
+                    <div class="bg-white/40 border border-white/50 p-5 rounded-[1.8rem] flex justify-between items-start group hover:bg-white/60 transition-all">
+                        <div>
+                            <span class="text-[10px] font-bold px-3 py-1 bg-white/80 text-blue-600 rounded-full uppercase tracking-widest">${item.category}</span>
+                            <p class="mt-3 text-slate-800 font-medium text-lg leading-relaxed">${item.content}</p>
+                        </div>
+                        <button onclick="hapusData(${item.id})" class="text-slate-300 hover:text-red-500 transition-colors p-2 text-xl">✕</button>
                     </div>
                 `).join('');
-                document.getElementById('status').innerText = "Terhubung ke Database";
             }
         }
 
+        // Simpan Data
         async function simpanData() {
             const cat = document.getElementById('kategori').value;
             const teks = document.getElementById('isiData').value;
-            if(!teks) return alert("Isi data dulu!");
+            if(!teks) return alert("Ketik pesannya dulu ya!");
 
             const btn = document.getElementById('btnSimpan');
             btn.disabled = true;
-            btn.innerText = "Mengirim...";
+            btn.innerText = "⏳ Sinkronisasi...";
 
-            await supabase.from('schedule').insert([{ category: cat, content: teks }]);
-
+            const { error } = await supabaseClient.from('schedule').insert([{ category: cat, content: teks }]);
+            
+            if(error) alert("Gagal menyimpan!");
             document.getElementById('isiData').value = '';
             btn.disabled = false;
-            btn.innerText = "Kirim ke Semua";
+            btn.innerText = "Update Hub";
             muatData();
         }
 
+        // Hapus Data
         async function hapusData(id) {
-            if(confirm("Hapus data ini?")) {
-                await supabase.from('schedule').delete().eq('id', id);
+            if(confirm("Hapus informasi ini dari semua orang?")) {
+                await supabaseClient.from('schedule').delete().eq('id', id);
                 muatData();
             }
         }
 
+        // Jalankan Fitur
+        setInterval(updateClock, 1000);
+        updateClock();
         muatData();
-        setInterval(muatData, 10000); // Update otomatis tiap 10 detik
+        // Cek data baru setiap 15 detik secara otomatis
+        setInterval(muatData, 15000);
     </script>
 </body>
 </html>
