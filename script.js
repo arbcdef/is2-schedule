@@ -38,10 +38,12 @@ function renderCountdown(data) {
         area.innerHTML = `
             <div class="countdown-card fade-in">
                 <div>
-                    <p class="text-[10px] font-black opacity-60 uppercase tracking-widest">NEXT MILESTONE</p>
-                    <h2 class="text-2xl font-bold tracking-tight">${upcoming.content}</h2>
+                    <p class="text-[10px] font-black opacity-40 uppercase tracking-widest mb-1">Coming Up</p>
+                    <h2 class="text-xl font-bold tracking-tight">${upcoming.content}</h2>
                 </div>
-                <div class="text-right"><p class="text-3xl font-black">${days <= 0 ? "TODAY" : days + " DAYS"}</p></div>
+                <div class="text-right">
+                    <p class="text-2xl font-black">${days <= 0 ? "TODAY" : days + "D"}</p>
+                </div>
             </div>`;
     } else { area.innerHTML = ""; }
 }
@@ -49,16 +51,16 @@ function renderCountdown(data) {
 function renderFeed(data) {
     const list = document.getElementById('listData');
     list.innerHTML = data.map(item => `
-        <div class="liquid-glass p-5 flex justify-between items-center transition-all priority-${item.priority} ${item.is_done ? 'task-done' : ''}">
+        <div class="ios-card p-5 flex justify-between items-center transition-all priority-${item.priority} ${item.is_done ? 'task-done' : ''}">
             <div class="flex items-center gap-4">
-                <input type="checkbox" ${item.is_done ? 'checked' : ''} onclick="toggleDone(${item.id}, ${item.is_done})" class="w-5 h-5 cursor-pointer accent-black">
+                <input type="checkbox" ${item.is_done ? 'checked' : ''} onclick="toggleDone(${item.id}, ${item.is_done})" class="w-5 h-5 cursor-pointer accent-blue-500 rounded-full">
                 <div>
-                    <span class="text-[9px] font-black opacity-40 uppercase">${item.category} • ${item.tgl_deadline}</span>
-                    <p class="font-bold text-base mt-0.5" style="color: var(--text-main)">${item.content}</p>
-                    ${item.task_link ? `<a href="${item.task_link}" target="_blank" class="text-[10px] text-blue-500 font-bold mt-1 block">🔗 RESOURCE</a>` : ''}
+                    <span class="text-[9px] font-black opacity-30 uppercase">${item.category} • ${item.tgl_deadline}</span>
+                    <p class="font-bold text-base mt-0.5 leading-tight">${item.content}</p>
+                    ${item.task_link ? `<a href="${item.task_link}" target="_blank" class="text-[10px] text-blue-500 font-bold mt-1 block">LINK RESOURCE</a>` : ''}
                 </div>
             </div>
-            <button onclick="openDeleteModal(${item.id})" class="opacity-20 hover:opacity-100 text-xl px-2">✕</button>
+            <button onclick="openDeleteModal(${item.id})" class="opacity-20 hover:opacity-100 text-lg px-2">✕</button>
         </div>
     `).join('');
 }
@@ -70,8 +72,7 @@ async function simpanData() {
     const teks = document.getElementById('isiData').value;
     const link = document.getElementById('taskLink').value; 
     
-    if(!teks || !tgl) return alert("Fill all fields!");
-
+    if(!teks || !tgl) return alert("Missing required fields.");
     const btn = document.getElementById('btnSimpan');
     btn.innerText = "Syncing...";
     btn.disabled = true;
@@ -85,7 +86,7 @@ async function simpanData() {
         document.getElementById('taskLink').value = ''; 
         muatData(); 
     }
-    btn.innerText = "Update Hub";
+    btn.innerText = "Sync to Cloud";
     btn.disabled = false;
 }
 
