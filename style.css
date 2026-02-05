@@ -1,11 +1,12 @@
 * {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
+    box-sizing: border-box;
 }
 
 [data-theme="light"] {
     --bg-color: #fbfbfb;
-    --glass-bg: rgba(255, 255, 255, 0.5);
+    --glass-bg: rgba(255, 255, 255, 0.6);
     --text-main: #000000;
     --text-sub: #6e6e73;
     --input-bg: #f5f5f7;
@@ -14,91 +15,45 @@
 
 [data-theme="dark"] {
     --bg-color: #000000;
-    --glass-bg: rgba(29, 29, 31, 0.6);
+    --glass-bg: rgba(28, 28, 30, 0.7);
     --text-main: #f5f5f7;
     --text-sub: #86868b;
-    --input-bg: #1d1d1f;
+    --input-bg: #1c1c1e;
     --accent: #ffffff;
 }
 
-body {
-    background-color: var(--bg-color);
-    color: var(--text-main);
-}
-
-.main-title { letter-spacing: -0.04em; }
+body { background-color: var(--bg-color); color: var(--text-main); }
+.main-title { letter-spacing: -0.05em; }
 
 .liquid-glass {
     background: var(--glass-bg);
-    backdrop-filter: blur(35px) saturate(160%);
-    -webkit-backdrop-filter: blur(35px) saturate(160%);
-    border: 1px solid rgba(128, 128, 128, 0.15);
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    border: 1px solid rgba(128, 128, 128, 0.2);
     border-radius: 2rem;
 }
 
-.glass-input {
-    background: var(--input-bg);
-    border: none;
-    border-radius: 0.8rem;
-    color: var(--text-main);
-}
-
-.ios-btn-primary {
-    background: var(--accent);
-    color: var(--bg-color);
-    padding: 1rem;
-    border-radius: 1.2rem;
-    font-weight: 700;
-    transition: transform 0.2s ease;
-}
-
+.glass-input { background: var(--input-bg); border: none; border-radius: 1rem; color: var(--text-main); }
+.ios-btn-primary { background: var(--accent); color: var(--bg-color); padding: 1rem; border-radius: 1.2rem; font-weight: 700; transition: 0.2s; }
 .ios-btn-primary:active { transform: scale(0.96); }
 
-.calendar-widget {
-    background: var(--accent);
-    color: var(--bg-color);
-    border-radius: 2rem;
-}
+.calendar-widget { background: var(--accent); color: var(--bg-color); border-radius: 2rem; }
 
 .day-cell {
-    aspect-ratio: 1/1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    background: var(--input-bg);
-    transition: all 0.3s ease;
+    aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center;
+    border-radius: 12px; font-size: 0.85rem; background: var(--input-bg); transition: 0.3s;
 }
 
-/* WARN ABU-ABU UNTUK TANGGAL BERJADWAL */
-.has-event {
-    background: #8E8E93 !important;
-    color: white !important;
-    font-weight: 800;
-}
+/* TANGGAL DENGAN JADWAL (ABU-ABU) */
+.has-event { background: #8E8E93 !important; color: white !important; font-weight: 800; }
+.today { background: var(--accent) !important; color: var(--bg-color) !important; font-weight: 900; }
 
-.today {
-    background: var(--accent) !important;
-    color: var(--bg-color) !important;
-    font-weight: 900;
-    box-shadow: 0 0 15px rgba(128, 128, 128, 0.3);
-}
-
-.status-pill {
-    background: var(--input-bg);
-    padding: 8px 16px;
-    border-radius: 12px;
-    font-size: 9px;
-    font-weight: 900;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
+.status-pill { background: var(--input-bg); padding: 8px 16px; border-radius: 12px; font-size: 9px; font-weight: 900; display: flex; align-items: center; gap: 8px; }
 .dot { width: 6px; height: 6px; background: #71717a; border-radius: 50%; }
+.label-text { font-size: 0.65rem; font-weight: 800; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; display: block; }
 
-.label-text { font-size: 0.6rem; font-weight: 800; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.4rem; display: block; }
-
+/* MODAL ANIMATION */
+#deleteModal.flex #modalBox { animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+@keyframes modalPop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-.fade-in { animation: fadeIn 0.8s ease-out forwards; }
+.fade-in { animation: fadeIn 0.8s ease-out; }
