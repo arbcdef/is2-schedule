@@ -31,19 +31,15 @@ function renderCountdown(data) {
     const area = document.getElementById('next-deadline-area');
     const today = new Date();
     today.setHours(0,0,0,0);
-    
     const upcoming = data.find(t => !t.is_done && new Date(t.tgl_deadline) >= today);
 
     if (upcoming) {
-        const deadlineDate = new Date(upcoming.tgl_deadline);
-        const diffTime = deadlineDate - today;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
+        const diffDays = Math.ceil((new Date(upcoming.tgl_deadline) - today) / (1000 * 60 * 60 * 24));
         area.innerHTML = `
             <div class="countdown-card fade-in">
-                <div class="space-y-1">
+                <div>
                     <p class="text-[10px] font-black opacity-40 uppercase tracking-[0.3em]">Next Milestone</p>
-                    <h2 class="text-2xl font-bold tracking-tight uppercase">${upcoming.content}</h2>
+                    <h2 class="text-2xl font-bold uppercase">${upcoming.content}</h2>
                 </div>
                 <div class="text-right">
                     <p class="text-4xl font-black">${diffDays === 0 ? "TODAY" : diffDays + " DAYS"}</p>
@@ -55,86 +51,63 @@ function renderCountdown(data) {
 function renderFeed(data) {
     const list = document.getElementById('listData');
     list.innerHTML = data.map(item => `
-        <div class="ios-card p-6 flex justify-between items-center transition-all priority-${item.priority} ${item.is_done ? 'task-done' : ''}">
+        <div class="ios-card p-6 flex justify-between items-center priority-${item.priority} ${item.is_done ? 'opacity-30 grayscale' : ''}">
             <div class="flex items-center gap-5">
-                <input type="checkbox" ${item.is_done ? 'checked' : ''} onclick="toggleDone(${item.id}, ${item.is_done})" class="w-6 h-6 cursor-pointer accent-blue-500 rounded-full">
+                <input type="checkbox" ${item.is_done ? 'checked' : ''} onclick="toggleDone(${item.id}, ${item.is_done})" class="w-6 h-6 accent-zinc-500">
                 <div>
-                    <span class="text-[10px] font-black opacity-30 uppercase tracking-widest">${item.category} • ${item.tgl_deadline}</span>
-                    <p class="font-bold text-lg mt-1 leading-tight">${item.content}</p>
-                    ${item.task_link ? `<a href="${item.task_link}" target="_blank" class="text-[11px] text-blue-500 font-bold mt-2 inline-block underline decoration-2 underline-offset-4">RESOURCE LINK</a>` : ''}
+                    <span class="text-[10px] font-black opacity-30 uppercase">${item.category} • ${item.tgl_deadline}</span>
+                    <p class="font-bold text-lg mt-1">${item.content}</p>
                 </div>
             </div>
-            <button onclick="openDeleteModal(${item.id})" class="opacity-10 hover:opacity-100 transition-opacity text-xl px-4">✕</button>
+            <button onclick="openDeleteModal(${item.id})" class="opacity-20 hover:opacity-100 text-xl px-4">✕</button>
         </div>
     `).join('');
 }
 
 async function simpanData() {
-    const cat = document.getElementById('kategori').value;
-    const prio = document.getElementById('priority').value; 
+    const teks = document.getElementById('isiData').value.trim();
     const tgl = document.getElementById('tglDeadline').value;
-    const teks = document.getElementById('isiData').value.trim(); 
-    const link = document.getElementById('taskLink').value; 
-    
-    if (!teks || !tgl) return alert("Please fill in both Task and Deadline!");
+    if (!teks || !tgl) return alert("Fill Task & Date!");
 
     const btn = document.getElementById('btnSimpan');
     btn.innerText = "Syncing...";
-    btn.disabled = true;
-
-    const { error } = await supabaseClient.from('schedule').insert([{ 
-        category: cat, content: teks, tgl_deadline: tgl, priority: prio, is_done: false, task_link: link 
+    
+    await supabaseClient.from('schedule').insert([{ 
+        category: document.getElementById('kategori').value, 
+        content: teks, 
+        tgl_deadline: tgl, 
+        priority: document.getElementById('priority').value, 
+        is_done: false, 
+        task_link: document.getElementById('taskLink').value 
     }]);
 
-    if(!error) { 
-        document.getElementById('isiData').value = ''; 
-        document.getElementById('tglDeadline').value = '';
-        muatData(); 
-    }
+    document.getElementById('isiData').value = '';
     btn.innerText = "Update Hub";
-    btn.disabled = false;
+    muatData();
 }
 
 function renderCalendar() {
     const container = document.getElementById('calendar-container');
     const label = document.getElementById('calendar-month-year');
     const now = new Date();
-    
     label.innerText = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
     const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-
     container.innerHTML = '';
     for (let i = 0; i < firstDay; i++) container.innerHTML += `<div class="opacity-0"></div>`;
-    
     for (let d = 1; d <= daysInMonth; d++) {
         const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         const tasksOnDate = allTasks.filter(t => t.tgl_deadline === dateStr && !t.is_done);
-        
-        let pClass = "";
-        if (tasksOnDate.length > 0) {
-            if (tasksOnDate.some(t => t.priority === 'high')) pClass = "cal-high";
-            else if (tasksOnDate.some(t => t.priority === 'medium')) pClass = "cal-medium";
-            else pClass = "cal-low";
-        }
-
+        let pClass = tasksOnDate.length > 0 ? "cal-high" : "";
         const isToday = (dateStr === new Date().toISOString().split('T')[0]) ? 'today-glow' : '';
         container.innerHTML += `<div class="day-cell ${isToday} ${pClass}">${d}</div>`;
     }
 }
 
-async function toggleDone(id, status) {
-    await supabaseClient.from('schedule').update({ is_done: !status }).eq('id', id);
-    muatData();
-}
-
+async function toggleDone(id, status) { await supabaseClient.from('schedule').update({ is_done: !status }).eq('id', id); muatData(); }
 function openDeleteModal(id) { deleteTargetId = id; document.getElementById('deleteModal').classList.replace('hidden', 'flex'); }
 function closeDeleteModal() { document.getElementById('deleteModal').classList.replace('flex', 'hidden'); }
-document.getElementById('confirmDeleteBtn').onclick = async () => {
-    await supabaseClient.from('schedule').delete().eq('id', deleteTargetId);
-    closeDeleteModal();
-    muatData();
-};
+document.getElementById('confirmDeleteBtn').onclick = async () => { await supabaseClient.from('schedule').delete().eq('id', deleteTargetId); closeDeleteModal(); muatData(); };
 
 setInterval(updateClock, 1000);
 updateClock();
