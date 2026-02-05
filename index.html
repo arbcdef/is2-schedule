@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>IS2 | Hub</title>
+    <title>IS2 | Hub iOS 26</title>
     <link rel="manifest" href="manifest.json">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -11,10 +11,15 @@
 </head>
 <body class="ios-bg transition-all duration-700">
 
-    <div class="max-w-5xl mx-auto px-6 py-12 space-y-10">
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-[-1]">
+        <div class="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-blue-500/10 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-purple-500/10 rounded-full blur-[120px]"></div>
+    </div>
+
+    <div class="max-w-5xl mx-auto px-6 py-12 space-y-10 relative z-10">
         <header class="flex justify-between items-end px-2 fade-in">
             <div class="space-y-1">
-                <p id="clock" class="ios-time">00:00</p>
+                <p id="clock" class="ios-time">00:00:00</p>
                 <h1 class="ios-title">IS2 Dashboard</h1>
             </div>
             <div class="flex items-center gap-3">
@@ -33,50 +38,65 @@
         <main class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-4 space-y-6 fade-in">
                 <section class="ios-card p-7 space-y-6">
-                    <h2 class="text-lg font-semibold tracking-tight">New Task</h2>
+                    <h2 class="text-lg font-semibold tracking-tight">New Entry</h2>
                     <div class="space-y-4">
                         <div class="grid grid-cols-2 gap-3">
-                            <select id="kategori" class="ios-input">
-                                <option value="Assignment">Assignment</option>
-                                <option value="Event">Event</option>
-                            </select>
-                            <select id="priority" class="ios-input">
-                                <option value="low">Low</option>
-                                <option value="medium" selected>Medium</option>
-                                <option value="high">High</option>
-                            </select>
+                            <div class="space-y-1">
+                                <label class="text-[9px] font-black opacity-40 uppercase ml-2">Type</label>
+                                <select id="kategori" class="ios-input w-full">
+                                    <option value="Assignment">Assignment</option>
+                                    <option value="Event">Event</option>
+                                </select>
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[9px] font-black opacity-40 uppercase ml-2">Priority</label>
+                                <select id="priority" class="ios-input w-full">
+                                    <option value="low">Low</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="high">High</option>
+                                </select>
+                            </div>
                         </div>
-                        <input type="date" id="tglDeadline" class="ios-input w-full">
-                        <textarea id="isiData" placeholder="What's the task?" class="ios-input w-full h-24 pt-3 resize-none"></textarea>
-                        <input type="url" id="taskLink" placeholder="Resource link (optional)" class="ios-input w-full">
+                        <div class="space-y-1">
+                            <label class="text-[9px] font-black opacity-40 uppercase ml-2">Deadline</label>
+                            <input type="date" id="tglDeadline" class="ios-input w-full">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[9px] font-black opacity-40 uppercase ml-2">Detail</label>
+                            <textarea id="isiData" placeholder="Task description..." class="ios-input w-full h-24 pt-3 resize-none"></textarea>
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[9px] font-black opacity-40 uppercase ml-2">Resource</label>
+                            <input type="url" id="taskLink" placeholder="https://..." class="ios-input w-full">
+                        </div>
                     </div>
-                    <button onclick="simpanData()" id="btnSimpan" class="ios-primary-btn">Update Hub</button>
+                    <button onclick="simpanData()" id="btnSimpan" class="ios-primary-btn">Sync to Cloud</button>
                 </section>
             </div>
 
             <div class="lg:col-span-8 space-y-8 fade-in">
-                <section class="ios-card p-7 min-h-[400px]">
+                <section class="ios-card p-7 min-h-[500px]">
                     <h2 class="text-lg font-semibold mb-6 tracking-tight">Timeline</h2>
-                    <div id="listData" class="space-y-3"></div>
+                    <div id="listData" class="space-y-4"></div>
                 </section>
                 
-                <section class="ios-card p-8">
-                    <h2 class="text-[10px] font-black opacity-30 uppercase tracking-[0.3em] text-center mb-6">Academic Calendar</h2>
-                    <div id="calendar-month-year" class="text-[11px] font-bold mb-4 text-center opacity-60"></div>
-                    <div id="calendar-container" class="grid grid-cols-7 gap-2 max-w-[300px] mx-auto"></div>
+                <section class="ios-card p-10">
+                    <h2 class="text-[10px] font-black opacity-30 uppercase tracking-[0.4em] text-center mb-8">Academic Calendar</h2>
+                    <div id="calendar-month-year" class="text-[11px] font-bold mb-6 text-center opacity-60"></div>
+                    <div id="calendar-container" class="grid grid-cols-7 gap-3 max-w-[320px] mx-auto"></div>
                 </section>
             </div>
         </main>
     </div>
 
     <div id="deleteModal" class="fixed inset-0 z-[100] hidden items-end justify-center pb-10 px-6">
-        <div class="absolute inset-0 bg-black/40 backdrop-blur-md" onclick="closeDeleteModal()"></div>
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-xl" onclick="closeDeleteModal()"></div>
         <div class="ios-card relative w-full max-w-sm p-8 text-center animate-ios-slide">
             <h3 class="text-xl font-bold mb-2">Delete Task?</h3>
-            <p class="text-sm opacity-50 mb-6">This will be permanently removed.</p>
+            <p class="text-sm opacity-50 mb-8">This action is permanent and cannot be undone.</p>
             <div class="flex flex-col gap-3">
                 <button id="confirmDeleteBtn" class="w-full py-4 rounded-2xl bg-red-500 text-white font-bold">Delete</button>
-                <button onclick="closeDeleteModal()" class="w-full py-4 rounded-2xl bg-zinc-100 dark:bg-zinc-800 font-bold">Cancel</button>
+                <button onclick="closeDeleteModal()" class="w-full py-4 rounded-2xl bg-zinc-200/50 dark:bg-zinc-800 font-bold">Cancel</button>
             </div>
         </div>
     </div>
