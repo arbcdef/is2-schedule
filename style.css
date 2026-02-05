@@ -1,39 +1,49 @@
+/* GLOBAL FONT HELVETICA */
+* {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
 [data-theme="light"] {
-    --bg-color: #FFFFFF;
-    --glass-bg: rgba(244, 244, 245, 0.4);
-    --text-main: #09090b;
-    --text-sub: #71717a;
-    --input-bg: rgba(244, 244, 245, 0.6);
-    --accent: #09090b;
+    --bg-color: #fbfbfb;
+    --glass-bg: rgba(255, 255, 255, 0.5);
+    --text-main: #000000;
+    --text-sub: #6e6e73;
+    --input-bg: #f5f5f7;
+    --accent: #000000;
 }
 
 [data-theme="dark"] {
-    --bg-color: #09090b;
-    --glass-bg: rgba(24, 24, 27, 0.5);
-    --text-main: #fafafa;
-    --text-sub: #a1a1aa;
-    --input-bg: rgba(39, 39, 42, 0.6);
-    --accent: #fafafa;
+    --bg-color: #000000;
+    --glass-bg: rgba(29, 29, 31, 0.6);
+    --text-main: #f5f5f7;
+    --text-sub: #86868b;
+    --input-bg: #1d1d1f;
+    --accent: #ffffff;
 }
 
 body {
-    font-family: 'SF Pro Display', sans-serif;
     background-color: var(--bg-color);
     color: var(--text-main);
 }
 
+.main-title {
+    letter-spacing: -0.03em;
+}
+
+/* LIQUID GLASS iOS 26 */
 .liquid-glass {
     background: var(--glass-bg);
-    backdrop-filter: blur(40px) saturate(150%);
-    -webkit-backdrop-filter: blur(40px) saturate(150%);
-    border: 1px solid rgba(128, 128, 128, 0.1);
-    border-radius: 2.5rem;
+    backdrop-filter: blur(35px) saturate(160%);
+    -webkit-backdrop-filter: blur(35px) saturate(160%);
+    border: 1px solid rgba(128, 128, 128, 0.15);
+    border-radius: 2rem;
 }
 
 .glass-input {
     background: var(--input-bg);
     border: none;
-    border-radius: 1rem;
+    border-radius: 0.8rem;
     color: var(--text-main);
 }
 
@@ -41,26 +51,28 @@ body {
     background: var(--accent);
     color: var(--bg-color);
     padding: 1rem;
-    border-radius: 1.5rem;
-    font-weight: 600;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 1.2rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+.ios-btn-primary:active { transform: scale(0.97); }
 
 .calendar-widget {
     background: var(--accent);
     color: var(--bg-color);
-    border-radius: 2.2rem;
+    border-radius: 2rem;
 }
 
 .theme-toggle-btn {
     background: var(--glass-bg);
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid rgba(128, 128, 128, 0.1);
 }
 
 .day-cell {
@@ -69,41 +81,41 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    border-radius: 14px;
-    font-size: 0.8rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
     position: relative;
     background: var(--input-bg);
 }
 
 .event-dot {
-    width: 5px;
-    height: 5px;
-    background: var(--text-sub);
+    width: 4px;
+    height: 4px;
+    background: var(--accent);
     border-radius: 50%;
     margin-top: 2px;
 }
 
 .today {
-    outline: 2px solid var(--accent);
+    background: var(--accent) !important;
+    color: var(--bg-color) !important;
     font-weight: 900;
 }
 
 .status-pill {
-    background: var(--glass-bg);
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 10px;
-    font-weight: 800;
+    background: var(--input-bg);
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.05em;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
 }
 
-.dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; }
+.dot { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; }
 
-.title-text { color: var(--text-main); }
-.sub-text { color: var(--text-sub); }
-.label-text { font-size: 0.65rem; font-weight: 800; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.05em; margin-left: 0.5rem; }
+.label-text { font-size: 0.6rem; font-weight: 800; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.4rem; display: block; }
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 .fade-in { animation: fadeIn 0.8s ease-out forwards; }
