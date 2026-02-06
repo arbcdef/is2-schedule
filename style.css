@@ -1,114 +1,189 @@
-@font-face {
-    font-family: 'Akira Expanded';
-    src: url('https://db.onlinewebfonts.com/t/90ef26d19b78864459f2762a043532f9.woff2') format('woff2');
-}
-
 :root {
-    --bg-main: #f5f5f7;
-    --card-bg: rgba(255, 255, 255, 0.55);
-    --text-main: #000000;
-    --input-bg: rgba(0, 0, 0, 0.04);
-    --border-glass: rgba(255, 255, 255, 0.8);
+  --bg-page: #f2f2f7;
+  --text-main: #1c1c1e;
+  --card-bg: rgba(255, 255, 255, 0.9);
+  --border-color: rgba(0, 0, 0, 0.05);
+  --island-bg: #1c1c1e;
+  --island-text: #ffffff;
 }
 
 [data-theme="dark"] {
-    --bg-main: #000000;
-    --card-bg: rgba(28, 28, 30, 0.45);
-    --text-main: #ffffff;
-    --input-bg: rgba(255, 255, 255, 0.08);
-    --border-glass: rgba(255, 255, 255, 0.1);
+  --bg-page: #000000;
+  --text-main: #ffffff;
+  --card-bg: rgba(28, 28, 30, 0.8);
+  --border-color: rgba(255, 255, 255, 0.08);
+  --island-bg: #ffffff !important;
+  --island-text: #000000 !important;
 }
 
-body { background: var(--bg-main); color: var(--text-main); font-family: -apple-system, sans-serif; overflow-x: hidden; }
-
-.ios-time { font-family: 'Akira Expanded', sans-serif; opacity: 0.3; font-size: 10px; }
-.ios-title { font-family: 'Akira Expanded', sans-serif !important; letter-spacing: -2px; }
-
-.ios-card { 
-    background: var(--card-bg) !important; 
-    backdrop-filter: blur(40px) saturate(200%); 
-    -webkit-backdrop-filter: blur(40px) saturate(200%);
-    border-radius: 35px; 
-    border: 1px solid var(--border-glass); 
-    box-shadow: 0 10px 50px rgba(0,0,0,0.02);
-    color: var(--text-main) !important;
+body {
+  background: var(--bg-page);
+  color: var(--text-main);
+  font-family: sans-serif;
+  transition: 0.4s ease;
+  overflow-x: hidden;
 }
 
-.ios-label { font-size: 10px; font-weight: 800; opacity: 0.4; text-transform: uppercase; margin-left: 10px; display: block; }
+/* MODAL / POP-UP */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(15px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 25px;
+}
+.modal-card {
+  background: var(--card-bg);
+  width: 100%;
+  max-width: 320px;
+  padding: 35px;
+  border-radius: 40px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+}
+.option-btn {
+  width: 100%;
+  padding: 18px;
+  border-radius: 20px;
+  background: rgba(128, 128, 128, 0.1);
+  font-weight: 800;
+  text-align: center;
+  transition: 0.2s;
+  font-size: 13px;
+}
+.option-btn:hover {
+  background: var(--text-main);
+  color: var(--bg-page);
+  transform: scale(1.02);
+}
 
+/* CUSTOM COMPONENTS */
+.ios-select-btn {
+  background: rgba(128, 128, 128, 0.1);
+  padding: 14px;
+  border-radius: 18px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-main);
+  transition: 0.2s;
+}
+.ios-select-btn:active {
+  transform: scale(0.95);
+  background: rgba(128, 128, 128, 0.2);
+}
+
+.delete-btn {
+  background: #ff3b30;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 15px;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  shadow: 0 10px 20px rgba(255, 59, 48, 0.2);
+  transition: 0.3s;
+}
+.delete-btn:hover {
+  transform: scale(1.05);
+  filter: brightness(1.2);
+}
+
+/* UI CARDS */
+.ios-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(40px);
+  border-radius: 35px;
+  padding: 30px;
+  border: 1px solid var(--border-color);
+}
 .ios-input {
-    background: var(--input-bg) !important;
-    border-radius: 18px;
-    padding: 16px;
-    border: 1px solid rgba(128,128,128,0.1);
-    color: var(--text-main) !important;
-    font-size: 15px;
-    font-weight: 600;
-    outline: none;
+  background: rgba(128, 128, 128, 0.1);
+  border-radius: 20px;
+  padding: 16px;
+  width: 100%;
+  color: var(--text-main);
+  border: none;
+  font-weight: 600;
+  outline: none;
+}
+.ios-primary-btn {
+  background: var(--text-main);
+  color: var(--bg-page);
+  width: 100%;
+  padding: 22px;
+  border-radius: 22px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: 0.3s;
+}
+.ios-primary-btn:active {
+  transform: scale(0.98);
 }
 
-.ios-primary-btn {
-    background: var(--text-main);
-    color: var(--bg-main);
-    width: 100%;
-    padding: 20px;
-    border-radius: 22px;
-    font-weight: 900;
-    text-transform: uppercase;
-    font-size: 12px;
-    letter-spacing: 1px;
+/* CALENDAR */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 12px;
+}
+.day-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  font-weight: 900;
+  background: rgba(128, 128, 128, 0.05);
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 14px;
+}
+.cal-high {
+  background: #ff3b30 !important;
+  color: white !important;
+}
+.cal-medium {
+  background: #ff9500 !important;
+  color: white !important;
+}
+.cal-low {
+  background: #8e8e93 !important;
+  color: white !important;
+}
+.today-glow {
+  outline: 2px solid var(--text-main);
+  outline-offset: 2px;
 }
 
 .countdown-card {
-    background: #000000 !important;
-    color: #ffffff !important;
-    padding: 30px 45px;
-    border-radius: 40px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  background: var(--island-bg) !important;
+  color: var(--island-text) !important;
+  padding: 40px 50px;
+  border-radius: 45px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.countdown-card * {
+  color: var(--island-text) !important;
 }
 
-.calendar-grid-large {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 15px;
-    width: 100%;
+.fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
-
-.day-cell { 
-    aspect-ratio: 1/1; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    border-radius: 18px; 
-    font-size: 14px; 
-    font-weight: 800; 
-    color: var(--text-main);
-    background: var(--input-bg);
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
-
-.today-glow { 
-    background: #007AFF !important; 
-    color: white !important; 
-    transform: scale(1.1);
-    box-shadow: 0 10px 20px rgba(0,122,255,0.4);
-}
-
-.cal-high { border: 2px solid #FF3B30; color: #FF3B30 !important; }
-.cal-medium { border: 2px solid #FFCC00; color: #B28F00 !important; }
-.cal-low { border: 2px solid #8E8E93; color: #8E8E93 !important; }
-
-.priority-high { border-left: 10px solid #FF3B30 !important; }
-.priority-medium { border-left: 10px solid #FFCC00 !important; }
-.priority-low { border-left: 10px solid #8E8E93 !important; }
-
-.task-done { opacity: 0.25; filter: grayscale(1); transform: scale(0.98); }
-
-.ios-icon-btn { padding: 15px; background: var(--card-bg); border-radius: 20px; border: 1px solid var(--border-glass); }
-.ios-pill { background: var(--card-bg); padding: 10px 20px; border-radius: 22px; display: flex; align-items: center; gap: 10px; border: 1px solid var(--border-glass); }
-.ios-dot { width: 8px; height: 8px; background: #34C759; border-radius: 50%; box-shadow: 0 0 15px #34C759; }
-
-@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-.fade-in { animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
