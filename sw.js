@@ -1,17 +1,26 @@
-self.addEventListener('install', (e) => {
+const CACHE_NAME = 'is2-hub-v1';
+const assets = [
+  './',
+  './index.html',
+  './style.css',
+  './script.js',
+  './manifest.json'
+];
+
+// Install Service Worker
+self.addEventListener('install', e => {
   e.waitUntil(
-    caches.open('is2-store').then((cache) => cache.addAll([
-      '/',
-      '/index.html',
-      '/style.css',
-      '/script.js',
-      '/icon.png'
-    ]))
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(assets);
+    })
   );
 });
 
-self.addEventListener('fetch', (e) => {
+// Fetching assets
+self.addEventListener('fetch', e => {
   e.respondWith(
-    caches.match(e.request).then((response) => response || fetch(e.request))
+    caches.match(e.request).then(res => {
+      return res || fetch(e.request);
+    })
   );
 });
