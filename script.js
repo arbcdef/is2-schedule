@@ -1,189 +1,189 @@
-:root {
-  --bg-page: #f2f2f7;
-  --text-main: #1c1c1e;
-  --card-bg: rgba(255, 255, 255, 0.9);
-  --border-color: rgba(0, 0, 0, 0.05);
-  --island-bg: #1c1c1e;
-  --island-text: #ffffff;
-}
+const SB_URL = "https://mycldrtubwstojeaumcg.supabase.co";
+const SB_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15Y2xkcnR1YndzdG9qZWF1bWNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNzQwNTksImV4cCI6MjA4NTg1MDA1OX0.GHgglJHGQqDDRY-IcvhQeZyYZmR48J3arnby8IxZo9I";
+const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
 
-[data-theme="dark"] {
-  --bg-page: #000000;
-  --text-main: #ffffff;
-  --card-bg: rgba(28, 28, 30, 0.8);
-  --border-color: rgba(255, 255, 255, 0.08);
-  --island-bg: #ffffff !important;
-  --island-text: #000000 !important;
-}
+let allTasks = [];
+let currentSelectType = "";
+let selectedKategori = "Assignment";
+let selectedPriority = "Medium";
+let taskIdToDelete = null;
 
-body {
-  background: var(--bg-page);
-  color: var(--text-main);
-  font-family: sans-serif;
-  transition: 0.4s ease;
-  overflow-x: hidden;
-}
-
-/* MODAL / POP-UP */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(15px);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 25px;
-}
-.modal-card {
-  background: var(--card-bg);
-  width: 100%;
-  max-width: 320px;
-  padding: 35px;
-  border-radius: 40px;
-  border: 1px solid var(--border-color);
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
-}
-.option-btn {
-  width: 100%;
-  padding: 18px;
-  border-radius: 20px;
-  background: rgba(128, 128, 128, 0.1);
-  font-weight: 800;
-  text-align: center;
-  transition: 0.2s;
-  font-size: 13px;
-}
-.option-btn:hover {
-  background: var(--text-main);
-  color: var(--bg-page);
-  transform: scale(1.02);
-}
-
-/* CUSTOM COMPONENTS */
-.ios-select-btn {
-  background: rgba(128, 128, 128, 0.1);
-  padding: 14px;
-  border-radius: 18px;
-  font-size: 12px;
-  font-weight: 800;
-  color: var(--text-main);
-  transition: 0.2s;
-}
-.ios-select-btn:active {
-  transform: scale(0.95);
-  background: rgba(128, 128, 128, 0.2);
-}
-
-.delete-btn {
-  background: #ff3b30;
-  color: white;
-  padding: 10px 18px;
-  border-radius: 15px;
-  font-size: 10px;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  shadow: 0 10px 20px rgba(255, 59, 48, 0.2);
-  transition: 0.3s;
-}
-.delete-btn:hover {
-  transform: scale(1.05);
-  filter: brightness(1.2);
-}
-
-/* UI CARDS */
-.ios-card {
-  background: var(--card-bg);
-  backdrop-filter: blur(40px);
-  border-radius: 35px;
-  padding: 30px;
-  border: 1px solid var(--border-color);
-}
-.ios-input {
-  background: rgba(128, 128, 128, 0.1);
-  border-radius: 20px;
-  padding: 16px;
-  width: 100%;
-  color: var(--text-main);
-  border: none;
-  font-weight: 600;
-  outline: none;
-}
-.ios-primary-btn {
-  background: var(--text-main);
-  color: var(--bg-page);
-  width: 100%;
-  padding: 22px;
-  border-radius: 22px;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  transition: 0.3s;
-}
-.ios-primary-btn:active {
-  transform: scale(0.98);
-}
-
-/* CALENDAR */
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 12px;
-}
-.day-cell {
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 16px;
-  font-weight: 900;
-  background: rgba(128, 128, 128, 0.05);
-  cursor: pointer;
-  transition: 0.2s;
-  font-size: 14px;
-}
-.cal-high {
-  background: #ff3b30 !important;
-  color: white !important;
-}
-.cal-medium {
-  background: #ff9500 !important;
-  color: white !important;
-}
-.cal-low {
-  background: #8e8e93 !important;
-  color: white !important;
-}
-.today-glow {
-  outline: 2px solid var(--text-main);
-  outline-offset: 2px;
-}
-
-.countdown-card {
-  background: var(--island-bg) !important;
-  color: var(--island-text) !important;
-  padding: 40px 50px;
-  border-radius: 45px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.countdown-card * {
-  color: var(--island-text) !important;
-}
-
-.fade-in {
-  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9) translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
+async function muatData() {
+  try {
+    const { data, error } = await supabaseClient
+      .from("schedule")
+      .select("*")
+      .order("tgl_deadline", { ascending: true });
+    if (error) throw error;
+    allTasks = data || [];
+    document.getElementById("db-status-dot")?.classList.add("online");
+    document.getElementById("db-status-text").innerText = "System Active";
+    renderAll();
+  } catch (e) {
+    console.error(e);
   }
 }
+
+// LOGIKA SELECT MODAL
+function openSelect(type) {
+  currentSelectType = type;
+  const modal = document.getElementById("custom-modal");
+  const optionsDiv = document.getElementById("modal-options");
+  modal.classList.remove("hidden");
+  optionsDiv.innerHTML = "";
+  const options =
+    type === "kategori" ? ["Assignment", "Event"] : ["Low", "Medium", "High"];
+  options.forEach((opt) => {
+    const btn = document.createElement("button");
+    btn.className = "option-btn";
+    btn.innerText = opt;
+    btn.onclick = () => {
+      if (type === "kategori") {
+        selectedKategori = opt;
+        document.getElementById("btn-kategori").innerText = opt;
+      } else {
+        selectedPriority = opt;
+        document.getElementById("btn-priority").innerText = opt;
+      }
+      closeModal();
+    };
+    optionsDiv.appendChild(btn);
+  });
+}
+function closeModal() {
+  document.getElementById("custom-modal").classList.add("hidden");
+}
+
+// LOGIKA DELETE MODAL (BARU)
+function triggerDelete(id) {
+  taskIdToDelete = id;
+  const modal = document.getElementById("delete-modal");
+  modal.classList.remove("hidden");
+  document.getElementById("confirm-delete-btn").onclick = confirmDelete;
+}
+function closeDeleteModal() {
+  document.getElementById("delete-modal").classList.add("hidden");
+  taskIdToDelete = null;
+}
+async function confirmDelete() {
+  if (!taskIdToDelete) return;
+  await supabaseClient.from("schedule").delete().eq("id", taskIdToDelete);
+  closeDeleteModal();
+  muatData();
+}
+
+function renderAll() {
+  renderCountdown();
+  renderFeed();
+  renderCalendar();
+}
+
+function renderCountdown() {
+  const area = document.getElementById("next-deadline-area");
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  const next = allTasks.find(
+    (t) => !t.is_done && new Date(t.tgl_deadline).getTime() >= now.getTime(),
+  );
+  if (next) {
+    const deadline = new Date(next.tgl_deadline);
+    const diffDays = Math.ceil(
+      (deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
+    );
+    area.innerHTML = `<div class="countdown-card fade-in"><div><p class="text-[11px] font-black uppercase tracking-[0.2em] opacity-40">Upcoming Focus</p><h2 class="text-3xl font-black mt-2 tracking-tighter">${next.content}</h2></div><div class="text-right"><p class="text-5xl font-black tracking-tighter">${diffDays === 0 ? "TODAY" : diffDays + "D"}</p></div></div>`;
+  } else {
+    area.innerHTML = "";
+  }
+}
+
+function renderFeed() {
+  const list = document.getElementById("listData");
+  list.innerHTML = allTasks
+    .map(
+      (t) => `
+        <div class="ios-card p-6 flex justify-between items-center ${t.is_done ? "opacity-30" : ""} mb-4" 
+             style="border-left: 10px solid ${t.priority.toLowerCase() === "high" ? "#ff3b30" : t.priority.toLowerCase() === "medium" ? "#ff9500" : "#8e8e93"}">
+            <div class="flex items-center gap-6">
+                <input type="checkbox" ${t.is_done ? "checked" : ""} onclick="toggleDone(${t.id}, ${t.is_done})" class="w-6 h-6 cursor-pointer accent-white">
+                <div>
+                    <p class="text-[10px] font-black opacity-30 uppercase tracking-widest">${t.category} • ${t.tgl_deadline}</p>
+                    <p class="font-bold text-lg tracking-tight">${t.content}</p>
+                </div>
+            </div>
+            <button onclick="triggerDelete(${t.id})" class="delete-btn">Delete</button>
+        </div>
+    `,
+    )
+    .join("");
+}
+
+function renderCalendar() {
+  const container = document.getElementById("calendar-container");
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  document.getElementById("calendar-month-year").innerText = now.toLocaleString(
+    "id-ID",
+    { month: "long", year: "numeric" },
+  );
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  container.innerHTML = "";
+  for (let i = 0; i < firstDay; i++) container.innerHTML += "<div></div>";
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+    const tasks = allTasks.filter((t) => t.tgl_deadline === dStr && !t.is_done);
+    let pClass = "";
+    if (tasks.some((t) => t.priority.toLowerCase() === "high"))
+      pClass = "cal-high";
+    else if (tasks.some((t) => t.priority.toLowerCase() === "medium"))
+      pClass = "cal-medium";
+    else if (tasks.some((t) => t.priority.toLowerCase() === "low"))
+      pClass = "cal-low";
+    const isToday =
+      dStr === new Date().toISOString().split("T")[0] ? "today-glow" : "";
+    container.innerHTML += `<div class="day-cell ${pClass} ${isToday}" onclick="showAgenda('${dStr}', this)">${d}</div>`;
+  }
+}
+
+async function simpanData() {
+  const content = document.getElementById("isiData").value;
+  const date = document.getElementById("tglDeadline").value;
+  if (!content || !date) return;
+  await supabaseClient
+    .from("schedule")
+    .insert([
+      {
+        content,
+        tgl_deadline: date,
+        category: selectedKategori,
+        priority: selectedPriority,
+        is_done: false,
+      },
+    ]);
+  document.getElementById("isiData").value = "";
+  muatData();
+}
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute("data-theme") === "dark";
+  html.setAttribute("data-theme", isDark ? "light" : "dark");
+  document.getElementById("theme-icon").innerText = isDark ? "🌙" : "☀️";
+}
+
+async function toggleDone(id, status) {
+  await supabaseClient
+    .from("schedule")
+    .update({ is_done: !status })
+    .eq("id", id);
+  muatData();
+}
+setInterval(() => {
+  document.getElementById("clock").innerText = new Date().toLocaleTimeString(
+    "id-ID",
+    { hour12: false },
+  );
+}, 1000);
+muatData();
