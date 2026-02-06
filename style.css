@@ -21,11 +21,25 @@
 body {
   background: var(--bg);
   color: var(--text);
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   transition: 0.5s;
   overflow-x: hidden;
   line-height: 1.5;
+
+  /* Optimalisasi untuk Mobile / PWA */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  
+  /* Membuat scroll di HP terasa "mental" (smooth bounce) khas aplikasi native */
+  -webkit-overflow-scrolling: touch;
+  
+  /* Menghilangkan highlight biru saat elemen diklik di Android/Chrome */
+  -webkit-tap-highlight-color: transparent;
+  
+  /* Memastikan body memenuhi layar agar gradasi background tidak putus */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .header-seamless {
