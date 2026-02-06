@@ -1,107 +1,156 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id" data-theme="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>IS2 Hub | Full Restore</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IS2 HUB | PRO EDITION</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body class="ios-bg">
-
-    <div class="fixed inset-0 overflow-hidden pointer-events-none z-[-1]">
-        <div class="absolute top-[-5%] left-[-5%] w-[60%] h-[60%] bg-blue-600/10 rounded-full blur-[120px]"></div>
-        <div class="absolute bottom-[-5%] right-[-5%] w-[60%] h-[60%] bg-purple-600/10 rounded-full blur-[120px]"></div>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="p-6 md:p-10">
+    <div id="custom-modal" class="modal-overlay hidden" onclick="closeModal()">
+      <div class="modal-card fade-in" onclick="event.stopPropagation()">
+        <h3
+          id="modal-title"
+          class="text-center font-black uppercase text-[10px] tracking-[0.3em] mb-6 opacity-40"
+        >
+          Select Option
+        </h3>
+        <div id="modal-options" class="space-y-3"></div>
+        <button
+          onclick="closeModal()"
+          class="w-full mt-6 py-2 text-[10px] font-black uppercase opacity-30 tracking-widest"
+        >
+          Cancel
+        </button>
+      </div>
     </div>
 
-    <div class="max-w-6xl mx-auto px-6 py-10 space-y-10 relative z-10">
-        <header class="flex justify-between items-end px-2">
-            <div class="space-y-1">
-                <p id="clock" class="ios-time">00:00:00</p>
-                <h1 class="ios-title text-4xl">INFORMATION SYSTEM 2</h1>
-            </div>
-            <div class="flex items-center gap-4">
-                <button onclick="toggleThemeManually()" class="ios-icon-btn shadow-lg">
-                    <span id="theme-icon">🌙</span>
-                </button>
-                <div class="ios-pill shadow-lg">
-                    <span class="ios-dot"></span>
-                    <span class="text-[10px] font-black uppercase tracking-widest opacity-80">System Active</span>
-                </div>
-            </div>
-        </header>
-
-        <div id="next-deadline-area" class="fade-in"></div>
-
-        <main class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-            <div class="lg:col-span-4 space-y-6">
-                <section class="ios-card p-8 space-y-6">
-                    <h2 class="text-2xl font-bold tracking-tight">Add Task</h2>
-                    <div class="space-y-5">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="space-y-1">
-                                <label class="ios-label">Category</label>
-                                <select id="kategori" class="ios-input w-full">
-                                    <option value="Assignment">Assignment</option>
-                                    <option value="Event">Event</option>
-                                </select>
-                            </div>
-                            <div class="space-y-1">
-                                <label class="ios-label">Priority</label>
-                                <select id="priority" class="ios-input w-full">
-                                    <option value="low">Low</option>
-                                    <option value="medium" selected>Medium</option>
-                                    <option value="high">High</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="space-y-1">
-                            <label class="ios-label">Deadline Date</label>
-                            <input type="date" id="tglDeadline" class="ios-input w-full">
-                        </div>
-                        <div class="space-y-1">
-                            <label class="ios-label">Task Details</label>
-                            <textarea id="isiData" placeholder="What needs to be done?" class="ios-input w-full h-28 pt-3 resize-none"></textarea>
-                        </div>
-                        <div class="space-y-1">
-                            <label class="ios-label">Resource Link</label>
-                            <input type="url" id="taskLink" placeholder="https://..." class="ios-input w-full">
-                        </div>
-                    </div>
-                    <button onclick="simpanData()" id="btnSimpan" class="ios-primary-btn shadow-2xl">Update Hub</button>
-                </section>
-            </div>
-
-            <div class="lg:col-span-8 space-y-10">
-                <section class="ios-card p-8 min-h-[500px]">
-                    <div class="flex justify-between items-center mb-8">
-                        <h2 class="text-2xl font-bold tracking-tight">Timeline Feed</h2>
-                    </div>
-                    <div id="listData" class="space-y-5"></div>
-                </section>
-                
-                <section class="ios-card p-10">
-                    <h2 class="text-xs font-black opacity-30 uppercase tracking-[0.5em] text-center mb-10">Academic Calendar</h2>
-                    <div id="calendar-month-year" class="text-sm font-bold mb-8 text-center opacity-80 uppercase tracking-widest"></div>
-                    <div id="calendar-container" class="calendar-grid-large"></div>
-                </section>
-            </div>
-        </main>
-    </div>
-
-    <div id="deleteModal" class="fixed inset-0 z-[100] hidden items-center justify-center px-6">
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-md" onclick="closeDeleteModal()"></div>
-        <div class="ios-card relative w-full max-w-xs p-10 text-center scale-up">
-            <h3 class="text-2xl font-bold mb-3">Delete?</h3>
-            <p class="text-sm opacity-50 mb-8">This action is permanent.</p>
-            <div class="flex gap-4">
-                <button onclick="closeDeleteModal()" class="flex-1 py-4 rounded-2xl bg-zinc-200/50 dark:bg-zinc-800 font-bold">No</button>
-                <button id="confirmDeleteBtn" class="flex-1 py-4 rounded-2xl bg-red-500 text-white font-bold shadow-lg shadow-red-500/30">Yes</button>
-            </div>
+    <div
+      id="delete-modal"
+      class="modal-overlay hidden"
+      onclick="closeDeleteModal()"
+    >
+      <div class="modal-card fade-in" onclick="event.stopPropagation()">
+        <div class="text-center space-y-4">
+          <div
+            class="w-12 h-12 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto text-xl font-bold"
+          >
+            !
+          </div>
+          <div>
+            <h3 class="font-black text-lg tracking-tighter">Delete Task?</h3>
+            <p class="text-xs opacity-50 font-medium">
+              This action cannot be undone.
+            </p>
+          </div>
+          <div class="grid grid-cols-2 gap-3 pt-4">
+            <button
+              onclick="closeDeleteModal()"
+              class="py-4 bg-zinc-500/10 rounded-2xl font-bold text-xs uppercase tracking-widest"
+            >
+              No
+            </button>
+            <button
+              id="confirm-delete-btn"
+              class="py-4 bg-red-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-red-500/20"
+            >
+              Yes, Delete
+            </button>
+          </div>
         </div>
+      </div>
     </div>
 
+    <div class="max-w-6xl mx-auto space-y-10">
+      <header class="flex justify-between items-center">
+        <div class="space-y-1">
+          <p id="clock" class="text-xs font-bold opacity-40 tracking-widest">
+            00:00:00
+          </p>
+          <h1 class="text-3xl font-black uppercase tracking-tighter">
+            IS2 HUB
+          </h1>
+        </div>
+        <div class="flex items-center gap-3">
+          <button onclick="toggleTheme()" class="theme-toggle-btn shadow-xl">
+            <span id="theme-icon">☀️</span>
+          </button>
+          <div class="status-pill shadow-lg">
+            <div id="db-status-dot" class="status-dot"></div>
+            <span id="db-status-text" class="status-text">Connecting</span>
+          </div>
+        </div>
+      </header>
+
+      <div id="next-deadline-area"></div>
+
+      <main class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        <div class="lg:col-span-4 space-y-6">
+          <section class="ios-card shadow-2xl">
+            <h2 class="text-xl font-bold mb-6 tracking-tight">New Entry</h2>
+            <div class="space-y-4">
+              <div class="grid grid-cols-2 gap-3">
+                <button
+                  id="btn-kategori"
+                  onclick="openSelect('kategori')"
+                  class="ios-select-btn"
+                >
+                  Assignment
+                </button>
+                <button
+                  id="btn-priority"
+                  onclick="openSelect('priority')"
+                  class="ios-select-btn"
+                >
+                  Medium
+                </button>
+              </div>
+              <input type="date" id="tglDeadline" class="ios-input" />
+              <textarea
+                id="isiData"
+                placeholder="What's next?"
+                class="ios-input h-28 pt-4 resize-none"
+              ></textarea>
+              <button onclick="simpanData()" class="ios-primary-btn shadow-xl">
+                Update Hub
+              </button>
+            </div>
+          </section>
+        </div>
+
+        <div class="lg:col-span-8 space-y-10">
+          <section class="ios-card shadow-2xl min-h-[250px]">
+            <h2 class="text-xl font-bold mb-6 tracking-tight">Timeline Feed</h2>
+            <div id="listData" class="space-y-4"></div>
+          </section>
+
+          <section class="ios-card shadow-2xl">
+            <h2
+              class="text-[10px] font-black opacity-30 uppercase tracking-[0.4em] text-center mb-10"
+            >
+              Academic Calendar
+            </h2>
+            <div
+              id="calendar-month-year"
+              class="text-sm font-black mb-8 text-center uppercase tracking-[0.2em]"
+            ></div>
+            <div id="calendar-container" class="calendar-grid mb-6"></div>
+            <div
+              id="daily-agenda-area"
+              class="mt-8 pt-8 border-t border-zinc-500/10 hidden fade-in"
+            >
+              <p
+                id="agenda-date-label"
+                class="text-[10px] font-black opacity-40 uppercase mb-6 tracking-widest text-center"
+              ></p>
+              <div id="agenda-list" class="space-y-3"></div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
     <script src="script.js"></script>
-</body>
+  </body>
 </html>
