@@ -1,78 +1,101 @@
 const SB_URL = "https://mycldrtubwstojeaumcg.supabase.co";
 const SB_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15Y2xkcnR1YndzdG9qZWF1bWNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNzQwNTksImV4cCI6MjA4NTg1MDA1OX0.GHgglJHGQqDDRY-IcvhQeZyYZmR48J3arnby8IxZo9I";
-const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
+const sb = supabase.createClient(SB_URL, SB_KEY);
 
-let allTasks = [];
-let currentSelectType = "";
-let selectedKategori = "Assignment";
-let selectedPriority = "Medium";
-let taskIdToDelete = null;
+let allTasks = [],
+  selectedKat = "Assignment",
+  selectedPri = "Medium",
+  delId = null;
+let pDate = new Date(),
+  selFullDate = "";
 
 async function muatData() {
-  try {
-    const { data, error } = await supabaseClient
-      .from("schedule")
-      .select("*")
-      .order("tgl_deadline", { ascending: true });
-    if (error) throw error;
+  console.log("Fetching data...");
+  const { data, error } = await sb
+    .from("schedule")
+    .select("*")
+    .order("tgl_deadline", { ascending: true });
+  if (!error) {
     allTasks = data || [];
-    document.getElementById("db-status-dot")?.classList.add("online");
-    document.getElementById("db-status-text").innerText = "System Active";
+    document.getElementById("db-status-dot").style.background = "#34c759";
+    document.getElementById("db-status-text").innerText = "Active";
     renderAll();
-  } catch (e) {
-    console.error(e);
   }
 }
 
-// LOGIKA SELECT MODAL
-function openSelect(type) {
-  currentSelectType = type;
-  const modal = document.getElementById("custom-modal");
-  const optionsDiv = document.getElementById("modal-options");
-  modal.classList.remove("hidden");
-  optionsDiv.innerHTML = "";
-  const options =
-    type === "kategori" ? ["Assignment", "Event"] : ["Low", "Medium", "High"];
-  options.forEach((opt) => {
-    const btn = document.createElement("button");
-    btn.className = "option-btn";
-    btn.innerText = opt;
-    btn.onclick = () => {
-      if (type === "kategori") {
-        selectedKategori = opt;
-        document.getElementById("btn-kategori").innerText = opt;
-      } else {
-        selectedPriority = opt;
-        document.getElementById("btn-priority").innerText = opt;
-      }
-      closeModal();
-    };
-    optionsDiv.appendChild(btn);
-  });
-}
-function closeModal() {
-  document.getElementById("custom-modal").classList.add("hidden");
+// DELETE LOGIC (FIXED)
+function askDel(id) {
+  console.log("Asking to delete ID:", id);
+  delId = id;
+  document.getElementById("delete-modal").classList.remove("hidden");
 }
 
-// LOGIKA DELETE MODAL (BARU)
-function triggerDelete(id) {
-  taskIdToDelete = id;
-  const modal = document.getElementById("delete-modal");
-  modal.classList.remove("hidden");
-  document.getElementById("confirm-delete-btn").onclick = confirmDelete;
-}
 function closeDeleteModal() {
   document.getElementById("delete-modal").classList.add("hidden");
-  taskIdToDelete = null;
-}
-async function confirmDelete() {
-  if (!taskIdToDelete) return;
-  await supabaseClient.from("schedule").delete().eq("id", taskIdToDelete);
-  closeDeleteModal();
-  muatData();
+  delId = null;
 }
 
+async function confirmDelete() {
+  if (!delId) return;
+  console.log("Confirming delete for ID:", delId);
+  try {
+    const { error } = await sb.from("schedule").delete().eq("id", delId);
+    if (error) throw error;
+    console.log("Delete success!");
+    closeDeleteModal();
+    muatData();
+  } catch (e) {
+    console.error("Delete failed:", e);
+    alert("Gagal menghapus: " + e.message);
+  }
+}
+
+// DATE PICKER
+function toggleDatePicker() {
+  const p = document.getElementById("custom-datepicker");
+  if (p.classList.contains("hidden")) {
+    p.classList.remove("hidden");
+    setTimeout(() => p.classList.add("active"), 10);
+    renderPicker();
+  } else {
+    closePicker();
+  }
+}
+function closePicker() {
+  const p = document.getElementById("custom-datepicker");
+  p.classList.remove("active");
+  setTimeout(() => p.classList.add("hidden"), 300);
+}
+function selectDate(d) {
+  selFullDate = d;
+  document.getElementById("tglDeadline").value = d;
+  closePicker();
+}
+function renderPicker() {
+  const cont = document.getElementById("datepicker-days"),
+    lbl = document.getElementById("currentMonthYear");
+  const m = pDate.getMonth(),
+    y = pDate.getFullYear();
+  lbl.innerText = pDate.toLocaleString("id-ID", {
+    month: "long",
+    year: "numeric",
+  });
+  const first = new Date(y, m, 1).getDay(),
+    days = new Date(y, m + 1, 0).getDate();
+  cont.innerHTML = "";
+  for (let i = 0; i < first; i++) cont.innerHTML += "<div></div>";
+  for (let d = 1; d <= days; d++) {
+    const dStr = `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+    cont.innerHTML += `<div class="picker-day ${dStr === selFullDate ? "picker-selected" : ""}" onclick="event.stopPropagation(); selectDate('${dStr}')">${d}</div>`;
+  }
+}
+function changeMonth(v) {
+  pDate.setMonth(pDate.getMonth() + v);
+  renderPicker();
+}
+
+// RENDERING
 function renderAll() {
   renderCountdown();
   renderFeed();
@@ -80,106 +103,131 @@ function renderAll() {
 }
 
 function renderCountdown() {
-  const area = document.getElementById("next-deadline-area");
-  const now = new Date();
+  const area = document.getElementById("next-deadline-area"),
+    now = new Date();
   now.setHours(0, 0, 0, 0);
   const next = allTasks.find(
-    (t) => !t.is_done && new Date(t.tgl_deadline).getTime() >= now.getTime(),
+    (t) => !t.is_done && new Date(t.tgl_deadline) >= now,
   );
   if (next) {
-    const deadline = new Date(next.tgl_deadline);
-    const diffDays = Math.ceil(
-      (deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
+    const diff = Math.ceil(
+      (new Date(next.tgl_deadline) - now) / (1000 * 60 * 60 * 24),
     );
-    area.innerHTML = `<div class="countdown-card fade-in"><div><p class="text-[11px] font-black uppercase tracking-[0.2em] opacity-40">Upcoming Focus</p><h2 class="text-3xl font-black mt-2 tracking-tighter">${next.content}</h2></div><div class="text-right"><p class="text-5xl font-black tracking-tighter">${diffDays === 0 ? "TODAY" : diffDays + "D"}</p></div></div>`;
+    area.innerHTML = `<div class="countdown-card fade-in mb-10 flex justify-between items-center shadow-2xl">
+            <div><p class="text-[10px] font-black uppercase opacity-40">Upcoming Focus</p><h2 class="text-2xl font-black mt-1 tracking-tighter">${next.content}</h2></div>
+            <div class="text-right"><p class="text-4xl font-black tracking-tighter">${diff === 0 ? "TODAY" : diff + "D"}</p></div>
+        </div>`;
   } else {
     area.innerHTML = "";
   }
 }
 
 function renderFeed() {
-  const list = document.getElementById("listData");
-  list.innerHTML = allTasks
+  document.getElementById("listData").innerHTML = allTasks
     .map(
       (t) => `
-        <div class="ios-card p-6 flex justify-between items-center ${t.is_done ? "opacity-30" : ""} mb-4" 
-             style="border-left: 10px solid ${t.priority.toLowerCase() === "high" ? "#ff3b30" : t.priority.toLowerCase() === "medium" ? "#ff9500" : "#8e8e93"}">
+        <div class="ios-card flex justify-between items-center mb-4 ${t.is_done ? "opacity-30" : ""}" 
+             style="border-left: 10px solid ${t.priority.toUpperCase() === "HIGH" ? "#ff3b30" : t.priority.toUpperCase() === "MEDIUM" ? "#ff9500" : "#8e8e93"}">
             <div class="flex items-center gap-6">
-                <input type="checkbox" ${t.is_done ? "checked" : ""} onclick="toggleDone(${t.id}, ${t.is_done})" class="w-6 h-6 cursor-pointer accent-white">
+                <input type="checkbox" ${t.is_done ? "checked" : ""} onclick="toggleDone(${t.id}, ${t.is_done})" class="w-6 h-6">
                 <div>
-                    <p class="text-[10px] font-black opacity-30 uppercase tracking-widest">${t.category} • ${t.tgl_deadline}</p>
+                    <p class="text-[10px] font-black opacity-30 uppercase">${t.category} • ${t.tgl_deadline}</p>
                     <p class="font-bold text-lg tracking-tight">${t.content}</p>
                 </div>
             </div>
-            <button onclick="triggerDelete(${t.id})" class="delete-btn">Delete</button>
-        </div>
-    `,
+            <button onclick="askDel(${t.id})" class="bg-red-500/10 text-red-500 px-4 py-2 rounded-xl text-[10px] font-black hover:bg-red-500 hover:text-white transition-all">DELETE</button>
+        </div>`,
     )
     .join("");
 }
 
 function renderCalendar() {
-  const container = document.getElementById("calendar-container");
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth();
+  const cont = document.getElementById("calendar-container"),
+    now = new Date();
+  const y = now.getFullYear(),
+    m = now.getMonth();
   document.getElementById("calendar-month-year").innerText = now.toLocaleString(
     "id-ID",
     { month: "long", year: "numeric" },
   );
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  container.innerHTML = "";
-  for (let i = 0; i < firstDay; i++) container.innerHTML += "<div></div>";
-  for (let d = 1; d <= daysInMonth; d++) {
-    const dStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+  const first = new Date(y, m, 1).getDay(),
+    days = new Date(y, m + 1, 0).getDate();
+  cont.innerHTML = "";
+  for (let i = 0; i < first; i++) cont.innerHTML += "<div></div>";
+  for (let d = 1; d <= days; d++) {
+    const dStr = `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
     const tasks = allTasks.filter((t) => t.tgl_deadline === dStr && !t.is_done);
-    let pClass = "";
-    if (tasks.some((t) => t.priority.toLowerCase() === "high"))
-      pClass = "cal-high";
-    else if (tasks.some((t) => t.priority.toLowerCase() === "medium"))
-      pClass = "cal-medium";
-    else if (tasks.some((t) => t.priority.toLowerCase() === "low"))
-      pClass = "cal-low";
-    const isToday =
-      dStr === new Date().toISOString().split("T")[0] ? "today-glow" : "";
-    container.innerHTML += `<div class="day-cell ${pClass} ${isToday}" onclick="showAgenda('${dStr}', this)">${d}</div>`;
+    let pClass = tasks.some((t) => t.priority.toUpperCase() === "HIGH")
+      ? "cal-high"
+      : tasks.some((t) => t.priority.toUpperCase() === "MEDIUM")
+        ? "cal-medium"
+        : tasks.some((t) => t.priority.toUpperCase() === "LOW")
+          ? "cal-low"
+          : "";
+    cont.innerHTML += `<div class="day-cell ${pClass}">${d}</div>`;
   }
 }
 
+// SELECT MODAL
+function openSelect(type) {
+  const m = document.getElementById("custom-modal"),
+    opt = document.getElementById("modal-options");
+  m.classList.remove("hidden");
+  opt.innerHTML = "";
+  const list =
+    type === "kategori" ? ["Assignment", "Event"] : ["Low", "Medium", "High"];
+  list.forEach((item) => {
+    const b = document.createElement("button");
+    b.className = "option-btn";
+    b.innerText = item;
+    b.onclick = () => {
+      if (type === "kategori") {
+        selectedKat = item;
+        document.getElementById("btn-kategori").innerText = item;
+      } else {
+        selectedPri = item;
+        document.getElementById("btn-priority").innerText = item;
+      }
+      closeModal();
+    };
+    opt.appendChild(b);
+  });
+}
+function closeModal() {
+  document.getElementById("custom-modal").classList.add("hidden");
+}
+
+async function toggleDone(id, s) {
+  await sb.from("schedule").update({ is_done: !s }).eq("id", id);
+  muatData();
+}
 async function simpanData() {
-  const content = document.getElementById("isiData").value;
-  const date = document.getElementById("tglDeadline").value;
-  if (!content || !date) return;
-  await supabaseClient
+  const isi = document.getElementById("isiData").value,
+    tgl = document.getElementById("tglDeadline").value;
+  if (!isi || !tgl) return alert("Lengkapi data!");
+  await sb
     .from("schedule")
     .insert([
       {
-        content,
-        tgl_deadline: date,
-        category: selectedKategori,
-        priority: selectedPriority,
+        content: isi,
+        tgl_deadline: tgl,
+        category: selectedKat,
+        priority: selectedPri,
         is_done: false,
       },
     ]);
   document.getElementById("isiData").value = "";
+  document.getElementById("tglDeadline").value = "";
   muatData();
 }
 
 function toggleTheme() {
-  const html = document.documentElement;
-  const isDark = html.getAttribute("data-theme") === "dark";
-  html.setAttribute("data-theme", isDark ? "light" : "dark");
-  document.getElementById("theme-icon").innerText = isDark ? "🌙" : "☀️";
+  const h = document.documentElement;
+  const isD = h.getAttribute("data-theme") === "dark";
+  h.setAttribute("data-theme", isD ? "light" : "dark");
+  document.getElementById("theme-icon").innerText = isD ? "🌙" : "☀️";
 }
 
-async function toggleDone(id, status) {
-  await supabaseClient
-    .from("schedule")
-    .update({ is_done: !status })
-    .eq("id", id);
-  muatData();
-}
 setInterval(() => {
   document.getElementById("clock").innerText = new Date().toLocaleTimeString(
     "id-ID",
