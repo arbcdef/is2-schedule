@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>IS2 HUB | PRO EDITION</title>
+    <title>IS2 HUB | ULTIMATE REPAIR</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="style.css" />
@@ -12,18 +12,11 @@
     <div id="custom-modal" class="modal-overlay hidden" onclick="closeModal()">
       <div class="modal-card fade-in" onclick="event.stopPropagation()">
         <h3
-          id="modal-title"
-          class="text-center font-black uppercase text-[10px] tracking-[0.3em] mb-6 opacity-40"
+          class="text-[10px] font-black opacity-30 uppercase tracking-[0.3em] mb-4 text-center"
         >
           Select Option
         </h3>
-        <div id="modal-options" class="space-y-3"></div>
-        <button
-          onclick="closeModal()"
-          class="w-full mt-6 py-2 text-[10px] font-black uppercase opacity-30 tracking-widest"
-        >
-          Cancel
-        </button>
+        <div id="modal-options" class="flex flex-col gap-3"></div>
       </div>
     </div>
 
@@ -32,33 +25,24 @@
       class="modal-overlay hidden"
       onclick="closeDeleteModal()"
     >
-      <div class="modal-card fade-in" onclick="event.stopPropagation()">
-        <div class="text-center space-y-4">
-          <div
-            class="w-12 h-12 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto text-xl font-bold"
+      <div
+        class="modal-card fade-in text-center"
+        onclick="event.stopPropagation()"
+      >
+        <h3 class="font-black text-lg mb-6 tracking-tighter">Hapus Tugas?</h3>
+        <div class="grid grid-cols-2 gap-3">
+          <button
+            onclick="closeDeleteModal()"
+            class="py-4 bg-zinc-500/10 rounded-2xl font-bold uppercase text-[10px]"
           >
-            !
-          </div>
-          <div>
-            <h3 class="font-black text-lg tracking-tighter">Delete Task?</h3>
-            <p class="text-xs opacity-50 font-medium">
-              This action cannot be undone.
-            </p>
-          </div>
-          <div class="grid grid-cols-2 gap-3 pt-4">
-            <button
-              onclick="closeDeleteModal()"
-              class="py-4 bg-zinc-500/10 rounded-2xl font-bold text-xs uppercase tracking-widest"
-            >
-              No
-            </button>
-            <button
-              id="confirm-delete-btn"
-              class="py-4 bg-red-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-red-500/20"
-            >
-              Yes, Delete
-            </button>
-          </div>
+            Batal
+          </button>
+          <button
+            onclick="confirmDelete()"
+            class="py-4 bg-red-500 text-white rounded-2xl font-black uppercase text-[10px]"
+          >
+            Hapus
+          </button>
         </div>
       </div>
     </div>
@@ -66,11 +50,9 @@
     <div class="max-w-6xl mx-auto space-y-10">
       <header class="flex justify-between items-center">
         <div class="space-y-1">
-          <p id="clock" class="text-xs font-bold opacity-40 tracking-widest">
-            00:00:00
-          </p>
+          <p id="clock" class="text-xs font-bold opacity-40">00:00:00</p>
           <h1 class="text-3xl font-black uppercase tracking-tighter">
-            IS2 HUB
+            Information System 2 HUB
           </h1>
         </div>
         <div class="flex items-center gap-3">
@@ -107,12 +89,60 @@
                   Medium
                 </button>
               </div>
-              <input type="date" id="tglDeadline" class="ios-input" />
+              <div class="relative">
+                <input
+                  type="text"
+                  id="tglDeadline"
+                  placeholder="Pilih Tanggal"
+                  class="ios-input cursor-pointer"
+                  readonly
+                  onclick="toggleDatePicker()"
+                />
+                <div
+                  id="custom-datepicker"
+                  class="hidden absolute top-full left-0 mt-2 w-full ios-card z-[9999] p-5 shadow-2xl scale-95 opacity-0 transition-all duration-300"
+                >
+                  <div class="flex justify-between items-center mb-4">
+                    <button
+                      onclick="
+                        event.stopPropagation();
+                        changeMonth(-1);
+                      "
+                      class="p-2 font-black text-[10px] opacity-40"
+                    >
+                      PREV
+                    </button>
+                    <span
+                      id="currentMonthYear"
+                      class="text-[10px] font-black tracking-widest uppercase"
+                    ></span>
+                    <button
+                      onclick="
+                        event.stopPropagation();
+                        changeMonth(1);
+                      "
+                      class="p-2 font-black text-[10px] opacity-40"
+                    >
+                      NEXT
+                    </button>
+                  </div>
+                  <div
+                    id="datepicker-days"
+                    class="grid grid-cols-7 gap-1 text-center"
+                  ></div>
+                </div>
+              </div>
               <textarea
                 id="isiData"
-                placeholder="What's next?"
-                class="ios-input h-28 pt-4 resize-none"
+                placeholder="Tugas apa hari ini?"
+                class="ios-input h-24 pt-4 resize-none"
               ></textarea>
+              <input
+                type="url"
+                id="linkData"
+                placeholder="Link Resource (Opsional)"
+                class="ios-input"
+              />
               <button onclick="simpanData()" class="ios-primary-btn shadow-xl">
                 Update Hub
               </button>
@@ -121,32 +151,15 @@
         </div>
 
         <div class="lg:col-span-8 space-y-10">
-          <section class="ios-card shadow-2xl min-h-[250px]">
-            <h2 class="text-xl font-bold mb-6 tracking-tight">Timeline Feed</h2>
-            <div id="listData" class="space-y-4"></div>
-          </section>
-
-          <section class="ios-card shadow-2xl">
+          <div id="listData" class="space-y-4"></div>
+          <section class="ios-card shadow-xl">
             <h2
-              class="text-[10px] font-black opacity-30 uppercase tracking-[0.4em] text-center mb-10"
+              id="calendar-month-year"
+              class="text-center font-black uppercase mb-10 tracking-[0.3em] text-xs opacity-40 uppercase"
             >
               Academic Calendar
             </h2>
-            <div
-              id="calendar-month-year"
-              class="text-sm font-black mb-8 text-center uppercase tracking-[0.2em]"
-            ></div>
-            <div id="calendar-container" class="calendar-grid mb-6"></div>
-            <div
-              id="daily-agenda-area"
-              class="mt-8 pt-8 border-t border-zinc-500/10 hidden fade-in"
-            >
-              <p
-                id="agenda-date-label"
-                class="text-[10px] font-black opacity-40 uppercase mb-6 tracking-widest text-center"
-              ></p>
-              <div id="agenda-list" class="space-y-3"></div>
-            </div>
+            <div id="calendar-container" class="calendar-grid"></div>
           </section>
         </div>
       </main>
