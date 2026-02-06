@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="style.css" />
 </head>
-<body class="p-6 md:p-10">
+<body class="p-4 md:p-10 antialiased">
     <div id="custom-modal" class="modal-overlay hidden" onclick="closeModal()">
         <div class="modal-card fade-in" onclick="event.stopPropagation()">
             <h3 class="text-[10px] font-black opacity-30 uppercase tracking-[0.3em] mb-4 text-center">Select Option</h3>
@@ -26,33 +26,33 @@
         </div>
     </div>
 
-    <div class="max-w-6xl mx-auto space-y-10">
+    <div class="max-w-6xl mx-auto space-y-8">
         <header class="flex justify-between items-center">
             <div class="space-y-1">
                 <p id="clock" class="text-xs font-bold opacity-40">00:00:00</p>
-                <h1 class="text-3xl font-black uppercase tracking-tighter">IS2 HUB</h1>
+                <h1 class="text-3xl font-black uppercase tracking-tighter leading-none">IS2 HUB</h1>
             </div>
             <div class="flex items-center gap-3">
-                <button onclick="toggleTheme()" class="theme-toggle-btn shadow-xl text-xl">
-                    <span id="theme-icon">☀️</span>
+                <button onclick="toggleTheme()" class="theme-toggle-btn w-10 h-10 flex items-center justify-center bg-zinc-500/10 rounded-full shadow-lg">
+                    <span id="theme-icon" class="text-lg">☀️</span>
                 </button>
-                <div class="status-pill shadow-lg">
-                    <div id="db-status-dot" class="status-dot"></div>
-                    <span id="db-status-text" class="status-text text-[10px] font-bold uppercase">Connecting</span>
+                <div class="status-pill shadow-lg bg-zinc-500/10 px-4 py-2 rounded-full flex items-center gap-2">
+                    <div id="db-status-dot" class="status-dot w-2 h-2 rounded-full bg-red-500"></div>
+                    <span id="db-status-text" class="text-[9px] font-black uppercase tracking-widest opacity-60">Connecting</span>
                 </div>
             </div>
         </header>
 
         <div id="next-deadline-area"></div>
 
-        <main class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-10">
             <div class="lg:col-span-4 space-y-6">
                 <section class="ios-card shadow-2xl">
                     <h2 class="text-xl font-bold mb-6 tracking-tight">New Entry</h2>
                     <div class="space-y-4">
                         <div class="grid grid-cols-2 gap-3">
-                            <button id="btn-kategori" onclick="openSelect('kategori')" class="ios-select-btn">Assignment</button>
-                            <button id="btn-priority" onclick="openSelect('priority')" class="ios-select-btn">Medium</button>
+                            <button id="btn-kategori" onclick="openSelect('kategori')" class="ios-select-btn active:scale-95 transition-all">Assignment</button>
+                            <button id="btn-priority" onclick="openSelect('priority')" class="ios-select-btn active:scale-95 transition-all">Medium</button>
                         </div>
                         <div class="relative">
                             <input
@@ -64,11 +64,11 @@
                                 onfocus="this.blur();"
                                 onclick="toggleDatePicker(event)"
                             />
-                            <div id="custom-datepicker" class="hidden absolute top-full left-0 mt-2 w-full ios-card z-[9999] p-5 shadow-2xl scale-95 opacity-0 transition-all duration-300">
+                            <div id="custom-datepicker" class="hidden absolute top-full left-0 mt-2 w-full ios-card z-[9999] p-5 shadow-2xl scale-95 opacity-0 transition-all duration-300 pointer-events-none">
                                 <div class="flex justify-between items-center mb-4">
-                                    <button onclick="event.stopPropagation(); changeMonth(-1);" class="p-2 font-black text-[10px] opacity-40">PREV</button>
-                                    <span id="currentMonthYear" class="text-[10px] font-black tracking-widest uppercase text-center"></span>
-                                    <button onclick="event.stopPropagation(); changeMonth(1);" class="p-2 font-black text-[10px] opacity-40">NEXT</button>
+                                    <button onclick="event.stopPropagation(); changeMonth(-1);" class="p-2 font-black text-[10px] opacity-40 hover:opacity-100">PREV</button>
+                                    <span id="currentMonthYear" class="text-[10px] font-black tracking-widest uppercase"></span>
+                                    <button onclick="event.stopPropagation(); changeMonth(1);" class="p-2 font-black text-[10px] opacity-40 hover:opacity-100">NEXT</button>
                                 </div>
                                 <div id="datepicker-days" class="grid grid-cols-7 gap-1 text-center"></div>
                             </div>
@@ -80,10 +80,10 @@
                 </section>
             </div>
 
-            <div class="lg:col-span-8 space-y-10">
+            <div class="lg:col-span-8 space-y-8">
                 <div id="listData" class="space-y-4"></div>
-                <section class="ios-card shadow-xl">
-                    <h2 id="calendar-month-year" class="text-center font-black uppercase mb-10 tracking-[0.3em] text-xs opacity-40 uppercase">Academic Calendar</h2>
+                <section class="ios-card shadow-xl overflow-hidden">
+                    <h2 id="calendar-month-year" class="text-center font-black uppercase mb-8 tracking-[0.3em] text-xs opacity-40">Academic Calendar</h2>
                     <div id="calendar-container" class="calendar-grid"></div>
                 </section>
             </div>
