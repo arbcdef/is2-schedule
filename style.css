@@ -1,136 +1,238 @@
+/* --- ROOT VARIABLE & THEME --- */
 :root[data-theme="dark"] {
-    --bg: #000000;
-    --card: rgba(20, 20, 20, 0.8);
-    --text: #ffffff;
-    --border: rgba(255, 255, 255, 0.1);
-    --input: rgba(255, 255, 255, 0.05);
+  --bg: #000000;
+  --bg-rgb: 0, 0, 0;
+  --card: rgba(18, 18, 18, 0.7);
+  --text: #ffffff;
+  --border: rgba(255, 255, 255, 0.06);
+  --input: rgba(255, 255, 255, 0.03);
 }
 
 :root[data-theme="light"] {
-    --bg: #f5f5f7;
-    --card: rgba(255, 255, 255, 0.8);
-    --text: #000000;
-    --border: rgba(0, 0, 0, 0.1);
-    --input: rgba(0, 0, 0, 0.05);
+  --bg: #f5f5f7;
+  --bg-rgb: 245, 245, 247;
+  --card: rgba(255, 255, 255, 0.7);
+  --text: #000000;
+  --border: rgba(0, 0, 0, 0.06);
+  --input: rgba(0, 0, 0, 0.03);
 }
 
+/* --- BASE STYLES --- */
 body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, sans-serif;
-    margin: 0;
-    overflow-x: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  transition: 0.5s;
+  overflow-x: hidden;
+  line-height: 1.5;
 }
 
-/* Header */
 .header-seamless {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    background: linear-gradient(to bottom, var(--bg) 60%, transparent);
-    padding: 1.5rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  /* Padding top dibuat sedang (2rem), cukup untuk memberi ruang bernapas */
+  padding-top: calc(env(safe-area-inset-top) + 1.8rem);
+  padding-bottom: 1.8rem;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: linear-gradient(
+    to bottom,
+    var(--bg) 0%,
+    rgba(var(--bg-rgb), 0.9) 75%,
+    transparent 100%
+  );
 }
 
-/* Fix Area Tabrakan */
-#next-deadline-area {
-    pointer-events: none; /* Klik bisa tembus ke input di bawahnya */
+.header-seamless h1 {
+  font-size: 1.5rem; /* Ukuran teks kembali diperkuat tapi tidak raksasa */
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
 }
 
-/* Dynamic Island di dalam tetap bisa diklik */
+#clock {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.4;
+  margin-bottom: 4px;
+}
+
+/* --- LAYOUT & SPACING --- */
+.max-w-6xl.mx-auto.mt-10 {
+  margin-top: 2.5rem !important; /* Jarak antara header dan konten utama */
+}
+
+/* --- DYNAMIC ISLAND: TEBAL & DOMINAN --- */
 .dynamic-island {
-    pointer-events: auto;
-    background: var(--text) !important;
-    color: var(--bg) !important;
-    border-radius: 24px;
-    padding: 1.5rem !important;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  background: var(--text) !important;
+  color: var(--bg) !important;
+  border-radius: 35px;
+  padding: 2.2rem !important;
+  transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+  margin-bottom: 2.5rem;
 }
 
-.glass-card {
-    background: var(--card);
-    backdrop-filter: blur(25px);
-    border-radius: 28px;
-    padding: 1.5rem;
+.dynamic-island h2 {
+  font-size: 1.6rem; /* Nama tugas besar */
+  font-weight: 900;
 }
 
-/* Input Styles */
-.ios-input {
-    width: 100%;
-    background: var(--input);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 14px;
-    color: var(--text);
-    font-size: 14px;
-    outline: none;
-    display: block;
-    -webkit-appearance: none;
+.dynamic-island span {
+  font-size: 1.8rem; /* Countdown besar (X DAYS LEFT) */
+  font-weight: 900;
+  letter-spacing: -0.05em;
 }
 
-.select-btn {
-    width: 100%;
-    background: var(--input);
-    border: 1px solid var(--border);
-    padding: 12px;
-    border-radius: 12px;
-    font-size: 10px;
-    font-weight: 800;
-    text-transform: uppercase;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
+.dynamic-island p {
+  font-size: 10px; /* Label UPCOMING */
+  letter-spacing: 0.2em;
+  opacity: 0.6;
 }
 
-.primary-btn {
-    width: 100%;
-    background: var(--text);
-    color: var(--bg);
-    padding: 18px;
-    border-radius: 16px;
-    font-weight: 900;
-    text-transform: uppercase;
-    cursor: pointer;
-}
-
-/* Kalender Timeline */
+/* --- CALENDAR SYSTEM (ANTI-BUG) --- */
 .calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px; /* Jarak antar tanggal */
+  max-width: 450px; /* KUNCI: Kalender tidak akan melebar raksasa */
+  margin: 0 auto; /* Tengah secara horizontal */
+  padding: 10px;
 }
 
 .day-cell {
-    aspect-ratio: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
-    font-weight: 700;
-    border-radius: 10px;
-    background: var(--input);
-    cursor: pointer;
+  aspect-ratio: 1; /* Kotak sempurna */
+  width: 100%;
+  max-width: 50px; /* Batas ukuran kotak agar tetap rapi */
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--input);
+  border: 1px solid transparent;
 }
 
-/* Penanda Warna Kegiatan */
-.pri-high { background: #ff3b30 !important; color: white !important; }
-.pri-medium { background: #ff9500 !important; color: white !important; }
-.pri-low { background: #34c759 !important; color: white !important; }
-.pri-mixed { background: var(--border) !important; border: 1px dashed var(--text); }
-.cal-today { border: 2px solid var(--text); }
+.day-cell:hover {
+  transform: translateY(-2px);
+  background: rgba(var(--bg-rgb), 0.1);
+  border-color: var(--border);
+}
 
-/* Modal */
+.cal-today {
+  background: var(--text) !important;
+  color: var(--bg) !important;
+  border-radius: 50% !important;
+  font-weight: 900;
+  transform: scale(1.1);
+  z-index: 2;
+}
+
+/* Kalender Priority Colors */
+.pri-high {
+  background: rgba(255, 59, 48, 0.2) !important;
+  color: #ff3b30;
+}
+.pri-medium {
+  background: rgba(255, 149, 0, 0.2) !important;
+  color: #ff9500;
+}
+.pri-low {
+  background: rgba(142, 142, 147, 0.2) !important;
+  color: #8e8e93;
+}
+.pri-mixed {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px dashed var(--border);
+}
+
+/* --- COMPONENTS --- */
+.glass-card {
+  background: var(--card);
+  backdrop-filter: blur(25px);
+  border-radius: 24px;
+}
+
+.ios-input {
+  width: 100%;
+  background: var(--input);
+  border-radius: 14px;
+  padding: 14px 18px;
+  color: var(--text);
+  border: 1px solid var(--border);
+  outline: none;
+  font-size: 14px;
+}
+
+.primary-btn {
+  background: var(--text) !important;
+  color: var(--bg) !important;
+  width: 100%;
+  padding: 20px;
+  border-radius: 18px;
+  font-weight: 900;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  transition: opacity 0.2s;
+}
+
+.primary-btn:active {
+  opacity: 0.8;
+}
+
+.select-btn {
+  width: 100%;
+  background: var(--input);
+  padding: 14px;
+  border-radius: 14px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  border: 1px solid var(--border);
+}
+
+/* --- MODALS & OVERLAYS --- */
 .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.8);
-    z-index: 2000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(10px);
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
 }
 
-.hidden { display: none !important; }
+.modal-card {
+  background: var(--card);
+  border-radius: 30px;
+  width: 100%;
+  max-width: 360px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.fade-in {
+  animation: smoothIn 0.4s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+@keyframes smoothIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
