@@ -1,32 +1,16 @@
-:root {
-  --bg-page: #f2f2f7;
-  --text-main: #1c1c1e;
-  --card-bg: rgba(255, 255, 255, 0.85);
-  --border-color: rgba(0, 0, 0, 0.05);
-}
-
-[data-theme="dark"] {
-  --bg-page: #000000;
-  --text-main: #ffffff;
-  --card-bg: rgba(28, 28, 30, 0.7);
-  --border-color: rgba(255, 255, 255, 0.08);
-}
-
-body {
-  background: var(--bg-page);
-  color: var(--text-main);
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  overflow-x: hidden;
-  min-height: 100vh;
-}
-
+/* Base Style */
 .ios-card {
-  background: var(--card-bg);
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
-  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 28px;
   padding: 24px;
-  border: 1px solid var(--border-color);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .ios-card {
+  background: rgba(28, 28, 30, 0.7);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 .ios-input {
@@ -34,9 +18,9 @@ body {
   border-radius: 16px;
   padding: 14px 18px;
   width: 100%;
-  color: var(--text-main);
   outline: none;
   border: 1px solid transparent;
+  color: inherit;
 }
 
 .ios-select-btn {
@@ -46,53 +30,95 @@ body {
   font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
+  width: 100%;
 }
 
 .ios-primary-btn {
-  background: var(--text-main);
-  color: var(--bg-page);
+  background: currentColor; /* Mengikuti warna teks main */
+  background-color: #1c1c1e;
+  color: white;
   width: 100%;
   padding: 18px;
   border-radius: 18px;
   font-weight: 900;
   text-transform: uppercase;
 }
+[data-theme="dark"] .ios-primary-btn { background-color: white; color: black; }
 
-/* FIX TOMBOL GEPEG */
-.delete-btn {
-  flex-shrink: 0; /* Mencegah tombol gepeng */
-  width: 80px;    /* Lebar tetap */
-  height: 35px;   /* Tinggi tetap */
+/* FIX PICKER LOGIC */
+.datepicker-popover {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 8px;
+  z-index: 1000;
+  background: white;
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  border: 1px solid rgba(0,0,0,0.1);
+}
+[data-theme="dark"] .datepicker-popover {
+  background: #2c2c2e;
+  border-color: rgba(255,255,255,0.1);
+}
+.datepicker-popover.active { display: block; }
+
+.picker-day {
+  aspect-ratio: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.picker-selected { background: #007aff !important; color: white !important; }
+
+/* FIX TOMBOL DELETE TIDAK GEPENG */
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.delete-btn {
+  flex-shrink: 0; /* WAJIB: Mencegah gepeng */
+  padding: 8px 16px;
   background: rgba(239, 68, 68, 0.1);
   color: #ef4444;
   border-radius: 12px;
   font-size: 10px;
   font-weight: 900;
-  transition: all 0.2s;
 }
 
-.delete-btn:active {
-  background: #ef4444;
-  color: white;
-}
-
-/* CALENDAR & PICKER */
+/* Calendar Grid */
 .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
 .day-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-weight: 800; font-size: 11px; background: rgba(128, 128, 128, 0.05); }
-
-#custom-datepicker.active { display: block !important; opacity: 1; transform: scale(1); }
-.picker-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; }
-.picker-selected { background: #007aff !important; color: white !important; }
 
 .cal-high { background: #ff3b30 !important; color: white !important; }
 .cal-medium { background: #ff9500 !important; color: white !important; }
 .cal-low { background: #8e8e93 !important; color: white !important; }
 
-.modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 99999; display: flex; align-items: center; justify-content: center; padding: 20px; }
-.modal-card { background: var(--card-bg); width: 100%; max-width: 320px; padding: 30px; border-radius: 35px; border: 1px solid var(--border-color); }
-
-.fade-in { animation: fadeIn 0.3s ease-out forwards; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-card {
+  background: white;
+  width: 100%;
+  max-width: 320px;
+  padding: 24px;
+  border-radius: 32px;
+}
+[data-theme="dark"] .modal-card { background: #1c1c1e; }
