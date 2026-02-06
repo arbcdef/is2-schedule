@@ -8,16 +8,17 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="style.css" />
 </head>
-<body class="p-4 md:p-10 antialiased">
+<body class="p-4 md:p-10 antialiased bg-[#f2f2f7] dark:bg-black text-[#1c1c1e] dark:text-white transition-colors duration-300">
+
     <div id="custom-modal" class="modal-overlay hidden" onclick="closeModal()">
-        <div class="modal-card fade-in" onclick="event.stopPropagation()">
+        <div class="modal-card" onclick="event.stopPropagation()">
             <h3 class="text-[10px] font-black opacity-30 uppercase tracking-[0.3em] mb-4 text-center">Select Option</h3>
             <div id="modal-options" class="flex flex-col gap-3"></div>
         </div>
     </div>
 
     <div id="delete-modal" class="modal-overlay hidden" onclick="closeDeleteModal()">
-        <div class="modal-card fade-in text-center" onclick="event.stopPropagation()">
+        <div class="modal-card text-center" onclick="event.stopPropagation()">
             <h3 class="font-black text-lg mb-6 tracking-tighter">Hapus Tugas?</h3>
             <div class="grid grid-cols-2 gap-3">
                 <button onclick="closeDeleteModal()" class="py-4 bg-zinc-500/10 rounded-2xl font-bold uppercase text-[10px]">Batal</button>
@@ -37,7 +38,7 @@
                     <span id="theme-icon" class="text-lg">☀️</span>
                 </button>
                 <div class="status-pill shadow-lg bg-zinc-500/10 px-4 py-2 rounded-full flex items-center gap-2">
-                    <div id="db-status-dot" class="status-dot w-2 h-2 rounded-full bg-red-500"></div>
+                    <div id="db-status-dot" class="w-2 h-2 rounded-full bg-red-500"></div>
                     <span id="db-status-text" class="text-[9px] font-black uppercase tracking-widest opacity-60">Connecting</span>
                 </div>
             </div>
@@ -56,11 +57,11 @@
                         </div>
                         <div class="relative">
                             <input type="text" id="tglDeadline" placeholder="Pilih Tanggal" class="ios-input cursor-pointer" readonly onfocus="this.blur();" onclick="toggleDatePicker(event)" />
-                            <div id="custom-datepicker" class="hidden absolute top-full left-0 mt-2 w-full ios-card z-[9999] p-5 shadow-2xl scale-95 opacity-0 transition-all duration-300">
+                            <div id="custom-datepicker" class="datepicker-popover">
                                 <div class="flex justify-between items-center mb-4">
-                                    <button onclick="event.stopPropagation(); changeMonth(-1);" class="p-2 font-black text-[10px] opacity-40">PREV</button>
-                                    <span id="currentMonthYear" class="text-[10px] font-black tracking-widest uppercase"></span>
-                                    <button onclick="event.stopPropagation(); changeMonth(1);" class="p-2 font-black text-[10px] opacity-40">NEXT</button>
+                                    <button onclick="event.stopPropagation(); changeMonth(-1);" class="p-2 font-black text-[10px] opacity-40 hover:opacity-100">PREV</button>
+                                    <span id="currentMonthYear" class="text-[10px] font-black tracking-widest uppercase text-center flex-1"></span>
+                                    <button onclick="event.stopPropagation(); changeMonth(1);" class="p-2 font-black text-[10px] opacity-40 hover:opacity-100">NEXT</button>
                                 </div>
                                 <div id="datepicker-days" class="grid grid-cols-7 gap-1 text-center"></div>
                             </div>
