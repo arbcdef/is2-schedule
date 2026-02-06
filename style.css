@@ -4,8 +4,8 @@
   --bg-rgb: 0, 0, 0;
   --card: rgba(18, 18, 18, 0.7);
   --text: #ffffff;
-  --border: rgba(255, 255, 255, 0.06);
-  --input: rgba(255, 255, 255, 0.03);
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.04);
 }
 
 :root[data-theme="light"] {
@@ -13,8 +13,8 @@
   --bg-rgb: 245, 245, 247;
   --card: rgba(255, 255, 255, 0.7);
   --text: #000000;
-  --border: rgba(0, 0, 0, 0.06);
-  --input: rgba(0, 0, 0, 0.03);
+  --border: rgba(0, 0, 0, 0.08);
+  --input: rgba(0, 0, 0, 0.04);
 }
 
 /* --- BASE STYLES --- */
@@ -22,148 +22,110 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  transition: 0.5s;
+  transition: background 0.5s;
   overflow-x: hidden;
   line-height: 1.5;
-
-  /* Optimalisasi untuk Mobile / PWA */
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-  
-  /* Membuat scroll di HP terasa "mental" (smooth bounce) khas aplikasi native */
-  -webkit-overflow-scrolling: touch;
-  
-  /* Menghilangkan highlight biru saat elemen diklik di Android/Chrome */
-  -webkit-tap-highlight-color: transparent;
-  
-  /* Memastikan body memenuhi layar agar gradasi background tidak putus */
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
 }
 
+/* --- HEADER OPTIMIZED --- */
 .header-seamless {
   position: sticky;
   top: 0;
   z-index: 100;
-  /* Padding top dibuat sedang (2rem), cukup untuk memberi ruang bernapas */
-  padding-top: calc(env(safe-area-inset-top) + 1.8rem);
-  padding-bottom: 1.8rem;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  /* Menggunakan padding lebih kecil agar tidak makan tempat di HP */
+  padding-top: calc(env(safe-area-inset-top) + 1rem);
+  padding-bottom: 1rem;
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
   background: linear-gradient(
     to bottom,
     var(--bg) 0%,
-    rgba(var(--bg-rgb), 0.9) 75%,
+    rgba(var(--bg-rgb), 0.95) 80%,
     transparent 100%
   );
 }
 
 .header-seamless h1 {
-  font-size: 1.5rem; /* Ukuran teks kembali diperkuat tapi tidak raksasa */
+  font-size: 1.4rem; /* Seimbang, tidak menutupi konten */
   font-weight: 900;
   letter-spacing: -0.03em;
-  line-height: 1.2;
+  line-height: 1.1;
 }
 
 #clock {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   opacity: 0.4;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
-/* --- LAYOUT & SPACING --- */
-.max-w-6xl.mx-auto.mt-10 {
-  margin-top: 2.5rem !important; /* Jarak antara header dan konten utama */
+/* --- CONTENT WRAPPER FIX --- */
+/* Menghilangkan margin negatif yang menyebabkan bug tabrakan */
+.max-w-6xl.mx-auto.mt-10, 
+.main-content-wrapper {
+  margin-top: 1rem !important; 
+  padding-top: 0 !important;
 }
 
-/* --- DYNAMIC ISLAND: TEBAL & DOMINAN --- */
+/* --- DYNAMIC ISLAND MOBILE FRIENDLY --- */
 .dynamic-island {
   background: var(--text) !important;
   color: var(--bg) !important;
-  border-radius: 35px;
-  padding: 2.2rem !important;
+  border-radius: 28px;
+  /* Padding dikurangi agar tidak terlalu tinggi di HP */
+  padding: 1.5rem 1.8rem !important; 
   transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
-  margin-bottom: 2.5rem;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .dynamic-island h2 {
-  font-size: 1.6rem; /* Nama tugas besar */
+  font-size: 1.3rem; 
   font-weight: 900;
+  line-height: 1.2;
 }
 
 .dynamic-island span {
-  font-size: 1.8rem; /* Countdown besar (X DAYS LEFT) */
+  font-size: 1.5rem; 
   font-weight: 900;
-  letter-spacing: -0.05em;
+  white-space: nowrap;
 }
 
 .dynamic-island p {
-  font-size: 10px; /* Label UPCOMING */
-  letter-spacing: 0.2em;
-  opacity: 0.6;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  opacity: 0.7;
+  margin-bottom: 2px;
 }
 
-/* --- CALENDAR SYSTEM (ANTI-BUG) --- */
+/* --- CALENDAR SYSTEM --- */
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 8px; /* Jarak antar tanggal */
-  max-width: 450px; /* KUNCI: Kalender tidak akan melebar raksasa */
-  margin: 0 auto; /* Tengah secara horizontal */
-  padding: 10px;
+  gap: 6px;
+  max-width: 100%;
+  padding: 5px;
 }
 
 .day-cell {
-  aspect-ratio: 1; /* Kotak sempurna */
-  width: 100%;
-  max-width: 50px; /* Batas ukuran kotak agar tetap rapi */
-  margin: 0 auto;
+  aspect-ratio: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  border-radius: 8px;
   background: var(--input);
-  border: 1px solid transparent;
-}
-
-.day-cell:hover {
-  transform: translateY(-2px);
-  background: rgba(var(--bg-rgb), 0.1);
-  border-color: var(--border);
 }
 
 .cal-today {
   background: var(--text) !important;
   color: var(--bg) !important;
   border-radius: 50% !important;
-  font-weight: 900;
-  transform: scale(1.1);
-  z-index: 2;
-}
-
-/* Kalender Priority Colors */
-.pri-high {
-  background: rgba(255, 59, 48, 0.2) !important;
-  color: #ff3b30;
-}
-.pri-medium {
-  background: rgba(255, 149, 0, 0.2) !important;
-  color: #ff9500;
-}
-.pri-low {
-  background: rgba(142, 142, 147, 0.2) !important;
-  color: #8e8e93;
-}
-.pri-mixed {
-  background: rgba(255, 255, 255, 0.1) !important;
-  border: 1px dashed var(--border);
+  transform: scale(1.05);
 }
 
 /* --- COMPONENTS --- */
@@ -171,16 +133,16 @@ body {
   background: var(--card);
   backdrop-filter: blur(25px);
   border-radius: 24px;
+  padding: 1.5rem !important; /* Padding lebih pas untuk HP */
 }
 
 .ios-input {
   width: 100%;
   background: var(--input);
-  border-radius: 14px;
-  padding: 14px 18px;
+  border-radius: 12px;
+  padding: 12px 16px;
   color: var(--text);
   border: 1px solid var(--border);
-  outline: none;
   font-size: 14px;
 }
 
@@ -188,65 +150,23 @@ body {
   background: var(--text) !important;
   color: var(--bg) !important;
   width: 100%;
-  padding: 20px;
-  border-radius: 18px;
+  padding: 16px;
+  border-radius: 14px;
   font-weight: 900;
   text-transform: uppercase;
   font-size: 12px;
-  letter-spacing: 0.1em;
-  transition: opacity 0.2s;
+  letter-spacing: 0.05em;
 }
 
-.primary-btn:active {
-  opacity: 0.8;
-}
+/* Priority Colors */
+.pri-high { background: rgba(255, 59, 48, 0.2) !important; color: #ff3b30; }
+.pri-medium { background: rgba(255, 149, 0, 0.2) !important; color: #ff9500; }
+.pri-low { background: rgba(142, 142, 147, 0.2) !important; color: #8e8e93; }
 
-.select-btn {
-  width: 100%;
-  background: var(--input);
-  padding: 14px;
-  border-radius: 14px;
-  font-size: 10px;
-  font-weight: 800;
-  text-transform: uppercase;
-  border: 1px solid var(--border);
-}
-
-/* --- MODALS & OVERLAYS --- */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(12px);
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-
-.modal-card {
-  background: var(--card);
-  border-radius: 30px;
-  width: 100%;
-  max-width: 360px;
-}
-
-.hidden {
-  display: none !important;
-}
-
-.fade-in {
-  animation: smoothIn 0.4s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-}
-
-@keyframes smoothIn {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* --- MEDIA QUERIES FOR TABLET/DESKTOP --- */
+@media (min-width: 1024px) {
+  .header-seamless h1 { font-size: 1.8rem; }
+  .dynamic-island { padding: 2.2rem !important; }
+  .dynamic-island h2 { font-size: 1.6rem; }
+  .dynamic-island span { font-size: 1.8rem; }
 }
