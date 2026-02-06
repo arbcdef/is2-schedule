@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>IS2 HUB | ULTIMATE REPAIR</title>
+    <title>IS2 HUB | ULTIMATE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="style.css" />
 </head>
-<body class="p-4 md:p-10 antialiased bg-[#f2f2f7] dark:bg-black text-[#1c1c1e] dark:text-white transition-colors duration-300">
-
+<body class="p-4 md:p-10 antialiased">
     <div id="custom-modal" class="modal-overlay hidden" onclick="closeModal()">
         <div class="modal-card" onclick="event.stopPropagation()">
             <h3 class="text-[10px] font-black opacity-30 uppercase tracking-[0.3em] mb-4 text-center">Select Option</h3>
@@ -27,56 +26,46 @@
         </div>
     </div>
 
-    <div class="max-w-6xl mx-auto space-y-8">
-        <header class="flex justify-between items-center">
-            <div class="space-y-1">
-                <p id="clock" class="text-xs font-bold opacity-40">00:00:00</p>
+    <div class="max-w-5xl mx-auto space-y-6">
+        <header class="flex justify-between items-end">
+            <div>
+                <p id="clock" class="text-xs font-bold opacity-40 mb-1">00:00:00</p>
                 <h1 class="text-3xl font-black uppercase tracking-tighter leading-none">IS2 HUB</h1>
             </div>
-            <div class="flex items-center gap-3">
-                <button onclick="toggleTheme()" class="w-10 h-10 flex items-center justify-center bg-zinc-500/10 rounded-full shadow-lg">
-                    <span id="theme-icon" class="text-lg">☀️</span>
-                </button>
-                <div class="status-pill shadow-lg bg-zinc-500/10 px-4 py-2 rounded-full flex items-center gap-2">
-                    <div id="db-status-dot" class="w-2 h-2 rounded-full bg-red-500"></div>
-                    <span id="db-status-text" class="text-[9px] font-black uppercase tracking-widest opacity-60">Connecting</span>
-                </div>
-            </div>
+            <button onclick="toggleTheme()" class="w-10 h-10 flex items-center justify-center bg-zinc-500/10 rounded-full">
+                <span id="theme-icon">☀️</span>
+            </button>
         </header>
 
         <div id="next-deadline-area"></div>
 
-        <main class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div class="lg:col-span-4 space-y-6">
-                <section class="ios-card shadow-2xl">
-                    <h2 class="text-xl font-bold mb-6 tracking-tight">New Entry</h2>
-                    <div class="space-y-4">
-                        <div class="grid grid-cols-2 gap-3">
-                            <button id="btn-kategori" onclick="openSelect('kategori')" class="ios-select-btn">Assignment</button>
-                            <button id="btn-priority" onclick="openSelect('priority')" class="ios-select-btn">Medium</button>
-                        </div>
-                        <div class="relative">
-                            <input type="text" id="tglDeadline" placeholder="Pilih Tanggal" class="ios-input cursor-pointer" readonly onfocus="this.blur();" onclick="toggleDatePicker(event)" />
-                            <div id="custom-datepicker" class="datepicker-popover">
-                                <div class="flex justify-between items-center mb-4">
-                                    <button onclick="event.stopPropagation(); changeMonth(-1);" class="p-2 font-black text-[10px] opacity-40 hover:opacity-100">PREV</button>
-                                    <span id="currentMonthYear" class="text-[10px] font-black tracking-widest uppercase text-center flex-1"></span>
-                                    <button onclick="event.stopPropagation(); changeMonth(1);" class="p-2 font-black text-[10px] opacity-40 hover:opacity-100">NEXT</button>
-                                </div>
-                                <div id="datepicker-days" class="grid grid-cols-7 gap-1 text-center"></div>
-                            </div>
-                        </div>
-                        <textarea id="isiData" placeholder="Tugas apa hari ini?" class="ios-input h-24 pt-4 resize-none"></textarea>
-                        <input type="url" id="linkData" placeholder="Link Resource (Opsional)" class="ios-input" />
-                        <button onclick="simpanData()" class="ios-primary-btn active:scale-95 transition-transform">Update Hub</button>
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-4">
+                <section class="ios-card shadow-xl space-y-4">
+                    <div class="grid grid-cols-2 gap-2">
+                        <button id="btn-kategori" onclick="openSelect('kategori')" class="ios-btn-alt">Assignment</button>
+                        <button id="btn-priority" onclick="openSelect('priority')" class="ios-btn-alt">Medium</button>
                     </div>
+                    <div class="relative">
+                        <input type="text" id="tglDeadline" placeholder="Pilih Tanggal" class="ios-input cursor-pointer" readonly onclick="toggleDatePicker(event)" />
+                        <div id="custom-datepicker" class="picker-container hidden">
+                            <div class="flex justify-between items-center mb-4">
+                                <button onclick="event.stopPropagation(); changeMonth(-1);" class="text-[10px] font-bold opacity-50">PREV</button>
+                                <span id="currentMonthYear" class="text-[10px] font-black uppercase"></span>
+                                <button onclick="event.stopPropagation(); changeMonth(1);" class="text-[10px] font-bold opacity-50">NEXT</button>
+                            </div>
+                            <div id="datepicker-days" class="grid grid-cols-7 gap-1"></div>
+                        </div>
+                    </div>
+                    <textarea id="isiData" placeholder="Tugas apa hari ini?" class="ios-input h-24 pt-4 resize-none"></textarea>
+                    <button onclick="simpanData()" class="ios-primary-btn">Update Hub</button>
                 </section>
             </div>
 
-            <div class="lg:col-span-8 space-y-8">
-                <div id="listData" class="space-y-4"></div>
-                <section class="ios-card shadow-xl overflow-hidden">
-                    <h2 id="calendar-month-year" class="text-center font-black uppercase mb-8 tracking-[0.3em] text-xs opacity-40">Academic Calendar</h2>
+            <div class="lg:col-span-8 space-y-6">
+                <div id="listData" class="space-y-3"></div>
+                <section class="ios-card">
+                    <h2 id="calendar-month-year" class="text-center font-black uppercase text-[10px] opacity-30 tracking-widest mb-6">Calendar</h2>
                     <div id="calendar-container" class="calendar-grid"></div>
                 </section>
             </div>
