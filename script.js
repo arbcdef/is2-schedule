@@ -1,141 +1,189 @@
-const SB_URL = "https://mycldrtubwstojeaumcg.supabase.co"; 
-const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15Y2xkcnR1YndzdG9qZWF1bWNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNzQwNTksImV4cCI6MjA4NTg1MDA1OX0.GHgglJHGQqDDRY-IcvhQeZyYZmR48J3arnby8IxZo9I";
-const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
-
-let allTasks = [];
-let deleteTargetId = null;
-
-function toggleThemeManually() {
-    const html = document.documentElement;
-    const isLight = html.getAttribute('data-theme') === 'light';
-    html.setAttribute('data-theme', isLight ? 'dark' : 'light');
-    document.getElementById('theme-icon').innerText = isLight ? '🌙' : '☀️';
+:root {
+  --bg-page: #f2f2f7;
+  --text-main: #1c1c1e;
+  --card-bg: rgba(255, 255, 255, 0.9);
+  --border-color: rgba(0, 0, 0, 0.05);
+  --island-bg: #1c1c1e;
+  --island-text: #ffffff;
 }
 
-function updateClock() {
-    document.getElementById('clock').innerText = new Date().toLocaleTimeString('id-ID');
+[data-theme="dark"] {
+  --bg-page: #000000;
+  --text-main: #ffffff;
+  --card-bg: rgba(28, 28, 30, 0.8);
+  --border-color: rgba(255, 255, 255, 0.08);
+  --island-bg: #ffffff !important;
+  --island-text: #000000 !important;
 }
 
-async function muatData() {
-    try {
-        let { data, error } = await supabaseClient.from('schedule').select('*').order('tgl_deadline', { ascending: true });
-        if (error) throw error;
-        allTasks = data;
-        renderCalendar();
-        renderFeed(data);
-        renderCountdown(data);
-    } catch (err) { console.error(err); }
+body {
+  background: var(--bg-page);
+  color: var(--text-main);
+  font-family: sans-serif;
+  transition: 0.4s ease;
+  overflow-x: hidden;
 }
 
-function renderCountdown(data) {
-    const area = document.getElementById('next-deadline-area');
-    const today = new Date();
-    today.setHours(0,0,0,0);
-    
-    const upcoming = data.find(t => !t.is_done && new Date(t.tgl_deadline) >= today);
-
-    if (upcoming) {
-        const deadlineDate = new Date(upcoming.tgl_deadline);
-        const diffTime = deadlineDate - today;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
-        area.innerHTML = `
-            <div class="countdown-card fade-in">
-                <div class="space-y-1">
-                    <p class="text-[10px] font-black opacity-40 uppercase tracking-[0.3em]">Next Milestone</p>
-                    <h2 class="text-2xl font-bold tracking-tight uppercase">${upcoming.content}</h2>
-                </div>
-                <div class="text-right">
-                    <p class="text-4xl font-black">${diffDays === 0 ? "TODAY" : diffDays + " DAYS"}</p>
-                </div>
-            </div>`;
-    } else { area.innerHTML = ""; }
+/* MODAL / POP-UP */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(15px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 25px;
+}
+.modal-card {
+  background: var(--card-bg);
+  width: 100%;
+  max-width: 320px;
+  padding: 35px;
+  border-radius: 40px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+}
+.option-btn {
+  width: 100%;
+  padding: 18px;
+  border-radius: 20px;
+  background: rgba(128, 128, 128, 0.1);
+  font-weight: 800;
+  text-align: center;
+  transition: 0.2s;
+  font-size: 13px;
+}
+.option-btn:hover {
+  background: var(--text-main);
+  color: var(--bg-page);
+  transform: scale(1.02);
 }
 
-function renderFeed(data) {
-    const list = document.getElementById('listData');
-    list.innerHTML = data.map(item => `
-        <div class="ios-card p-6 flex justify-between items-center transition-all priority-${item.priority} ${item.is_done ? 'task-done' : ''}">
-            <div class="flex items-center gap-5">
-                <input type="checkbox" ${item.is_done ? 'checked' : ''} onclick="toggleDone(${item.id}, ${item.is_done})" class="w-6 h-6 cursor-pointer accent-blue-500 rounded-full">
-                <div>
-                    <span class="text-[10px] font-black opacity-30 uppercase tracking-widest">${item.category} • ${item.tgl_deadline}</span>
-                    <p class="font-bold text-lg mt-1 leading-tight">${item.content}</p>
-                    ${item.task_link ? `<a href="${item.task_link}" target="_blank" class="text-[11px] text-blue-500 font-bold mt-2 inline-block underline decoration-2 underline-offset-4">RESOURCE LINK</a>` : ''}
-                </div>
-            </div>
-            <button onclick="openDeleteModal(${item.id})" class="opacity-10 hover:opacity-100 transition-opacity text-xl px-4">✕</button>
-        </div>
-    `).join('');
+/* CUSTOM COMPONENTS */
+.ios-select-btn {
+  background: rgba(128, 128, 128, 0.1);
+  padding: 14px;
+  border-radius: 18px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-main);
+  transition: 0.2s;
+}
+.ios-select-btn:active {
+  transform: scale(0.95);
+  background: rgba(128, 128, 128, 0.2);
 }
 
-async function simpanData() {
-    const cat = document.getElementById('kategori').value;
-    const prio = document.getElementById('priority').value; 
-    const tgl = document.getElementById('tglDeadline').value;
-    const teks = document.getElementById('isiData').value.trim(); 
-    const link = document.getElementById('taskLink').value; 
-    
-    if (!teks || !tgl) return alert("Please fill in both Task and Deadline!");
-
-    const btn = document.getElementById('btnSimpan');
-    btn.innerText = "Syncing...";
-    btn.disabled = true;
-
-    const { error } = await supabaseClient.from('schedule').insert([{ 
-        category: cat, content: teks, tgl_deadline: tgl, priority: prio, is_done: false, task_link: link 
-    }]);
-
-    if(!error) { 
-        document.getElementById('isiData').value = ''; 
-        document.getElementById('tglDeadline').value = '';
-        muatData(); 
-    }
-    btn.innerText = "Update Hub";
-    btn.disabled = false;
+.delete-btn {
+  background: #ff3b30;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 15px;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  shadow: 0 10px 20px rgba(255, 59, 48, 0.2);
+  transition: 0.3s;
+}
+.delete-btn:hover {
+  transform: scale(1.05);
+  filter: brightness(1.2);
 }
 
-function renderCalendar() {
-    const container = document.getElementById('calendar-container');
-    const label = document.getElementById('calendar-month-year');
-    const now = new Date();
-    
-    label.innerText = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
-    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-
-    container.innerHTML = '';
-    for (let i = 0; i < firstDay; i++) container.innerHTML += `<div class="opacity-0"></div>`;
-    
-    for (let d = 1; d <= daysInMonth; d++) {
-        const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-        const tasksOnDate = allTasks.filter(t => t.tgl_deadline === dateStr && !t.is_done);
-        
-        let pClass = "";
-        if (tasksOnDate.length > 0) {
-            if (tasksOnDate.some(t => t.priority === 'high')) pClass = "cal-high";
-            else if (tasksOnDate.some(t => t.priority === 'medium')) pClass = "cal-medium";
-            else pClass = "cal-low";
-        }
-
-        const isToday = (dateStr === new Date().toISOString().split('T')[0]) ? 'today-glow' : '';
-        container.innerHTML += `<div class="day-cell ${isToday} ${pClass}">${d}</div>`;
-    }
+/* UI CARDS */
+.ios-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(40px);
+  border-radius: 35px;
+  padding: 30px;
+  border: 1px solid var(--border-color);
+}
+.ios-input {
+  background: rgba(128, 128, 128, 0.1);
+  border-radius: 20px;
+  padding: 16px;
+  width: 100%;
+  color: var(--text-main);
+  border: none;
+  font-weight: 600;
+  outline: none;
+}
+.ios-primary-btn {
+  background: var(--text-main);
+  color: var(--bg-page);
+  width: 100%;
+  padding: 22px;
+  border-radius: 22px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: 0.3s;
+}
+.ios-primary-btn:active {
+  transform: scale(0.98);
 }
 
-async function toggleDone(id, status) {
-    await supabaseClient.from('schedule').update({ is_done: !status }).eq('id', id);
-    muatData();
+/* CALENDAR */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 12px;
+}
+.day-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  font-weight: 900;
+  background: rgba(128, 128, 128, 0.05);
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 14px;
+}
+.cal-high {
+  background: #ff3b30 !important;
+  color: white !important;
+}
+.cal-medium {
+  background: #ff9500 !important;
+  color: white !important;
+}
+.cal-low {
+  background: #8e8e93 !important;
+  color: white !important;
+}
+.today-glow {
+  outline: 2px solid var(--text-main);
+  outline-offset: 2px;
 }
 
-function openDeleteModal(id) { deleteTargetId = id; document.getElementById('deleteModal').classList.replace('hidden', 'flex'); }
-function closeDeleteModal() { document.getElementById('deleteModal').classList.replace('flex', 'hidden'); }
-document.getElementById('confirmDeleteBtn').onclick = async () => {
-    await supabaseClient.from('schedule').delete().eq('id', deleteTargetId);
-    closeDeleteModal();
-    muatData();
-};
+.countdown-card {
+  background: var(--island-bg) !important;
+  color: var(--island-text) !important;
+  padding: 40px 50px;
+  border-radius: 45px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.countdown-card * {
+  color: var(--island-text) !important;
+}
 
-setInterval(updateClock, 1000);
-updateClock();
-muatData();
+.fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
