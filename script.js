@@ -9,32 +9,20 @@ async function muatData() {
     const { data, error } = await sb.from("schedule").select("*").order("tgl_deadline", { ascending: true });
     if (!error) {
         allTasks = data || [];
-        document.getElementById("db-status-dot").style.background = "#34c759";
+        document.getElementById("db-status-dot").style.backgroundColor = "#34c759";
         document.getElementById("db-status-text").innerText = "Active";
         renderAll();
     }
 }
 
-// DATE PICKER LOGIC
+// LOGIK PICKER (FIXED)
 function toggleDatePicker(e) {
     if (e) e.stopPropagation();
     const p = document.getElementById("custom-datepicker");
-    if (p.classList.contains("hidden")) {
-        p.classList.remove("hidden");
-        setTimeout(() => p.classList.add("active"), 10);
-        renderPicker();
-    } else { closePicker(); }
+    p.classList.toggle("active");
+    if (p.classList.contains("active")) renderPicker();
 }
-function closePicker() {
-    const p = document.getElementById("custom-datepicker");
-    p.classList.remove("active");
-    setTimeout(() => p.classList.add("hidden"), 300);
-}
-function selectDate(d) {
-    selFullDate = d;
-    document.getElementById("tglDeadline").value = d;
-    closePicker();
-}
+
 function renderPicker() {
     const cont = document.getElementById("datepicker-days"), lbl = document.getElementById("currentMonthYear");
     const m = pDate.getMonth(), y = pDate.getFullYear();
@@ -44,18 +32,29 @@ function renderPicker() {
     for (let i = 0; i < first; i++) cont.innerHTML += "<div></div>";
     for (let d = 1; d <= days; d++) {
         const dStr = `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-        cont.innerHTML += `<div class="picker-day ${dStr === selFullDate ? 'picker-selected' : ''}" onclick="event.stopPropagation(); selectDate('${dStr}')">${d}</div>`;
+        const isSel = dStr === selFullDate;
+        cont.innerHTML += `<div class="picker-day ${isSel ? 'picker-selected' : ''}" onclick="selectDate('${dStr}')">${d}</div>`;
     }
 }
-function changeMonth(v) { pDate.setMonth(pDate.getMonth() + v); renderPicker(); }
 
-// RENDER FEED (FIXED BUTTON & TEXT)
+function selectDate(d) {
+    selFullDate = d;
+    document.getElementById("tglDeadline").value = d;
+    document.getElementById("custom-datepicker").classList.remove("active");
+}
+
+function changeMonth(v) {
+    pDate.setMonth(pDate.getMonth() + v);
+    renderPicker();
+}
+
+// RENDER LIST (FIXED GEPENG)
 function renderFeed() {
     document.getElementById("listData").innerHTML = allTasks.map(t => `
-        <div class="ios-card flex justify-between items-center gap-4 ${t.is_done ? 'opacity-40' : ''}" 
+        <div class="ios-card list-item ${t.is_done ? 'opacity-40' : ''}" 
              style="border-left: 8px solid ${t.priority.toUpperCase() === 'HIGH' ? '#ff3b30' : t.priority.toUpperCase() === 'MEDIUM' ? '#ff9500' : '#8e8e93'}">
             <div class="flex items-center gap-4 min-w-0 flex-1">
-                <input type="checkbox" ${t.is_done ? "checked" : ""} onclick="toggleDone(${t.id}, ${t.is_done})" class="w-6 h-6 shrink-0">
+                <input type="checkbox" ${t.is_done ? "checked" : ""} onclick="toggleDone(${t.id}, ${t.is_done})" class="w-5 h-5 shrink-0">
                 <div class="min-w-0">
                     <p class="text-[9px] font-black opacity-30 uppercase truncate">${t.category} • ${t.tgl_deadline}</p>
                     <p class="font-bold text-base tracking-tight truncate">${t.content}</p>
@@ -65,8 +64,9 @@ function renderFeed() {
         </div>`).join("");
 }
 
-// OTHER FUNCTIONS
+// LAIN-LAIN
 function renderAll() { renderCountdown(); renderFeed(); renderCalendar(); }
+
 function askDel(id) { delId = id; document.getElementById("delete-modal").classList.remove("hidden"); }
 function closeDeleteModal() { document.getElementById("delete-modal").classList.add("hidden"); }
 async function confirmDelete() {
@@ -75,10 +75,7 @@ async function confirmDelete() {
     closeDeleteModal();
     muatData();
 }
-async function toggleDone(id, s) {
-    await sb.from("schedule").update({ is_done: !s }).eq("id", id);
-    muatData();
-}
+
 function openSelect(type) {
     const m = document.getElementById("custom-modal"), opt = document.getElementById("modal-options");
     m.classList.remove("hidden");
@@ -89,14 +86,22 @@ function openSelect(type) {
         b.className = "py-4 bg-zinc-500/10 rounded-2xl font-bold text-sm active:bg-blue-500 active:text-white";
         b.innerText = item;
         b.onclick = () => {
-            if (type === "kategori") { selectedKat = item; document.getElementById("btn-kategori").innerText = item; }
-            else { selectedPri = item; document.getElementById("btn-priority").innerText = item; }
+            if (type === "kategori") { 
+                selectedKat = item; document.getElementById("btn-kategori").innerText = item; 
+            } else { 
+                selectedPri = item; document.getElementById("btn-priority").innerText = item; 
+            }
             closeModal();
         };
         opt.appendChild(b);
     });
 }
 function closeModal() { document.getElementById("custom-modal").classList.add("hidden"); }
+
+async function toggleDone(id, s) {
+    await sb.from("schedule").update({ is_done: !s }).eq("id", id);
+    muatData();
+}
 
 async function simpanData() {
     const isi = document.getElementById("isiData").value, tgl = document.getElementById("tglDeadline").value;
@@ -113,9 +118,9 @@ function renderCountdown() {
     const next = allTasks.find(t => !t.is_done && new Date(t.tgl_deadline) >= now);
     if (next) {
         const diff = Math.ceil((new Date(next.tgl_deadline) - now) / (1000 * 60 * 60 * 24));
-        area.innerHTML = `<div class="ios-card bg-black text-white flex justify-between items-center shadow-2xl mb-8">
+        area.innerHTML = `<div class="ios-card bg-black dark:bg-white text-white dark:text-black flex justify-between items-center shadow-2xl mb-8">
             <div class="truncate mr-4"><p class="text-[10px] font-black uppercase opacity-40">Focus</p><h2 class="text-xl font-black truncate">${next.content}</h2></div>
-            <div class="shrink-0 text-right"><p class="text-3xl font-black">${diff === 0 ? "TODAY" : diff + "D"}</p></div>
+            <div class="shrink-0 text-right"><p class="text-3xl font-black">${diff === 0 ? "NOW" : diff + "D"}</p></div>
         </div>`;
     } else { area.innerHTML = ""; }
 }
@@ -146,9 +151,11 @@ setInterval(() => {
     document.getElementById("clock").innerText = new Date().toLocaleTimeString("id-ID", { hour12: false });
 }, 1000);
 
-document.addEventListener('click', (e) => {
-    const p = document.getElementById("custom-datepicker");
-    if (p && !p.contains(e.target) && e.target.id !== "tglDeadline") closePicker();
-});
+// Klik luar untuk tutup kalender
+window.onclick = function(e) {
+    if (!e.target.matches('#tglDeadline') && !e.target.closest('#custom-datepicker')) {
+        document.getElementById("custom-datepicker").classList.remove("active");
+    }
+}
 
 muatData();
