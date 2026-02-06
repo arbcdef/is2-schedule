@@ -1,129 +1,44 @@
-/* --- THEME SETUP --- */
 :root[data-theme="dark"] {
-    --bg: #000000;
-    --bg-rgb: 0, 0, 0;
-    --card: rgba(18, 18, 18, 0.75);
-    --text: #ffffff;
-    --border: rgba(255, 255, 255, 0.08);
-    --input: rgba(255, 255, 255, 0.04);
+    --bg: #000000; --card: rgba(18, 18, 18, 0.8); --text: #ffffff; --border: rgba(255, 255, 255, 0.1); --input: rgba(255, 255, 255, 0.05);
 }
 
-:root[data-theme="light"] {
-    --bg: #f5f5f7;
-    --bg-rgb: 245, 245, 247;
-    --card: rgba(255, 255, 255, 0.75);
-    --text: #000000;
-    --border: rgba(0, 0, 0, 0.08);
-    --input: rgba(0, 0, 0, 0.04);
+body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; transition: 0.3s; }
+
+.header-seamless { sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); padding: 2rem 0; background: linear-gradient(to bottom, var(--bg), transparent); }
+
+.glass-card { background: var(--card); backdrop-filter: blur(20px); border-radius: 24px; padding: 1.5rem; }
+
+/* Input Fix */
+.ios-input { 
+    width: 100%; background: var(--input); border: 1px solid var(--border); 
+    border-radius: 12px; padding: 12px 16px; color: var(--text); outline: none;
+    position: relative; z-index: 10; /* Pastikan bisa diklik */
 }
 
-/* --- BASE --- */
-body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    transition: background 0.5s;
-    overflow-x: hidden;
+.select-btn { 
+    width: 100%; background: var(--input); border: 1px solid var(--border);
+    padding: 12px; border-radius: 12px; font-size: 10px; font-weight: 800;
+    text-transform: uppercase; cursor: pointer;
 }
 
-/* --- HEADER FIX --- */
-.header-seamless {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    padding-top: calc(env(safe-area-inset-top) + 1.2rem);
-    padding-bottom: 1.2rem;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    background: linear-gradient(to bottom, var(--bg) 0%, rgba(var(--bg-rgb), 0.9) 80%, transparent 100%);
+.primary-btn { 
+    width: 100%; background: var(--text); color: var(--bg); 
+    padding: 16px; border-radius: 14px; font-weight: 900; text-transform: uppercase;
 }
 
-.header-seamless h1 { font-size: 1.4rem; font-weight: 900; letter-spacing: -0.03em; }
-#clock { font-size: 11px; font-weight: 600; opacity: 0.3; }
+/* Kalender & Penanda */
+.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
 
-/* --- LAYOUT FIX (Anti-Tabrakan) --- */
-.main-content-wrapper {
-    margin-top: 1.5rem !important;
-    padding-bottom: 5rem;
+.day-cell { 
+    aspect-ratio: 1; display: flex; align-items: center; justify-content: center; 
+    font-size: 10px; font-weight: 700; border-radius: 8px; background: var(--input); 
 }
 
-#next-deadline-area {
-    pointer-events: none; /* Area transparan tidak menghalangi klik */
-    margin-bottom: 2rem;
-}
+/* WARNA PENANDA KALENDER */
+.pri-high { background: #ff3b30 !important; color: white !important; }
+.pri-medium { background: #ff9500 !important; color: white !important; }
+.pri-low { background: #34c759 !important; color: white !important; }
+.cal-today { border: 2px solid var(--text); }
 
-/* --- DYNAMIC ISLAND --- */
-.dynamic-island {
-    pointer-events: auto; /* Isi di dalamnya tetap bisa diklik */
-    background: var(--text) !important;
-    color: var(--bg) !important;
-    border-radius: 30px;
-    padding: 1.6rem 2rem !important;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.dynamic-island h2 { font-size: 1.4rem; font-weight: 900; }
-.dynamic-island span { font-size: 1.6rem; font-weight: 900; }
-
-/* --- COMPONENTS --- */
-.glass-card {
-    background: var(--card);
-    backdrop-filter: blur(25px);
-    border-radius: 26px;
-    padding: 2rem !important;
-}
-
-.select-btn {
-    width: 100%;
-    background: var(--input);
-    padding: 14px;
-    border-radius: 14px;
-    font-size: 10px;
-    font-weight: 800;
-    text-transform: uppercase;
-    border: 1px solid var(--border);
-    cursor: pointer !important;
-    position: relative;
-    z-index: 50; /* Kunci agar bisa ditekan */
-    -webkit-tap-highlight-color: transparent;
-}
-
-.select-btn:active { transform: scale(0.96); opacity: 0.8; }
-
-.ios-input {
-    width: 100%;
-    background: var(--input);
-    border-radius: 14px;
-    padding: 14px 18px;
-    color: var(--text);
-    border: 1px solid var(--border);
-    font-size: 14px;
-    outline: none;
-}
-
-.primary-btn {
-    background: var(--text) !important;
-    color: var(--bg) !important;
-    width: 100%;
-    padding: 18px;
-    border-radius: 16px;
-    font-weight: 900;
-    text-transform: uppercase;
-    font-size: 12px;
-}
-
-/* --- CALENDAR --- */
-.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-.day-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; border-radius: 8px; background: var(--input); }
-.cal-today { background: var(--text) !important; color: var(--bg) !important; border-radius: 50% !important; }
-
-/* --- MODALS --- */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
-.modal-card { background: var(--card); border-radius: 30px; width: 100%; max-width: 340px; }
-
-.hidden { display: none !important; }
-.fade-in { animation: fadeIn 0.3s ease-out forwards; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+.modal-card { background: var(--card); border-radius: 24px; width: 90%; max-width: 320px; }
