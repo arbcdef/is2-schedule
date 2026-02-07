@@ -138,7 +138,7 @@ function renderCalendar() {
   }
 }
 
-// --- MODALS LOGIC (FIXED) ---
+// --- MODALS LOGIC (FIXED GEPENG & KLIK) ---
 function openSelect(type) {
   const m = document.getElementById("custom-modal");
   const opt = document.getElementById("modal-options");
@@ -149,10 +149,11 @@ function openSelect(type) {
   
   items.forEach((item) => {
     const b = document.createElement("button");
-    b.className = "w-full py-4 mb-2 bg-white/5 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-white/10 transition-all border border-white/5";
+    // Gunakan class modal-option-btn yang sudah ada di CSS
+    b.className = "modal-option-btn"; 
     b.innerText = item;
     b.onclick = (e) => {
-      e.stopPropagation(); // Biar tidak trigger onclick overlay
+      e.stopPropagation();
       if (type === "kategori") {
         selectedKat = item;
         document.getElementById("btn-kategori").innerText = item;
@@ -160,20 +161,22 @@ function openSelect(type) {
         selectedPri = item;
         document.getElementById("btn-priority").innerText = item;
       }
-      closeModal(); // Tutup modal lewat fungsi standar agar animasinya jalan
+      closeModal();
     };
     opt.appendChild(b);
   });
 
   m.classList.remove("hidden");
-  setTimeout(() => m.classList.add("active"), 10);
+  // Force reflow untuk animasi
+  void m.offsetWidth; 
+  m.classList.add("active");
 }
 
 function closeModal() {
   const m = document.getElementById("custom-modal");
   if (m) {
     m.classList.remove("active");
-    setTimeout(() => m.classList.add("hidden"), 200);
+    setTimeout(() => m.classList.add("hidden"), 300);
   }
 }
 
@@ -193,14 +196,15 @@ function showCalendarDetail(dateStr, tasks) {
     </div>`).join("");
   
   modal.classList.remove("hidden");
-  setTimeout(() => modal.classList.add("active"), 10);
+  void modal.offsetWidth;
+  modal.classList.add("active");
 }
 
 function closeCalendarDetail() {
   const modal = document.getElementById("calendar-detail-modal");
   if (modal) {
     modal.classList.remove("active");
-    setTimeout(() => modal.classList.add("hidden"), 200);
+    setTimeout(() => modal.classList.add("hidden"), 300);
   }
 }
 
@@ -214,7 +218,7 @@ async function simpanData() {
   if (!isi || !t2) return;
   
   try {
-    await sb.from("schedule").insert([{
+    const { error } = await sb.from("schedule").insert([{
       content: isi,
       tgl_start: t1 || t2,
       tgl_deadline: t2,
@@ -224,11 +228,29 @@ async function simpanData() {
       task_link: link,
     }]);
     
+    if (error) throw error;
+
     // Reset inputs
     ["isiData", "linkData", "tglMulai", "tglDeadline"].forEach(id => document.getElementById(id).value = "");
+    
+    // Show success modal
+    const sModal = document.getElementById("universal-modal");
+    sModal.classList.remove("hidden");
+    void sModal.offsetWidth;
+    sModal.classList.add("active");
+
     muatData();
   } catch (err) {
+    console.error(err);
     alert("Save failed.");
+  }
+}
+
+function closeUniversalModal() {
+  const m = document.getElementById("universal-modal");
+  if (m) {
+    m.classList.remove("active");
+    setTimeout(() => m.classList.add("hidden"), 300);
   }
 }
 
@@ -241,13 +263,22 @@ function askDel(id) {
   delId = id;
   const m = document.getElementById("delete-modal");
   m.classList.remove("hidden");
-  setTimeout(() => m.classList.add("active"), 10);
+  void m.offsetWidth;
+  m.classList.add("active");
+}
+
+function closeDeleteModal() {
+  const m = document.getElementById("delete-modal");
+  if (m) {
+    m.classList.remove("active");
+    setTimeout(() => m.classList.add("hidden"), 300);
+  }
 }
 
 async function confirmDelete() {
+  if (!delId) return;
   await sb.from("schedule").delete().eq("id", delId);
-  document.getElementById("delete-modal").classList.remove("active");
-  setTimeout(() => document.getElementById("delete-modal").classList.add("hidden"), 200);
+  closeDeleteModal();
   muatData();
 }
 
@@ -255,7 +286,8 @@ async function confirmDelete() {
 function toggleDatePicker(e, target) {
   e.stopPropagation();
   dateTarget = target;
-  document.getElementById("custom-datepicker").classList.toggle("hidden");
+  const picker = document.getElementById("custom-datepicker");
+  picker.classList.toggle("hidden");
   renderPicker();
 }
 
@@ -275,7 +307,10 @@ function renderPicker() {
     
   if (cont) {
     cont.innerHTML = "";
-    for (let i = 0; i < (first === 0 ? 6 : first - 1); i++) cont.innerHTML += "<div></div>";
+    // Offset for Monday start (ISO style)
+    let offset = first === 0 ? 6 : first - 1;
+    for (let i = 0; i < offset; i++) cont.innerHTML += "<div></div>";
+    
     for (let d = 1; d <= days; d++) {
       const dStr = `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
       cont.innerHTML += `<div class="p-2 hover:bg-white/10 rounded-full cursor-pointer text-[10px]" onclick="selectDate('${dStr}')">${d}</div>`;
@@ -295,6 +330,12 @@ function changeMonth(dir) {
   pDate.setMonth(pDate.getMonth() + dir);
   renderPicker();
 }
+
+// Global click listener to close datepicker when clicking outside
+document.addEventListener('click', (e) => {
+    const dp = document.getElementById("custom-datepicker");
+    if (dp && !dp.contains(e.target)) dp.classList.add("hidden");
+});
 
 setInterval(() => {
   const el = document.getElementById("clock");
