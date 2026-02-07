@@ -22,7 +22,6 @@ async function muatData() {
         if (error) throw error;
         allTasks = data || [];
 
-        // Set status to ACTIVE
         if (statusDot) statusDot.className = "w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e]";
         if (statusText) {
             statusText.innerText = "Active";
@@ -43,7 +42,7 @@ function renderAll() {
     renderCountdown();
 }
 
-/* --- CALENDAR LOGIC (SINKRON WARNA) --- */
+/* --- CALENDAR LOGIC (LOGIKA WARNA CUSTOM) --- */
 function renderCalendar() {
     const cont = document.getElementById("calendar-container");
     if (!cont) return;
@@ -57,7 +56,6 @@ function renderCalendar() {
     const firstDay = new Date(y, m, 1).getDay();
     const totalDays = new Date(y, m + 1, 0).getDate();
 
-    // Senin = urutan pertama
     let offset = firstDay === 0 ? 6 : firstDay - 1;
     for (let i = 0; i < offset; i++) {
         cont.appendChild(document.createElement("div"));
@@ -78,18 +76,28 @@ function renderCalendar() {
         dayEl.className = "day-cell";
         dayEl.innerText = d;
 
-        // WARNA PRIORITAS
-        if (tasksAtDate.length > 0) {
-            const hasHigh = tasksAtDate.some(t => t.priority === "High");
-            const hasMedium = tasksAtDate.some(t => t.priority === "Medium");
-
-            if (hasHigh) dayEl.classList.add("pri-high"); // Merah
-            else if (hasMedium) dayEl.classList.add("pri-medium"); // Oranye
-            else dayEl.classList.add("pri-low"); // Hijau
+        // --- CUSTOM COLOR LOGIC ---
+        if (checkTime === todayDate) {
+            // Hari ini: Putih jika ada tugas, Biru jika kosong
+            if (tasksAtDate.length > 0) {
+                dayEl.classList.add("cal-today-task"); // Putih
+            } else {
+                dayEl.classList.add("cal-today-empty"); // Biru
+            }
+        } else if (tasksAtDate.length >= 3) {
+            // Triple atau lebih: Ungu
+            dayEl.classList.add("pri-triple");
+        } else if (tasksAtDate.length === 2) {
+            // Double: Merah Gelap
+            dayEl.classList.add("pri-double");
+        } else if (tasksAtDate.length === 1) {
+            // Tunggal: Ikuti prioritas (Abu, Orange, Merah)
+            const p = tasksAtDate[0].priority;
+            if (p === "High") dayEl.classList.add("pri-high");
+            else if (p === "Medium") dayEl.classList.add("pri-medium");
+            else dayEl.classList.add("pri-low");
         }
 
-        if (checkTime === todayDate) dayEl.classList.add("cal-today");
-        
         dayEl.onclick = () => {
             if (tasksAtDate.length > 0) showCalendarDetail(currDate.toDateString(), tasksAtDate);
         };
@@ -136,7 +144,6 @@ function renderCountdown() {
     }
 }
 
-/* --- ACTION FUNCTIONS --- */
 async function simpanData() {
     const isi = document.getElementById("isiData").value,
           t1 = document.getElementById("tglMulai").value,
@@ -196,7 +203,6 @@ function showCalendarDetail(dateStr, tasks) {
 
 function closeCalendarDetail() { document.getElementById("calendar-detail-modal")?.classList.add("hidden"); }
 
-/* --- INIT --- */
 document.addEventListener("DOMContentLoaded", () => {
     muatData();
     setInterval(() => {
