@@ -10,9 +10,13 @@
   --shadow: rgba(0, 0, 0, 0.6);
   
   /* Status Colors */
-  --c-high: #ff3b30;
-  --c-medium: #ff9500;
-  --c-low: #34c759;
+  --c-high: #ff3b30;       /* Merah */
+  --c-medium: #ff9500;     /* Orange */
+  --c-low: #8e8e93;        /* Abu-abu */
+  --c-today-empty: #007aff; /* Biru */
+  --c-today-task: #ffffff;  /* Putih */
+  --c-double: #8b0000;      /* Merah Gelap */
+  --c-triple: #5856d6;      /* Ungu */
 }
 
 :root[data-theme="light"] {
@@ -27,7 +31,11 @@
 
   --c-high: #ff3b30;
   --c-medium: #ff9500;
-  --c-low: #34c759;
+  --c-low: #8e8e93;
+  --c-today-empty: #007aff;
+  --c-today-task: #ffffff;
+  --c-double: #8b0000;
+  --c-triple: #5856d6;
 }
 
 * {
@@ -86,16 +94,7 @@ body {
   appearance: none;
   -webkit-appearance: none;
   position: relative;
-  z-index: 1; /* Dasar z-index untuk input */
-}
-
-/* Dropdown Arrow Fix */
-select.ios-input {
-  cursor: pointer;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='gray' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 16px center;
-  background-size: 14px;
+  z-index: 1;
 }
 
 /* CRITICAL FIX: Membuat Area Klik Tanggal Sangat Responsif */
@@ -110,7 +109,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   width: 100%; height: 100%;
   opacity: 0; 
   cursor: pointer;
-  z-index: 10; /* Memastikan berada di paling atas area input */
+  z-index: 10;
 }
 
 .primary-btn {
@@ -127,7 +126,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* --- CALENDAR SINKRON WARNA --- */
+/* --- CALENDAR SKEMA WARNA BARU --- */
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -141,18 +140,34 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   background: var(--input);
   color: var(--text);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid var(--border);
 }
 
-/* State Warna Mengikuti Kegiatan (Sesuai Priority di List) */
-.day-cell.pri-high {
-  background: var(--c-high) !important;
-  color: #fff !important;
-  border: none;
-  box-shadow: 0 4px 12px rgba(255, 59, 48, 0.3);
+/* 1. Hari Ini Kosong (Biru) */
+.day-cell.cal-today-empty {
+  background: var(--c-today-empty) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 0 15px rgba(0, 122, 255, 0.5);
 }
 
+/* 2. Hari Ini Ada Tugas (Putih) */
+.day-cell.cal-today-task {
+  background: var(--c-today-task) !important;
+  color: #000000 !important;
+  border: none !important;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.7);
+}
+
+/* 3. Satu Tugas - Low (Abu) */
+.day-cell.pri-low {
+  background: var(--c-low) !important;
+  color: #fff !important;
+  border: none;
+}
+
+/* 4. Satu Tugas - Medium (Orange) */
 .day-cell.pri-medium {
   background: var(--c-medium) !important;
   color: #fff !important;
@@ -160,16 +175,27 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   box-shadow: 0 4px 12px rgba(255, 149, 0, 0.3);
 }
 
-.day-cell.pri-low {
-  background: var(--c-low) !important;
+/* 5. Satu Tugas - High (Merah) */
+.day-cell.pri-high {
+  background: var(--c-high) !important;
+  color: #fff !important;
+  border: none;
+  box-shadow: 0 4px 12px rgba(255, 59, 48, 0.3);
+}
+
+/* 6. Dua Tugas (Merah Gelap) */
+.day-cell.pri-double {
+  background: var(--c-double) !important;
   color: #fff !important;
   border: none;
 }
 
-.day-cell.cal-today {
-  border: 2px solid var(--accent);
-  box-shadow: 0 0 12px var(--shadow);
-  z-index: 2;
+/* 7. Tiga Tugas atau Lebih (Ungu) */
+.day-cell.pri-triple {
+  background: var(--c-triple) !important;
+  color: #fff !important;
+  border: none;
+  box-shadow: 0 4px 12px rgba(88, 86, 214, 0.3);
 }
 
 /* --- MODALS & ANIMATIONS --- */
