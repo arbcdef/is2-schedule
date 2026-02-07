@@ -1,176 +1,36 @@
-/* --- ROOT VARIABLE & THEME --- */
+/* Update CSS kamu bagian ini */
+
 :root[data-theme="dark"] {
-  --bg-top: #0a0a0a;    /* Warna gelap atas */
-  --bg-bottom: #000000; /* Hitam pekat bawah */
-  --bg-rgb: 0, 0, 0;
-  --card: rgba(18, 18, 18, 0.7);
-  --text: #ffffff;
-  --border: rgba(255, 255, 255, 0.06);
-  --input: rgba(255, 255, 255, 0.03);
+    --bg-top: #0a0a0a;    /* Warna gelap paling atas */
+    --bg-bottom: #000000; /* Warna hitam pekat di bawah */
+    --text: #ffffff;
 }
 
-:root[data-theme="light"] {
-  --bg-top: #f5f5f7;
-  --bg-bottom: #e5e5e7;
-  --bg-rgb: 245, 245, 247;
-  --card: rgba(255, 255, 255, 0.7);
-  --text: #000000;
-  --border: rgba(0, 0, 0, 0.06);
-  --input: rgba(0, 0, 0, 0.03);
-}
-
-/* --- BASE STYLES --- */
 body {
-  /* Gradasi mulus dari paling atas */
-  background: linear-gradient(to bottom, var(--bg-top) 0%, var(--bg-bottom) 20%, var(--bg-bottom) 100%) no-repeat;
-  background-attachment: fixed;
-  color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  transition: 0.5s;
-  overflow-x: hidden;
-  line-height: 1.5;
-  min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    /* Membuat gradasi yang mengalir dari atas ke bawah tanpa putus */
+    background: linear-gradient(to bottom, var(--bg-top) 0%, var(--bg-bottom) 20%, var(--bg-bottom) 100%) no-repeat;
+    background-attachment: fixed; /* Penting agar gradasi tidak ikut tergulung saat scroll */
+    color: var(--text);
+    min-height: 100vh;
 }
 
-/* Header Tanpa Background Agar Gradasi Body Tembus Ke Atas */
+/* Header dibuat transparan total agar gradasi body terlihat */
 .header-seamless {
-  position: sticky;
-  top: 0;
-  z-index: 1000; /* Paling depan */
-  padding-top: calc(env(safe-area-inset-top) + 1rem);
-  padding-bottom: 1rem;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  background: transparent; /* Transparan agar tidak putus */
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: transparent; /* Menghapus warna yang membuat garis putus */
+    /* Opsional: Berikan sedikit blur jika ingin teks tetap terbaca saat di-scroll */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding-top: calc(env(safe-area-inset-top) + 1rem); /* Menyesuaikan Notch iPhone/Android */
+    padding-bottom: 1rem;
 }
 
-/* --- DYNAMIC ISLAND: ANTI-CUT --- */
-.dynamic-island {
-  background: var(--text) !important;
-  color: var(--bg-bottom) !important;
-  border-radius: 28px;
-  padding: 1.2rem 1.5rem !important;
-  margin-bottom: 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  min-height: 85px;
-  pointer-events: auto; /* Aktifkan klik kembali di dalam area island */
-}
-
-.dynamic-island h2 {
-  font-size: clamp(0.9rem, 4.5vw, 1.2rem); 
-  font-weight: 900;
-  line-height: 1.1;
-  word-wrap: break-word;
-  white-space: normal; /* Biarkan teks membungkus ke bawah */
-  overflow: visible;
-  display: block; /* Menghapus batasan baris jika ingin terlihat full */
-  text-transform: uppercase;
-  max-width: 70%; /* Beri ruang untuk teks deadline di kanan */
-}
-
-.dynamic-island span {
-  font-size: clamp(1rem, 5vw, 1.4rem); 
-  font-weight: 950;
-  letter-spacing: -0.05em;
-  text-align: right;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-/* --- CALENDAR SYSTEM --- */
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
-  margin: 0 auto;
-}
-
-.day-cell {
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  font-weight: 700;
-  border-radius: 10px;
-  cursor: pointer;
-  background: var(--input);
-  transition: 0.2s;
-}
-
-/* Warna Penanda Kegiatan di Kalender */
-.pri-high { background: #ff3b30 !important; color: white !important; }
-.pri-medium { background: #ff9500 !important; color: white !important; }
-.pri-low { background: #34c759 !important; color: white !important; }
-.cal-today { border: 2px solid var(--text); font-weight: 900; }
-
-/* --- COMPONENTS --- */
-.glass-card {
-  background: var(--card);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  border-radius: 24px;
-}
-
-.ios-input {
-  width: 100%;
-  background: var(--input);
-  border-radius: 14px;
-  padding: 14px 18px;
-  color: var(--text);
-  border: 1px solid var(--border);
-  outline: none;
-  font-size: 14px;
-  position: relative;
-  z-index: 10;
-}
-
-.primary-btn {
-  background: var(--text) !important;
-  color: var(--bg-bottom) !important;
-  width: 100%;
-  padding: 16px;
-  border-radius: 14px;
-  font-weight: 900;
-  text-transform: uppercase;
-  font-size: 12px;
-  border: none;
-  cursor: pointer;
-}
-
-/* --- MODALS --- */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-}
-
-.modal-card {
-  background: var(--card);
-  border-radius: 28px;
-  width: 100%;
-  max-width: 340px;
-  border: 1px solid var(--border);
-  overflow: hidden;
-}
-
-.hidden { display: none !important; }
-
-.fade-in {
-  animation: smoothIn 0.3s ease-out forwards;
-}
-
-@keyframes smoothIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+/* Pastikan tidak ada margin-top pada kontainer utama yang merusak gradasi */
+.main-content-wrapper {
+    margin-top: 0;
+    padding-top: 1rem;
 }
