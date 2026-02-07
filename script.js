@@ -19,26 +19,24 @@ async function muatData() {
       .select("*")
       .order("tgl_deadline", { ascending: true });
     
-    if (error) throw error; // Lempar ke catch jika ada error response
+    if (error) throw error;
 
     allTasks = data || [];
     
-    // STATUS: CONNECTED (Active - Lampu Hijau)
+    // STATUS: ACTIVE (Hanya tulisan Active saja)
     if (statusDot) {
       statusDot.className = "w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e]";
     }
     if (statusText) {
-      statusText.innerText = "Active";
-      statusText.style.color = ""; // Reset ke warna default CSS
+      statusText.innerText = "Active"; // Dipastikan tidak ada kata "HUB"
+      statusText.style.color = ""; 
       statusText.style.opacity = "0.5";
     }
     
     renderAll();
 
   } catch (err) {
-    console.error("Database connection error:", err);
-    
-    // STATUS: DISCONNECTED (Offline - Lampu Merah Berdenyut)
+    console.error("Database error:", err);
     if (statusDot) {
       statusDot.className = "w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_10px_#ef4444] animate-pulse";
     }
@@ -47,8 +45,6 @@ async function muatData() {
       statusText.style.color = "#ef4444";
       statusText.style.opacity = "1";
     }
-    
-    // Tetap render data lama jika ada di memori
     renderAll();
   }
 }
@@ -74,23 +70,16 @@ function renderCountdown() {
     deadline.setHours(0, 0, 0, 0);
     const diffDays = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
 
-    let dayText = "";
-    if (diffDays === 0) dayText = "DUE TODAY";
-    else if (diffDays < 0) {
-      const absDays = Math.abs(diffDays);
-      dayText = `${absDays} ${absDays === 1 ? "DAY" : "DAYS"} OVERDUE`;
-    } else {
-      dayText = `${diffDays} ${diffDays === 1 ? "DAY" : "DAYS"} LEFT`;
-    }
+    let dayText = diffDays === 0 ? "DUE TODAY" : diffDays < 0 ? `${Math.abs(diffDays)} OVERDUE` : `${diffDays} DAYS LEFT`;
 
     area.innerHTML = `
-            <div class="dynamic-island p-7 flex justify-between items-center fade-in border border-white/10">
+            <div class="dynamic-island p-6 flex justify-between items-center fade-in border border-white/10 shadow-2xl">
                 <div class="mr-4 flex-1">
-                    <p class="text-[8px] font-black opacity-50 uppercase tracking-[0.2em] mb-1">Upcoming Mission</p>
-                    <h2 class="text-lg font-black tracking-tight uppercase leading-tight" style="white-space: normal; word-break: break-word;">${upcoming.content}</h2>
+                    <p class="text-[8px] font-black opacity-40 uppercase tracking-[0.2em] mb-1">Upcoming Mission</p>
+                    <h2 class="text-base font-black tracking-tight uppercase leading-tight" style="white-space: normal; word-break: break-word;">${upcoming.content}</h2>
                 </div>
-                <div class="text-right min-w-[120px]"> 
-                    <span class="text-xl font-black tracking-tighter uppercase">${dayText}</span>
+                <div class="text-right"> 
+                    <span class="text-lg font-black tracking-tighter uppercase whitespace-nowrap">${dayText}</span>
                 </div>
             </div>`;
   } else {
@@ -106,13 +95,11 @@ function renderFeed() {
     ? allTasks
         .map((t) => {
           const hasLink = t.task_link && t.task_link.startsWith("http");
+          // Checkbox dihapus, diganti dengan click handler pada teks judul
           return `<div class="glass-card p-4 flex justify-between items-center ${t.is_done ? "opacity-30" : ""}" style="border-left: 4px solid ${t.priority === "High" ? "#ff3b30" : t.priority === "Medium" ? "#ff9500" : "#8e8e93"}">
-            <div class="flex items-center gap-4 truncate flex-1">
-                <input type="checkbox" ${t.is_done ? "checked" : ""} onclick="toggleDone(${t.id}, ${t.is_done})" class="w-4 h-4 accent-white cursor-pointer">
-                <div class="truncate">
-                    <p class="text-[7px] font-black opacity-30 uppercase">${t.category} • ${t.tgl_deadline}</p>
-                    <p class="font-bold truncate text-xs">${t.content}</p>
-                </div>
+            <div class="flex-1 truncate cursor-pointer" onclick="toggleDone(${t.id}, ${t.is_done})">
+                <p class="text-[7px] font-black opacity-30 uppercase">${t.category} • ${t.tgl_deadline}</p>
+                <p class="font-bold truncate text-xs ${t.is_done ? 'line-through' : ''}">${t.content}</p>
             </div>
             <div class="flex items-center gap-3 ml-2">
                 ${hasLink ? `<a href="${t.task_link}" target="_blank" class="text-[8px] font-black px-2 py-1 bg-white/10 rounded-md hover:bg-white/20 transition tracking-tighter">OPEN LINK</a>` : ""}
@@ -135,7 +122,7 @@ function renderCalendar() {
   const first = new Date(y, m, 1).getDay();
   const days = new Date(y, m + 1, 0).getDate();
   
-  for (let i = 0; i < first; i++) cont.innerHTML += "<div></div>";
+  for (let i = 0; i < (first === 0 ? 6 : first - 1); i++) cont.innerHTML += "<div></div>";
   
   for (let d = 1; d <= days; d++) {
     const checkDate = new Date(y, m, d).setHours(0, 0, 0, 0);
@@ -165,7 +152,6 @@ function showCalendarDetail(dateStr, tasks) {
   const modal = document.getElementById("calendar-detail-modal");
   const title = document.getElementById("detail-date-title");
   const list = document.getElementById("calendar-task-list");
-  
   if (!modal) return;
   
   title.innerText = dateStr;
@@ -214,7 +200,7 @@ async function simpanData() {
     
     muatData();
   } catch (err) {
-    alert("Failed to save mission. Check your connection.");
+    alert("Failed to save mission.");
   }
 }
 
@@ -244,7 +230,7 @@ function renderPicker() {
     
   if (cont) {
     cont.innerHTML = "";
-    for (let i = 0; i < first; i++) cont.innerHTML += "<div></div>";
+    for (let i = 0; i < (first === 0 ? 6 : first - 1); i++) cont.innerHTML += "<div></div>";
     for (let d = 1; d <= days; d++) {
       const dStr = `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
       cont.innerHTML += `<div class="p-2 hover:bg-white/10 rounded-full cursor-pointer text-[10px]" onclick="selectDate('${dStr}')">${d}</div>`;
@@ -291,8 +277,7 @@ function askDel(id) {
 
 async function confirmDelete() {
   await sb.from("schedule").delete().eq("id", delId);
-  const delModal = document.getElementById("delete-modal");
-  if (delModal) delModal.classList.add("hidden");
+  document.getElementById("delete-modal").classList.add("hidden");
   muatData();
 }
 
@@ -321,5 +306,4 @@ setInterval(() => {
   }
 }, 1000);
 
-// Jalankan muatData pertama kali
 muatData();
