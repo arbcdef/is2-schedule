@@ -10,6 +10,11 @@ let allTasks = [],
   delId = null,
   dateTarget = "start";
 
+// Load tema dari storage saat pertama kali buka
+if (localStorage.getItem("theme")) {
+  document.documentElement.setAttribute("data-theme", localStorage.getItem("theme"));
+}
+
 async function muatData() {
   const statusDot = document.getElementById("db-status-dot");
   const statusText = document.getElementById("db-status-text");
@@ -21,13 +26,10 @@ async function muatData() {
       .order("tgl_deadline", { ascending: true });
 
     if (error) throw error;
-
     allTasks = data || [];
 
-    // UI: Status Active
     if (statusDot) {
-      statusDot.className =
-        "w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e]";
+      statusDot.className = "w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e]";
     }
     if (statusText) {
       statusText.innerText = "Active";
@@ -36,10 +38,8 @@ async function muatData() {
 
     renderAll();
   } catch (err) {
-    // UI: Status Offline
     if (statusDot) {
-      statusDot.className =
-        "w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_10px_#ef4444]";
+      statusDot.className = "w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_10px_#ef4444]";
     }
     if (statusText) {
       statusText.innerText = "Offline";
@@ -67,12 +67,7 @@ function renderCountdown() {
     const deadline = new Date(upcoming.tgl_deadline).setHours(0, 0, 0, 0);
     const diffDays = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
 
-    let dayText =
-      diffDays === 0
-        ? "DUE TODAY"
-        : diffDays < 0
-          ? `${Math.abs(diffDays)} OVERDUE`
-          : `${diffDays} DAYS LEFT`;
+    let dayText = diffDays === 0 ? "DUE TODAY" : diffDays < 0 ? `${Math.abs(diffDays)} OVERDUE` : `${diffDays} DAYS LEFT`;
 
     area.innerHTML = `
             <div class="dynamic-island fade-in">
@@ -114,9 +109,7 @@ function renderFeed() {
 
 function renderCalendar() {
   const cont = document.getElementById("calendar-container");
-  const now = new Date(),
-    y = now.getFullYear(),
-    m = now.getMonth();
+  const now = new Date(), y = now.getFullYear(), m = now.getMonth();
   const todayStr = new Date().setHours(0, 0, 0, 0);
   cont.innerHTML = "";
   const first = new Date(y, m, 1).getDay();
@@ -126,46 +119,33 @@ function renderCalendar() {
 
   for (let d = 1; d <= days; d++) {
     const checkDate = new Date(y, m, d).setHours(0, 0, 0, 0);
-    const tasks = allTasks.filter(
-      (t) =>
+    const tasks = allTasks.filter(t => 
         checkDate >= new Date(t.tgl_start).setHours(0, 0, 0, 0) &&
-        checkDate <= new Date(t.tgl_deadline).setHours(0, 0, 0, 0),
+        checkDate <= new Date(t.tgl_deadline).setHours(0, 0, 0, 0)
     );
 
     let pClass = "";
     if (tasks.length === 1) {
       if (checkDate === todayStr) pClass = "task-today";
-      else
-        pClass =
-          tasks[0].priority === "High"
-            ? "pri-high"
-            : tasks[0].priority === "Medium"
-              ? "pri-medium"
-              : "pri-low";
+      else pClass = tasks[0].priority === "High" ? "pri-high" : tasks[0].priority === "Medium" ? "pri-medium" : "pri-low";
     } else if (tasks.length === 2) pClass = "task-double";
     else if (tasks.length >= 3) pClass = "task-triple";
 
     const dayEl = document.createElement("div");
     dayEl.className = `day-cell ${pClass} ${checkDate === todayStr ? "cal-today" : ""}`;
     dayEl.innerText = d;
-    dayEl.onclick = () =>
-      tasks.length &&
-      showCalendarDetail(new Date(y, m, d).toDateString(), tasks);
+    dayEl.onclick = () => tasks.length && showCalendarDetail(new Date(y, m, d).toDateString(), tasks);
     cont.appendChild(dayEl);
   }
 }
 
 function showCalendarDetail(dateStr, tasks) {
   document.getElementById("detail-date-title").innerText = dateStr;
-  document.getElementById("calendar-task-list").innerHTML = tasks
-    .map(
-      (t) => `
+  document.getElementById("calendar-task-list").innerHTML = tasks.map(t => `
         <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
             <span class="text-[7px] font-black uppercase ${t.priority === "High" ? "text-red-500" : t.priority === "Medium" ? "text-orange-500" : "text-gray-400"}">${t.priority}</span>
             <p class="text-xs font-bold mt-1">${t.content}</p>
-        </div>`,
-    )
-    .join("");
+        </div>`).join("");
   document.getElementById("calendar-detail-modal").classList.remove("hidden");
 }
 
@@ -179,17 +159,10 @@ async function simpanData() {
     t2 = document.getElementById("tglDeadline").value,
     link = document.getElementById("linkData").value;
   if (!isi || !t2) return;
-  await sb.from("schedule").insert([
-    {
-      content: isi,
-      tgl_start: t1 || t2,
-      tgl_deadline: t2,
-      category: selectedKat,
-      priority: selectedPri,
-      is_done: false,
-      task_link: link,
-    },
-  ]);
+  await sb.from("schedule").insert([{
+      content: isi, tgl_start: t1 || t2, tgl_deadline: t2,
+      category: selectedKat, priority: selectedPri, is_done: false, task_link: link
+  }]);
   document.getElementById("isiData").value = "";
   document.getElementById("linkData").value = "";
   muatData();
@@ -203,22 +176,14 @@ function toggleDatePicker(e, target) {
 }
 
 function selectDate(d) {
-  document.getElementById(
-    dateTarget === "start" ? "tglMulai" : "tglDeadline",
-  ).value = d;
+  document.getElementById(dateTarget === "start" ? "tglMulai" : "tglDeadline").value = d;
   document.getElementById("custom-datepicker").classList.add("hidden");
 }
 
 function renderPicker() {
-  const cont = document.getElementById("datepicker-days"),
-    m = pDate.getMonth(),
-    y = pDate.getFullYear();
-  document.getElementById("currentMonthYear").innerText = pDate.toLocaleString(
-    "en-US",
-    { month: "short", year: "numeric" },
-  );
-  const first = new Date(y, m, 1).getDay(),
-    days = new Date(y, m + 1, 0).getDate();
+  const cont = document.getElementById("datepicker-days"), m = pDate.getMonth(), y = pDate.getFullYear();
+  document.getElementById("currentMonthYear").innerText = pDate.toLocaleString("en-US", { month: "short", year: "numeric" });
+  const first = new Date(y, m, 1).getDay(), days = new Date(y, m + 1, 0).getDate();
   cont.innerHTML = "";
   for (let i = 0; i < first; i++) cont.innerHTML += "<div></div>";
   for (let d = 1; d <= days; d++) {
@@ -229,43 +194,26 @@ function renderPicker() {
 
 function openSelect(e, type) {
   e.stopPropagation();
-  const m = document.getElementById("custom-modal"),
-    opt = document.getElementById("modal-options");
+  const m = document.getElementById("custom-modal"), opt = document.getElementById("modal-options");
   m.classList.remove("hidden");
   opt.innerHTML = "";
-  const items =
-    type === "kategori"
-      ? ["Assignment", "Event", "Schedule"]
-      : ["Low", "Medium", "High"];
+  const items = type === "kategori" ? ["Assignment", "Event", "Schedule"] : ["Low", "Medium", "High"];
   items.forEach((item) => {
     const b = document.createElement("button");
-    b.className =
-      "py-4 bg-white/5 rounded-xl font-black text-[9px] uppercase hover:bg-white/10 text-current";
+    b.className = "py-4 bg-white/5 rounded-xl font-black text-[9px] uppercase hover:bg-white/10 text-current";
     b.innerText = item;
     b.onclick = () => {
-      if (type === "kategori") {
-        selectedKat = item;
-        document.getElementById("btn-kategori").innerText = item;
-      } else {
-        selectedPri = item;
-        document.getElementById("btn-priority").innerText = item;
-      }
+      if (type === "kategori") { selectedKat = item; document.getElementById("btn-kategori").innerText = item; } 
+      else { selectedPri = item; document.getElementById("btn-priority").innerText = item; }
       closeModal();
     };
     opt.appendChild(b);
   });
 }
 
-function closeModal() {
-  document.getElementById("custom-modal").classList.add("hidden");
-}
-function askDel(id) {
-  delId = id;
-  document.getElementById("delete-modal").classList.remove("hidden");
-}
-function closeDeleteModal() {
-  document.getElementById("delete-modal").classList.add("hidden");
-}
+function closeModal() { document.getElementById("custom-modal").classList.add("hidden"); }
+function askDel(id) { delId = id; document.getElementById("delete-modal").classList.remove("hidden"); }
+function closeDeleteModal() { document.getElementById("delete-modal").classList.add("hidden"); }
 
 async function confirmDelete() {
   await sb.from("schedule").delete().eq("id", delId);
@@ -277,10 +225,7 @@ function toggleTheme() {
   const h = document.documentElement,
     n = h.getAttribute("data-theme") === "dark" ? "light" : "dark";
   h.setAttribute("data-theme", n);
-  const themeIcon = document.getElementById("theme-icon");
-  if (themeIcon) {
-    themeIcon.innerText = n === "dark" ? "☀️" : "🌙";
-  }
+  localStorage.setItem("theme", n);
 }
 
 function changeMonth(dir) {
@@ -289,10 +234,7 @@ function changeMonth(dir) {
 }
 
 setInterval(() => {
-  document.getElementById("clock").innerText = new Date().toLocaleTimeString(
-    "id-ID",
-    { hour12: false },
-  );
+  document.getElementById("clock").innerText = new Date().toLocaleTimeString("id-ID", { hour12: false });
 }, 1000);
 
 muatData();
