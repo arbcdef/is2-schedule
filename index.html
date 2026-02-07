@@ -62,16 +62,16 @@
     </header>
 
     <div class="max-w-6xl mx-auto p-6 md:p-10 mt-2 relative z-10">
-      <div id="next-deadline-area" class="mb-10 min-h-[100px] relative z-20 pointer-events-none"></div>
+      <div id="next-deadline-area" class="mb-10 min-h-[100px] relative z-20"></div>
 
       <main class="grid grid-cols-1 lg:grid-cols-12 gap-10">
         <div class="lg:col-span-5 lg:sticky lg:top-24">
-          <section class="glass-card p-8 border border-white/5 relative z-30">
+          <section class="glass-card relative z-30">
             <h2 class="text-[10px] font-black opacity-20 uppercase tracking-[0.3em] mb-6">
               Mission Control
             </h2>
             <div class="space-y-4">
-              <div class="grid grid-cols-2 gap-3 relative z-50">
+              <div class="grid grid-cols-2 gap-3">
                 <button id="btn-kategori" onclick="openSelect('kategori')" class="select-btn">
                   Assignment
                 </button>
@@ -80,7 +80,7 @@
                 </button>
               </div>
               
-              <div class="grid grid-cols-2 gap-3 relative z-40">
+              <div class="grid grid-cols-2 gap-3 relative">
                 <input
                   type="text"
                   id="tglMulai"
@@ -97,6 +97,7 @@
                   readonly
                   onclick="toggleDatePicker(event, 'end')"
                 />
+                
                 <div
                   id="custom-datepicker"
                   class="hidden absolute left-0 right-0 top-full mt-2 glass-card z-[999] p-5 border border-white/10 shadow-2xl"
@@ -110,7 +111,7 @@
                 </div>
               </div>
 
-              <div class="relative z-10 space-y-4">
+              <div class="space-y-4">
                 <textarea
                   id="isiData"
                   placeholder="What's the mission?"
@@ -132,7 +133,8 @@
 
         <div class="lg:col-span-7 space-y-6">
           <div id="listData" class="space-y-3"></div>
-          <section class="glass-card p-6 border border-white/5">
+          
+          <section class="glass-card">
             <h2 class="text-center font-black uppercase mb-6 tracking-[0.4em] text-[10px] opacity-20">
               Timeline View
             </h2>
@@ -156,10 +158,10 @@
 
     <div id="universal-modal" class="modal-overlay hidden" onclick="closeUniversalModal()">
       <div class="modal-card fade-in overflow-hidden border border-white/10" onclick="event.stopPropagation()">
-        <div class="h-20 bg-white/5 flex items-center justify-center text-2xl">✓</div>
+        <div class="h-20 bg-green-500/20 flex items-center justify-center text-2xl">✓</div>
         <div class="p-8 text-center">
-          <h3 class="text-lg font-black mb-2">Synchronized</h3>
-          <button onclick="closeUniversalModal()" class="primary-btn py-4">Dismiss</button>
+          <h3 class="text-lg font-black mb-2 uppercase tracking-tighter">Synchronized</h3>
+          <button onclick="closeUniversalModal()" class="primary-btn py-4 mt-4">Dismiss</button>
         </div>
       </div>
     </div>
@@ -172,7 +174,7 @@
 
     <div id="delete-modal" class="modal-overlay hidden" onclick="closeDeleteModal()">
       <div class="modal-card fade-in p-10 text-center" onclick="event.stopPropagation()">
-        <h3 class="text-lg font-black mb-6">Remove?</h3>
+        <h3 class="text-lg font-black mb-6 uppercase tracking-widest">Remove?</h3>
         <div class="grid grid-cols-2 gap-3">
           <button onclick="closeDeleteModal()" class="py-4 bg-white/5 rounded-xl text-[9px] font-black uppercase">No</button>
           <button onclick="confirmDelete()" class="py-4 bg-red-600 text-white rounded-xl text-[9px] font-black uppercase">Yes</button>
