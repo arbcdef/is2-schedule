@@ -10,21 +10,47 @@ let allTasks = [],
   dateTarget = "start";
 
 async function muatData() {
-  const { data } = await sb
-    .from("schedule")
-    .select("*")
-    .order("tgl_deadline", { ascending: true });
-  
-  allTasks = data || [];
-  
-  // FIX: Mengubah "Hub Active" menjadi "Active" saja
   const statusDot = document.getElementById("db-status-dot");
   const statusText = document.getElementById("db-status-text");
-  
-  if (statusDot) statusDot.className = "w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_green]";
-  if (statusText) statusText.innerText = "Active";
-  
-  renderAll();
+
+  try {
+    const { data, error } = await sb
+      .from("schedule")
+      .select("*")
+      .order("tgl_deadline", { ascending: true });
+    
+    if (error) throw error; // Lempar ke catch jika ada error response
+
+    allTasks = data || [];
+    
+    // STATUS: CONNECTED (Active - Lampu Hijau)
+    if (statusDot) {
+      statusDot.className = "w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e]";
+    }
+    if (statusText) {
+      statusText.innerText = "Active";
+      statusText.style.color = ""; // Reset ke warna default CSS
+      statusText.style.opacity = "0.5";
+    }
+    
+    renderAll();
+
+  } catch (err) {
+    console.error("Database connection error:", err);
+    
+    // STATUS: DISCONNECTED (Offline - Lampu Merah Berdenyut)
+    if (statusDot) {
+      statusDot.className = "w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_10px_#ef4444] animate-pulse";
+    }
+    if (statusText) {
+      statusText.innerText = "Offline";
+      statusText.style.color = "#ef4444";
+      statusText.style.opacity = "1";
+    }
+    
+    // Tetap render data lama jika ada di memori
+    renderAll();
+  }
 }
 
 function renderAll() {
@@ -35,6 +61,8 @@ function renderAll() {
 
 function renderCountdown() {
   const area = document.getElementById("next-deadline-area");
+  if (!area) return;
+
   const upcoming = allTasks
     .filter((t) => !t.is_done)
     .sort((a, b) => new Date(a.tgl_deadline) - new Date(b.tgl_deadline))[0];
@@ -47,16 +75,14 @@ function renderCountdown() {
     const diffDays = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
 
     let dayText = "";
-    if (diffDays === 0) {
-      dayText = "DUE TODAY";
-    } else if (diffDays < 0) {
+    if (diffDays === 0) dayText = "DUE TODAY";
+    else if (diffDays < 0) {
       const absDays = Math.abs(diffDays);
       dayText = `${absDays} ${absDays === 1 ? "DAY" : "DAYS"} OVERDUE`;
     } else {
       dayText = `${diffDays} ${diffDays === 1 ? "DAY" : "DAYS"} LEFT`;
     }
 
-    // FIX: Menghapus class 'truncate' pada h2 agar teks tidak terpotong
     area.innerHTML = `
             <div class="dynamic-island p-7 flex justify-between items-center fade-in border border-white/10">
                 <div class="mr-4 flex-1">
@@ -106,10 +132,9 @@ function renderCalendar() {
     m = now.getMonth();
   
   cont.innerHTML = "";
-  const first = new Date(y, m, 1).getDay(),
-    days = new Date(y, m + 1, 0).getDate();
+  const first = new Date(y, m, 1).getDay();
+  const days = new Date(y, m + 1, 0).getDate();
   
-  // Offset hari (Senin sebagai awal minggu jika perlu, atau default Minggu)
   for (let i = 0; i < first; i++) cont.innerHTML += "<div></div>";
   
   for (let d = 1; d <= days; d++) {
@@ -131,8 +156,7 @@ function renderCalendar() {
     const dayEl = document.createElement("div");
     dayEl.className = `day-cell ${pClass} ${d === now.getDate() && m === now.getMonth() ? "cal-today" : ""}`;
     dayEl.innerText = d;
-    dayEl.onclick = () =>
-      tasks.length && showCalendarDetail(new Date(y, m, d).toDateString(), tasks);
+    dayEl.onclick = () => tasks.length && showCalendarDetail(new Date(y, m, d).toDateString(), tasks);
     cont.appendChild(dayEl);
   }
 }
@@ -170,25 +194,28 @@ async function simpanData() {
     
   if (!isi || !t2) return;
   
-  await sb.from("schedule").insert([
-    {
-      content: isi,
-      tgl_start: t1 || t2,
-      tgl_deadline: t2,
-      category: selectedKat,
-      priority: selectedPri,
-      is_done: false,
-      task_link: link,
-    },
-  ]);
-  
-  // Reset Form
-  document.getElementById("isiData").value = "";
-  document.getElementById("linkData").value = "";
-  document.getElementById("tglMulai").value = "";
-  document.getElementById("tglDeadline").value = "";
-  
-  muatData();
+  try {
+    await sb.from("schedule").insert([
+      {
+        content: isi,
+        tgl_start: t1 || t2,
+        tgl_deadline: t2,
+        category: selectedKat,
+        priority: selectedPri,
+        is_done: false,
+        task_link: link,
+      },
+    ]);
+    
+    document.getElementById("isiData").value = "";
+    document.getElementById("linkData").value = "";
+    document.getElementById("tglMulai").value = "";
+    document.getElementById("tglDeadline").value = "";
+    
+    muatData();
+  } catch (err) {
+    alert("Failed to save mission. Check your connection.");
+  }
 }
 
 function toggleDatePicker(e, target) {
@@ -210,42 +237,46 @@ function renderPicker() {
     m = pDate.getMonth(),
     y = pDate.getFullYear();
     
-  lbl.innerText = pDate.toLocaleString("en-US", { month: "short", year: "numeric" });
+  if (lbl) lbl.innerText = pDate.toLocaleString("en-US", { month: "short", year: "numeric" });
   
-  const first = new Date(y, m, 1).getDay(),
-    days = new Date(y, m + 1, 0).getDate();
+  const first = new Date(y, m, 1).getDay();
+  const days = new Date(y, m + 1, 0).getDate();
     
-  cont.innerHTML = "";
-  for (let i = 0; i < first; i++) cont.innerHTML += "<div></div>";
-  for (let d = 1; d <= days; d++) {
-    const dStr = `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-    cont.innerHTML += `<div class="p-2 hover:bg-white/10 rounded-full cursor-pointer text-[10px]" onclick="selectDate('${dStr}')">${d}</div>`;
+  if (cont) {
+    cont.innerHTML = "";
+    for (let i = 0; i < first; i++) cont.innerHTML += "<div></div>";
+    for (let d = 1; d <= days; d++) {
+      const dStr = `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+      cont.innerHTML += `<div class="p-2 hover:bg-white/10 rounded-full cursor-pointer text-[10px]" onclick="selectDate('${dStr}')">${d}</div>`;
+    }
   }
 }
 
 function openSelect(type) {
   const m = document.getElementById("custom-modal"),
     opt = document.getElementById("modal-options");
-  m.classList.remove("hidden");
-  opt.innerHTML = "";
-  const items = type === "kategori" ? ["Assignment", "Event", "Schedule"] : ["Low", "Medium", "High"];
-  
-  items.forEach((item) => {
-    const b = document.createElement("button");
-    b.className = "py-4 bg-white/5 rounded-xl font-black text-[9px] uppercase hover:bg-white/10 text-current";
-    b.innerText = item;
-    b.onclick = () => {
-      if (type === "kategori") {
-        selectedKat = item;
-        document.getElementById("btn-kategori").innerText = item;
-      } else {
-        selectedPri = item;
-        document.getElementById("btn-priority").innerText = item;
-      }
-      closeModal();
-    };
-    opt.appendChild(b);
-  });
+  if (m) m.classList.remove("hidden");
+  if (opt) {
+    opt.innerHTML = "";
+    const items = type === "kategori" ? ["Assignment", "Event", "Schedule"] : ["Low", "Medium", "High"];
+    
+    items.forEach((item) => {
+      const b = document.createElement("button");
+      b.className = "py-4 bg-white/5 rounded-xl font-black text-[9px] uppercase hover:bg-white/10 text-current";
+      b.innerText = item;
+      b.onclick = () => {
+        if (type === "kategori") {
+          selectedKat = item;
+          document.getElementById("btn-kategori").innerText = item;
+        } else {
+          selectedPri = item;
+          document.getElementById("btn-priority").innerText = item;
+        }
+        closeModal();
+      };
+      opt.appendChild(b);
+    });
+  }
 }
 
 function closeModal() {
@@ -260,7 +291,8 @@ function askDel(id) {
 
 async function confirmDelete() {
   await sb.from("schedule").delete().eq("id", delId);
-  document.getElementById("delete-modal").classList.add("hidden");
+  const delModal = document.getElementById("delete-modal");
+  if (delModal) delModal.classList.add("hidden");
   muatData();
 }
 
@@ -289,5 +321,5 @@ setInterval(() => {
   }
 }, 1000);
 
-// Inisialisasi awal
+// Jalankan muatData pertama kali
 muatData();
