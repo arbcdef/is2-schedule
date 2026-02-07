@@ -95,6 +95,20 @@ body {
   -webkit-appearance: none;
   position: relative;
   z-index: 1;
+  text-align: left; /* Memastikan teks di tombol rata kiri */
+}
+
+/* FIX: Box untuk Assignment & Priority Button */
+button.ios-input {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+button.ios-input:active {
+  transform: scale(0.98);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 /* CRITICAL FIX: Membuat Area Klik Tanggal Sangat Responsif */
