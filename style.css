@@ -1,174 +1,92 @@
 /* --- ROOT & CORE --- */
 :root[data-theme="dark"] {
-  --bg-top: #0a0a0a;
-  --bg-bottom: #000000;
-  --card: rgba(28, 28, 30, 0.95);
-  --text: #ffffff;
-  --border: rgba(255, 255, 255, 0.1);
-  --input: rgba(255, 255, 255, 0.06);
-  --accent: #ffffff;
-  --shadow: rgba(0, 0, 0, 0.6);
-  /* Calendar Colors */
-  --cal-default: rgba(255, 255, 255, 0.05);
-  --cal-today: #007aff;
-  --cal-low: #8e8e93;    
-  --cal-medium: #ff9500; 
-  --cal-high: #ff3b30;   
-  --cal-double: #8b0000; 
-  --cal-triple: #5856d6; 
+    --bg: #000000;
+    --card: #1c1c1e;
+    --text: #ffffff;
+    --border: rgba(255, 255, 255, 0.1);
+    --input: rgba(255, 255, 255, 0.08);
+    --shadow: rgba(0, 0, 0, 0.5);
+    --accent: #007aff;
 }
 
 :root[data-theme="light"] {
-  --bg-top: #f2f2f7;
-  --bg-bottom: #ffffff;
-  --card: #ffffff; 
-  --text: #000000;
-  --border: rgba(0, 0, 0, 0.1);
-  --input: rgba(0, 0, 0, 0.05);
-  --accent: #000000;
-  --shadow: rgba(0, 0, 0, 0.15); 
-  /* Calendar Colors */
-  --cal-default: rgba(0, 0, 0, 0.03);
-  --cal-today: #007aff;
-  --cal-low: #a2a2a7;
-  --cal-medium: #ff9500;
-  --cal-high: #ff3b30;
-  --cal-double: #8b0000;
-  --cal-triple: #5856d6;
+    --bg: #f2f2f7;
+    --card: #ffffff;
+    --text: #000000;
+    --border: rgba(0, 0, 0, 0.08);
+    --input: rgba(0, 0, 0, 0.04);
+    --shadow: rgba(0, 0, 0, 0.1);
+    --accent: #007aff;
 }
 
-* {
-  -webkit-tap-highlight-color: transparent;
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 body {
-  margin: 0;
-  padding: 0;
-  color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-  background: linear-gradient(to bottom, var(--bg-top) 0%, var(--bg-bottom) 30%, var(--bg-bottom) 100%) no-repeat;
-  background-attachment: fixed;
-  min-height: 100vh;
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    transition: background 0.3s ease;
 }
 
-/* --- MODAL SYSTEM (FIX GEPENG & KLIK) --- */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  z-index: 9999;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  pointer-events: auto; /* Pastikan bisa menerima klik */
+/* --- COMPONENTS --- */
+.glass-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 20px;
+    box-shadow: 0 10px 30px var(--shadow);
 }
 
-.modal-overlay.active {
-  display: flex !important;
-}
-
-.modal-content {
-  background: var(--card);
-  width: 100%;
-  max-width: 320px;
-  border-radius: 32px;
-  border: 1px solid var(--border);
-  padding: 28px;
-  box-shadow: 0 30px 60px var(--shadow);
-  display: flex;
-  flex-direction: column;
-  align-items: stretch; /* Paksa tombol melebar */
-  gap: 15px;
-  animation: popCenter 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-/* Grid khusus untuk tombol Yes/No agar tidak gepeng */
-.confirm-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  width: 100%;
-}
-
-.modal-option-btn {
-  width: 100%;
-  padding: 16px;
-  background: var(--input);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  color: var(--text);
-  font-weight: 800;
-  text-transform: uppercase;
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-/* Tombol bahaya (Hapus) */
-.btn-danger {
-  background: #ff3b30 !important;
-  color: #ffffff !important;
-  border: none !important;
-}
-
-@keyframes popCenter {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-/* --- REVISI INPUT & BUTTONS --- */
 .ios-input {
-  width: 100%;
-  background: var(--input) !important;
-  border: 1px solid var(--border) !important;
-  color: var(--text) !important;
-  border-radius: 18px;
-  padding: 16px;
-  font-size: 15px;
-  outline: none;
+    width: 100%; background: var(--input); border: 1px solid var(--border);
+    color: var(--text); padding: 16px; border-radius: 16px; font-size: 15px; outline: none;
 }
 
 .select-btn {
-  width: 100%;
-  background: var(--input);
-  border: 1px solid var(--border);
-  padding: 16px;
-  border-radius: 18px;
-  color: var(--text);
-  font-size: 11px;
-  font-weight: 800;
-  text-transform: uppercase;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.mission-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.2rem 1.8rem !important;
-  background: var(--card);
-  border-radius: 24px;
-  margin-bottom: 14px;
-  border: 1px solid var(--border);
-  box-shadow: 0 8px 25px var(--shadow);
+    width: 100%; background: var(--input); border: 1px solid var(--border);
+    padding: 14px; border-radius: 16px; color: var(--text); font-weight: 800;
+    font-size: 11px; text-transform: uppercase; cursor: pointer;
 }
 
 .primary-btn {
-  width: 100%;
-  background: var(--text);
-  color: var(--bg-bottom);
-  padding: 20px;
-  border-radius: 22px;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  font-size: 13px;
-  border: none;
+    width: 100%; background: var(--text); color: var(--bg);
+    padding: 18px; border-radius: 18px; font-weight: 900; text-transform: uppercase;
+    border: none; cursor: pointer;
 }
+
+.mission-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 15px 20px; background: var(--card); border-radius: 18px;
+    margin-bottom: 10px; border: 1px solid var(--border);
+}
+
+/* --- MODAL SYSTEM (ANTI-GEPENG) --- */
+.modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    z-index: 9999; display: none; align-items: center; justify-content: center;
+    padding: 20px; pointer-events: auto;
+}
+
+.modal-overlay.active { display: flex !important; }
+
+.modal-content {
+    background: var(--card); width: 100%; max-width: 320px;
+    border-radius: 28px; padding: 24px; border: 1px solid var(--border);
+    display: flex; flex-direction: column; align-items: stretch; gap: 12px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    animation: pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-option-btn {
+    width: 100%; padding: 16px; background: var(--input);
+    border: 1px solid var(--border); border-radius: 16px;
+    color: var(--text); font-weight: 800; text-transform: uppercase;
+    font-size: 12px; cursor: pointer; text-align: center;
+}
+
+.confirm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn-danger { background: #ff3b30 !important; color: white !important; border: none; }
+
+@keyframes pop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
