@@ -11,11 +11,11 @@
   /* Calendar Colors */
   --cal-default: rgba(255, 255, 255, 0.05);
   --cal-today: #007aff;
-  --cal-low: #8e8e93;
-  --cal-medium: #ff9500;
-  --cal-high: #ff3b30;
-  --cal-double: #8b0000;
-  --cal-triple: #5856d6;
+  --cal-low: #8e8e93;    /* Abu-abu */
+  --cal-medium: #ff9500; /* Orange */
+  --cal-high: #ff3b30;   /* Merah */
+  --cal-double: #8b0000; /* Merah Gelap */
+  --cal-triple: #5856d6; /* Ungu */
 }
 
 :root[data-theme="light"] {
@@ -24,11 +24,11 @@
   --card: rgba(255, 255, 255, 0.9);
   --text: #000000;
   --border: rgba(0, 0, 0, 0.08);
-  --input: rgba(0, 0, 0, 0.04);
+  --input: rgba(0, 0, 0, 0.05);
   --accent: #000000;
   --shadow: rgba(0, 0, 0, 0.12);
   /* Calendar Colors */
-  --cal-default: rgba(0, 0, 0, 0.05);
+  --cal-default: rgba(0, 0, 0, 0.03);
   --cal-today: #007aff;
   --cal-low: #a2a2a7;
   --cal-medium: #ff9500;
@@ -70,7 +70,7 @@ body {
   padding-bottom: 1.5rem;
 }
 
-/* --- UPCOMING MISSION --- */
+/* --- UPCOMING MISSION (DYNAMIC ISLAND) --- */
 .dynamic-island {
   pointer-events: auto;
   background: var(--accent) !important;
@@ -84,20 +84,60 @@ body {
   box-shadow: 0 20px 40px var(--shadow);
 }
 
+/* Memastikan tulisan tugas di Island tidak terpotong */
+.dynamic-island h2 {
+    font-size: clamp(1rem, 5vw, 1.4rem) !important;
+    white-space: normal;
+    line-height: 1.2;
+    font-weight: 900;
+}
+
+/* --- MISSION CONTROL (FIX INPUT BUG) --- */
+.ios-input {
+  width: 100%;
+  background: var(--input) !important; /* Memaksa background gelap/transparan */
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
+  border-radius: 16px;
+  padding: 14px 18px;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s ease;
+  -webkit-appearance: none;
+}
+
+.ios-input::placeholder {
+    color: var(--text);
+    opacity: 0.3;
+}
+
+.select-btn {
+  width: 100%;
+  background: var(--input);
+  border: 1px solid var(--border);
+  padding: 14px;
+  border-radius: 16px;
+  color: var(--text);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
 /* --- MISSION ITEM (LIST) --- */
 .mission-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.2rem 1.8rem !important; /* Padding kiri ditambah agar tidak mepet */
+    padding: 1.2rem 1.8rem !important;
     background: var(--card);
-    border-radius: 22px;
-    margin-bottom: 12px;
+    border-radius: 24px;
+    margin-bottom: 14px;
     border: 1px solid var(--border);
-    box-shadow: 0 8px 20px var(--shadow);
+    box-shadow: 0 8px 25px var(--shadow);
 }
 
-/* --- CALENDAR SYSTEM REVISED --- */
+/* --- CALENDAR SYSTEM --- */
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -119,22 +159,22 @@ body {
   border: 1px solid var(--border);
 }
 
-/* Custom States berdasarkan jumlah tugas */
-.day-cell.today { background: var(--cal-today) !important; color: #fff !important; border: none; box-shadow: 0 0 15px rgba(0, 122, 255, 0.4); }
-.day-cell.low { background: var(--cal-low) !important; color: #fff !important; border: none; }
+/* States Warna Kalender Sesuai Permintaan */
+.day-cell.today  { background: var(--cal-today) !important; color: #fff !important; border: none; box-shadow: 0 0 15px rgba(0, 122, 255, 0.4); }
+.day-cell.low    { background: var(--cal-low) !important; color: #fff !important; border: none; }
 .day-cell.medium { background: var(--cal-medium) !important; color: #fff !important; border: none; }
-.day-cell.high { background: var(--cal-high) !important; color: #fff !important; border: none; }
+.day-cell.high   { background: var(--cal-high) !important; color: #fff !important; border: none; }
 .day-cell.double { background: var(--cal-double) !important; color: #fff !important; border: none; }
 .day-cell.triple { background: var(--cal-triple) !important; color: #fff !important; border: none; }
 
-/* --- CARDS & INPUTS --- */
+/* --- CARDS --- */
 .glass-card {
   background: var(--card);
   backdrop-filter: blur(30px);
   -webkit-backdrop-filter: blur(30px);
   border-radius: 32px;
   border: 1px solid var(--border);
-  box-shadow: 0 15px 35px var(--shadow); /* Shadow lebih kuat untuk light mode */
+  box-shadow: 0 15px 45px var(--shadow);
   padding: 1.5rem;
 }
 
@@ -143,12 +183,17 @@ body {
   background: var(--text);
   color: var(--bg-bottom);
   padding: 20px;
-  border-radius: 20px;
+  border-radius: 22px;
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  font-size: 11px;
+  font-size: 12px;
   border: none;
   cursor: pointer;
-  box-shadow: 0 10px 25px var(--shadow);
+  box-shadow: 0 10px 30px var(--shadow);
+  transition: transform 0.2s active;
+}
+
+.primary-btn:active {
+    transform: scale(0.97);
 }
