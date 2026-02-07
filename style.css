@@ -1,189 +1,75 @@
-/* --- ROOT & CORE --- */
-:root[data-theme="dark"] {
-  --bg-top: #0a0a0a;
-  --bg-bottom: #000000;
-  --card: rgba(20, 20, 20, 0.7);
-  --text: #ffffff;
-  --border: rgba(255, 255, 255, 0.08);
-  --input: rgba(255, 255, 255, 0.05);
-  --accent: #ffffff;
-  --shadow: rgba(0, 0, 0, 0.6);
-  
-  /* Status Colors Dark */
-  --c-today: #007aff;
-  --c-low: #8e8e93;
-  --c-medium: #ff9500;
-  --c-high: #ff3b30;
-  --c-double: #8b0000;
-  --c-triple: #5856d6;
-}
-
-:root[data-theme="light"] {
-  --bg-top: #f2f2f7;
-  --bg-bottom: #ffffff;
-  --card: rgba(255, 255, 255, 0.85);
-  --text: #000000;
-  --border: rgba(0, 0, 0, 0.1);
-  --input: rgba(0, 0, 0, 0.05);
-  --accent: #000000;
-  --shadow: rgba(0, 0, 0, 0.08);
-
-  /* Status Colors Light */
-  --c-today: #007aff;
-  --c-low: #a2a2a7;
-  --c-medium: #ff9500;
-  --c-high: #ff3b30;
-  --c-double: #8b0000;
-  --c-triple: #5856d6;
-}
-
-* {
-  -webkit-tap-highlight-color: transparent;
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0; padding: 0;
-  color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: linear-gradient(to bottom, var(--bg-top) 0%, var(--bg-bottom) 30%, var(--bg-bottom) 100%) no-repeat;
-  background-attachment: fixed;
-  min-height: 100vh;
-  transition: background 0.4s ease;
-}
-
-/* --- HEADER & DYNAMIC ISLAND --- */
-.header-seamless {
-  position: sticky; top: 0; z-index: 100;
-  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  padding-top: calc(env(safe-area-inset-top) + 1.5rem);
-  padding-bottom: 1.5rem;
-}
-
-.dynamic-island {
-  background: var(--accent) !important;
-  color: var(--bg-bottom) !important;
-  border-radius: 28px;
-  padding: 1.2rem 1.8rem !important;
-  display: flex; justify-content: space-between; align-items: center;
-  box-shadow: 0 20px 40px var(--shadow);
-}
-
-/* --- CARDS & INPUTS --- */
-.glass-card {
-  background: var(--card);
-  backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
-  border-radius: 32px;
-  border: 1px solid var(--border);
-  box-shadow: 0 10px 30px var(--shadow);
-  padding: 1.5rem;
-}
+/* --- PERBAIKAN INPUT & SELECT (TAMBAHKAN/GANTI BAGIAN INI) --- */
 
 .ios-input {
-  width: 100%; background: var(--input);
-  border: 1px solid var(--border); border-radius: 16px;
-  padding: 16px; color: var(--text); outline: none;
+  width: 100%; 
+  background: var(--input);
+  border: 1px solid var(--border); 
+  border-radius: 16px;
+  padding: 16px; 
+  color: var(--text); 
+  outline: none;
+  font-size: 15px;
+  transition: all 0.2s ease;
+  appearance: none; /* Menghilangkan style default browser */
+  -webkit-appearance: none;
 }
 
-.primary-btn {
-  width: 100%; background: var(--text); color: var(--bg-bottom);
-  padding: 20px; border-radius: 20px; font-weight: 900;
-  text-transform: uppercase; border: none; cursor: pointer;
-  box-shadow: 0 10px 20px var(--shadow);
-}
-
-/* --- CALENDAR LOGIC (SINKRON DENGAN JS) --- */
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
-}
-
-.day-cell {
-  aspect-ratio: 1;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 800; border-radius: 12px;
-  background: var(--input); /* Default jika tidak ada tugas */
-  color: var(--text);
+/* Khusus Dropdown (Select) agar box-nya muncul */
+select.ios-input {
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid var(--border);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding-right: 40px; /* Ruang untuk icon panah */
 }
 
-/* Hari Ini (Biru) */
-.day-cell.today {
-  background: var(--c-today) !important;
-  color: #fff !important;
-  box-shadow: 0 0 15px rgba(0, 122, 255, 0.5);
-  border: none;
-  z-index: 2;
+/* Fix Input Date agar bisa ditekan & icon terlihat */
+input[type="date"].ios-input {
+  position: relative;
+  min-height: 54px; /* Memastikan box memiliki tinggi yang cukup */
+  cursor: pointer;
 }
 
-/* Low Priority (Abu) */
-.day-cell.low {
-  background: var(--c-low) !important;
-  color: #fff !important;
-  border: none;
+/* Munculkan picker saat area manapun di klik (Chrome/Android) */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100%; height: 100%;
+  opacity: 0; /* Kita buat transparan tapi memenuhi box agar seluruh area bisa diklik */
+  cursor: pointer;
 }
 
-/* Medium Priority (Orange) */
-.day-cell.medium {
-  background: var(--c-medium) !important;
-  color: #fff !important;
-  border: none;
+/* Agar teks placeholder date tidak hilang di beberapa kondisi */
+input[type="date"]::before {
+  content: attr(placeholder);
+  width: 100%;
+  color: var(--text);
+  margin-right: 0.5em;
 }
 
-/* High Priority (Merah) */
-.day-cell.high {
-  background: var(--c-high) !important;
-  color: #fff !important;
-  border: none;
+input[type="date"]:focus::before,
+input[type="date"]:valid::before {
+  display: none;
 }
 
-/* Double Mission (Merah Gelap) */
-.day-cell.double {
-  background: var(--c-double) !important;
-  color: #fff !important;
-  border: none;
+/* Layouting untuk bagian Assignment & Priority agar sejajar seperti di gambar */
+.input-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
-/* Triple Mission (Ungu) */
-.day-cell.triple {
-  background: var(--c-triple) !important;
-  color: #fff !important;
-  border: none;
+.input-row > div {
+  flex: 1;
 }
 
-/* --- MODALS --- */
-.modal-overlay {
-  position: fixed; inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-  z-index: 1000; display: flex; align-items: center; justify-content: center;
-  opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+.input-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  opacity: 0.6;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
-
-.modal-overlay.active {
-  opacity: 1; pointer-events: auto;
-}
-
-.modal-card {
-  background: var(--card);
-  width: 90%; max-width: 400px;
-  border-radius: 35px; border: 1px solid var(--border);
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
-  transform: translateY(20px); transition: transform 0.3s ease;
-}
-
-.modal-overlay.active .modal-card {
-  transform: translateY(0);
-}
-
-/* --- ANIMATIONS --- */
-.fade-in { animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.hidden { display: none !important; }
