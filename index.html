@@ -1,10 +1,10 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
     />
     <title>IS2 HUB | ULTIMATE SYNC</title>
 
@@ -35,14 +35,9 @@
   </head>
   <body class="antialiased">
     <header class="header-seamless">
-      <div
-        class="max-w-6xl mx-auto flex justify-between items-center px-6 md:px-10"
-      >
+      <div class="max-w-6xl mx-auto flex justify-between items-center px-6 md:px-10">
         <div>
-          <p
-            id="clock"
-            class="text-[10px] font-mono opacity-30 tracking-widest uppercase"
-          >
+          <p id="clock" class="text-[10px] font-mono opacity-30 tracking-widest uppercase">
             00:00:00
           </p>
           <h1 class="text-xl font-black uppercase tracking-tighter">
@@ -56,55 +51,36 @@
           >
             <span id="theme-icon">☀️</span>
           </button>
-          <div
-            class="px-4 py-2 bg-white/5 rounded-full flex items-center gap-2 border border-white/5"
-          >
-            <div
-              id="db-status-dot"
-              class="w-1.5 h-1.5 rounded-full bg-red-500"
-            ></div>
-            <span
-              id="db-status-text"
-              class="text-[8px] font-black uppercase tracking-widest opacity-30"
-              >Connecting</span
-            >
+          <div class="px-4 py-2 bg-white/5 rounded-full flex items-center gap-2 border border-white/5">
+            <div id="db-status-dot" class="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+            <span id="db-status-text" class="text-[8px] font-black uppercase tracking-widest opacity-50">
+              Active
+            </span>
           </div>
         </div>
       </div>
     </header>
 
-    <div class="max-w-6xl mx-auto p-6 md:p-10 mt-6 relative z-10">
-      <div
-        id="next-deadline-area"
-        class="mb-10 min-h-[100px] relative z-20"
-      ></div>
+    <div class="max-w-6xl mx-auto p-6 md:p-10 mt-2 relative z-10">
+      <div id="next-deadline-area" class="mb-10 min-h-[100px] relative z-20 pointer-events-none"></div>
 
       <main class="grid grid-cols-1 lg:grid-cols-12 gap-10">
         <div class="lg:col-span-5 lg:sticky lg:top-24">
-          <section class="glass-card p-8 border border-white/5">
-            <h2
-              class="text-[10px] font-black opacity-20 uppercase tracking-[0.3em] mb-6"
-            >
+          <section class="glass-card p-8 border border-white/5 relative z-30">
+            <h2 class="text-[10px] font-black opacity-20 uppercase tracking-[0.3em] mb-6">
               Mission Control
             </h2>
             <div class="space-y-4">
-              <div class="grid grid-cols-2 gap-3">
-                <button
-                  id="btn-kategori"
-                  onclick="openSelect('kategori')"
-                  class="select-btn"
-                >
+              <div class="grid grid-cols-2 gap-3 relative z-50">
+                <button id="btn-kategori" onclick="openSelect('kategori')" class="select-btn">
                   Assignment
                 </button>
-                <button
-                  id="btn-priority"
-                  onclick="openSelect('priority')"
-                  class="select-btn"
-                >
+                <button id="btn-priority" onclick="openSelect('priority')" class="select-btn">
                   Medium
                 </button>
               </div>
-              <div class="grid grid-cols-2 gap-3 relative">
+              
+              <div class="grid grid-cols-2 gap-3 relative z-40">
                 <input
                   type="text"
                   id="tglMulai"
@@ -126,49 +102,30 @@
                   class="hidden absolute left-0 right-0 top-full mt-2 glass-card z-[999] p-5 border border-white/10 shadow-2xl"
                 >
                   <div class="flex justify-between items-center mb-4">
-                    <button
-                      onclick="
-                        event.stopPropagation();
-                        changeMonth(-1);
-                      "
-                      class="text-[9px] font-black opacity-30"
-                    >
-                      PREV
-                    </button>
-                    <span
-                      id="currentMonthYear"
-                      class="text-[9px] font-black uppercase tracking-widest"
-                    ></span>
-                    <button
-                      onclick="
-                        event.stopPropagation();
-                        changeMonth(1);
-                      "
-                      class="text-[9px] font-black opacity-30"
-                    >
-                      NEXT
-                    </button>
+                    <button onclick="event.stopPropagation(); changeMonth(-1);" class="text-[9px] font-black opacity-30">PREV</button>
+                    <span id="currentMonthYear" class="text-[9px] font-black uppercase tracking-widest"></span>
+                    <button onclick="event.stopPropagation(); changeMonth(1);" class="text-[9px] font-black opacity-30">NEXT</button>
                   </div>
-                  <div
-                    id="datepicker-days"
-                    class="grid grid-cols-7 gap-1 text-center text-[10px] font-bold"
-                  ></div>
+                  <div id="datepicker-days" class="grid grid-cols-7 gap-1 text-center text-[10px] font-bold"></div>
                 </div>
               </div>
-              <textarea
-                id="isiData"
-                placeholder="What's the mission?"
-                class="ios-input h-24 pt-4 resize-none"
-              ></textarea>
-              <input
-                type="url"
-                id="linkData"
-                placeholder="https://link-tugas.com"
-                class="ios-input"
-              />
-              <button onclick="simpanData()" class="primary-btn">
-                Update Hub
-              </button>
+
+              <div class="relative z-10 space-y-4">
+                <textarea
+                  id="isiData"
+                  placeholder="What's the mission?"
+                  class="ios-input h-24 pt-4 resize-none"
+                ></textarea>
+                <input
+                  type="url"
+                  id="linkData"
+                  placeholder="https://link-tugas.com"
+                  class="ios-input"
+                />
+                <button onclick="simpanData()" class="primary-btn">
+                  Update Hub
+                </button>
+              </div>
             </div>
           </section>
         </div>
@@ -176,9 +133,7 @@
         <div class="lg:col-span-7 space-y-6">
           <div id="listData" class="space-y-3"></div>
           <section class="glass-card p-6 border border-white/5">
-            <h2
-              class="text-center font-black uppercase mb-6 tracking-[0.4em] text-[10px] opacity-20"
-            >
+            <h2 class="text-center font-black uppercase mb-6 tracking-[0.4em] text-[10px] opacity-20">
               Timeline View
             </h2>
             <div id="calendar-container" class="calendar-grid"></div>
@@ -187,48 +142,24 @@
       </main>
     </div>
 
-    <div
-      id="calendar-detail-modal"
-      class="modal-overlay hidden"
-      onclick="closeCalendarDetail()"
-    >
+    <div id="calendar-detail-modal" class="modal-overlay hidden" onclick="closeCalendarDetail()">
       <div class="modal-card fade-in p-8" onclick="event.stopPropagation()">
-        <h3
-          id="detail-date-title"
-          class="text-[10px] font-black opacity-30 uppercase tracking-[0.3em] mb-6 text-center"
-        >
+        <h3 id="detail-date-title" class="text-[10px] font-black opacity-30 uppercase tracking-[0.3em] mb-6 text-center">
           Date Details
         </h3>
-        <div
-          id="calendar-task-list"
-          class="space-y-4 max-h-[40vh] overflow-y-auto"
-        ></div>
-        <button
-          onclick="closeCalendarDetail()"
-          class="w-full mt-8 py-4 bg-white/5 rounded-2xl font-black uppercase text-[10px] tracking-widest"
-        >
+        <div id="calendar-task-list" class="space-y-4 max-h-[40vh] overflow-y-auto"></div>
+        <button onclick="closeCalendarDetail()" class="w-full mt-8 py-4 bg-white/5 rounded-2xl font-black uppercase text-[10px] tracking-widest">
           Close
         </button>
       </div>
     </div>
 
-    <div
-      id="universal-modal"
-      class="modal-overlay hidden"
-      onclick="closeUniversalModal()"
-    >
-      <div
-        class="modal-card fade-in overflow-hidden border border-white/10"
-        onclick="event.stopPropagation()"
-      >
-        <div class="h-20 bg-white/5 flex items-center justify-center text-2xl">
-          ✓
-        </div>
+    <div id="universal-modal" class="modal-overlay hidden" onclick="closeUniversalModal()">
+      <div class="modal-card fade-in overflow-hidden border border-white/10" onclick="event.stopPropagation()">
+        <div class="h-20 bg-white/5 flex items-center justify-center text-2xl">✓</div>
         <div class="p-8 text-center">
           <h3 class="text-lg font-black mb-2">Synchronized</h3>
-          <button onclick="closeUniversalModal()" class="primary-btn py-4">
-            Dismiss
-          </button>
+          <button onclick="closeUniversalModal()" class="primary-btn py-4">Dismiss</button>
         </div>
       </div>
     </div>
@@ -239,29 +170,12 @@
       </div>
     </div>
 
-    <div
-      id="delete-modal"
-      class="modal-overlay hidden"
-      onclick="closeDeleteModal()"
-    >
-      <div
-        class="modal-card fade-in p-10 text-center"
-        onclick="event.stopPropagation()"
-      >
+    <div id="delete-modal" class="modal-overlay hidden" onclick="closeDeleteModal()">
+      <div class="modal-card fade-in p-10 text-center" onclick="event.stopPropagation()">
         <h3 class="text-lg font-black mb-6">Remove?</h3>
         <div class="grid grid-cols-2 gap-3">
-          <button
-            onclick="closeDeleteModal()"
-            class="py-4 bg-white/5 rounded-xl text-[9px] font-black uppercase"
-          >
-            No
-          </button>
-          <button
-            onclick="confirmDelete()"
-            class="py-4 bg-red-600 text-white rounded-xl text-[9px] font-black uppercase"
-          >
-            Yes
-          </button>
+          <button onclick="closeDeleteModal()" class="py-4 bg-white/5 rounded-xl text-[9px] font-black uppercase">No</button>
+          <button onclick="confirmDelete()" class="py-4 bg-red-600 text-white rounded-xl text-[9px] font-black uppercase">Yes</button>
         </div>
       </div>
     </div>
