@@ -7,23 +7,18 @@
   --border: rgba(255, 255, 255, 0.08);
   --input: rgba(255, 255, 255, 0.05);
   --accent: #ffffff;
-  --shadow: rgba(0, 0, 0, 0.6); /* Bayangan pekat untuk dark mode */
+  --shadow: rgba(0, 0, 0, 0.6);
 }
 
 :root[data-theme="light"] {
-  --bg-top: #f2f2f7; /* Abu-abu iOS sangat muda agar kartu putih menonjol */
+  --bg-top: #f2f2f7;
   --bg-bottom: #ffffff;
   --card: rgba(255, 255, 255, 0.85);
   --text: #000000;
-  --border: rgba(0, 0, 0, 0.1); /* Border lebih tegas untuk light mode */
+  --border: rgba(0, 0, 0, 0.1);
   --input: rgba(0, 0, 0, 0.05);
   --accent: #000000;
-  --shadow: rgba(
-    0,
-    0,
-    0,
-    0.08
-  ); /* Bayangan halus tapi lebar untuk light mode */
+  --shadow: rgba(0, 0, 0, 0.08);
 }
 
 * {
@@ -37,7 +32,6 @@ body {
   color: var(--text);
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  /* Gradasi mulus ke atas */
   background: linear-gradient(
       to bottom,
       var(--bg-top) 0%,
@@ -47,7 +41,7 @@ body {
     no-repeat;
   background-attachment: fixed;
   min-height: 100vh;
-  transition: background 0.4s ease; /* Transisi halus saat ganti tema */
+  transition: background 0.4s ease;
 }
 
 /* --- HEADER --- */
@@ -62,13 +56,8 @@ body {
   padding-bottom: 1.5rem;
 }
 
-/* --- UPCOMING MISSION (DYNAMIC ISLAND) --- */
-#next-deadline-area {
-  pointer-events: none;
-}
-
+/* --- DYNAMIC ISLAND & CARDS --- */
 .dynamic-island {
-  pointer-events: auto;
   background: var(--accent) !important;
   color: var(--bg-bottom) !important;
   border-radius: 28px;
@@ -76,29 +65,16 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 15px;
-  /* Bayangan lebih dramatis agar terlihat melayang */
   box-shadow: 0 20px 40px var(--shadow);
 }
 
-.dynamic-island h2 {
-  font-size: clamp(1rem, 5vw, 1.4rem) !important;
-  font-weight: 900;
-  line-height: 1.1;
-  white-space: normal;
-  word-break: break-word;
-  display: block;
-  margin: 0;
-}
-
-/* --- MISSION CONTROL & CARDS --- */
 .glass-card {
   background: var(--card);
   backdrop-filter: blur(30px);
   -webkit-backdrop-filter: blur(30px);
   border-radius: 32px;
-  border: 1px solid var(--border); /* Memberi tepian agar tidak hilang di light mode */
-  box-shadow: 0 10px 30px var(--shadow); /* Memberi efek kedalaman */
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 30px var(--shadow);
   padding: 1.5rem;
 }
 
@@ -111,13 +87,6 @@ body {
   color: var(--text);
   font-size: 15px;
   outline: none;
-  transition: all 0.3s ease;
-}
-
-/* Hover & Focus state diperbaiki untuk Light/Dark */
-.ios-input:focus {
-  border-color: var(--accent);
-  background: var(--card);
 }
 
 .select-btn {
@@ -129,9 +98,7 @@ body {
   font-size: 10px;
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
   color: var(--text);
-  cursor: pointer;
 }
 
 .primary-btn {
@@ -142,20 +109,16 @@ body {
   border-radius: 20px;
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 0.2em;
-  font-size: 11px;
   border: none;
   cursor: pointer;
-  box-shadow: 0 10px 20px var(--shadow);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s;
 }
 
 .primary-btn:active {
   transform: scale(0.96);
-  opacity: 0.9;
 }
 
-/* --- CALENDAR --- */
+/* --- CALENDAR LOGIC COLORS --- */
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -173,12 +136,13 @@ body {
   background: var(--input);
   color: var(--text);
   cursor: pointer;
+  border: 1px solid var(--border);
   transition: all 0.2s;
-  border: 1px solid var(--border); /* Struktur kotak lebih jelas */
 }
 
-.day-cell.pri-high {
-  background: #ff3b30 !important;
+/* Priority Colors */
+.day-cell.pri-low {
+  background: #8e8e93 !important;
   color: #fff !important;
   border: none;
 }
@@ -187,11 +151,29 @@ body {
   color: #fff !important;
   border: none;
 }
-.day-cell.pri-low {
-  background: #34c759 !important;
+.day-cell.pri-high {
+  background: #ff3b30 !important;
   color: #fff !important;
   border: none;
 }
+
+/* Special Condition Colors */
+.day-cell.task-today {
+  background: #007aff !important;
+  color: #fff !important;
+  border: none;
+}
+.day-cell.task-double {
+  background: #800000 !important;
+  color: #fff !important;
+  border: none;
+}
+.day-cell.task-triple {
+  background: #5856d6 !important;
+  color: #fff !important;
+  border: none;
+}
+
 .day-cell.cal-today {
   border: 2px solid var(--text);
   box-shadow: 0 0 10px var(--shadow);
@@ -201,14 +183,8 @@ body {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(
-    0,
-    0,
-    0,
-    0.6
-  ); /* Lebih transparan sedikit agar blur terlihat */
+  background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -221,25 +197,21 @@ body {
   max-width: 400px;
   border-radius: 35px;
   border: 1px solid var(--border);
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
 }
 
-/* --- ANIMATIONS --- */
 .fade-in {
-  animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: fadeIn 0.4s ease;
 }
-
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(12px) scale(0.98);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
 }
-
 .hidden {
   display: none !important;
 }
