@@ -1,256 +1,245 @@
 /* --- ROOT & CORE --- */
 :root[data-theme="dark"] {
-    --bg-top: #0a0a0a;
-    --bg-bottom: #000000;
-    --card: rgba(20, 20, 20, 0.7);
-    --text: #ffffff;
-    --border: rgba(255, 255, 255, 0.08);
-    --input: rgba(255, 255, 255, 0.05);
-    --accent: #ffffff;
-    --shadow: rgba(0, 0, 0, 0.6);
+  --bg-top: #0a0a0a;
+  --bg-bottom: #000000;
+  --card: rgba(20, 20, 20, 0.7);
+  --text: #ffffff;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.05);
+  --accent: #ffffff;
+  --shadow: rgba(0, 0, 0, 0.6); /* Bayangan pekat untuk dark mode */
 }
 
 :root[data-theme="light"] {
-    --bg-top: #f2f2f7; 
-    --bg-bottom: #ffffff;
-    --card: rgba(255, 255, 255, 0.85);
-    --text: #000000;
-    --border: rgba(0, 0, 0, 0.1); 
-    --input: rgba(0, 0, 0, 0.05);
-    --accent: #000000;
-    --shadow: rgba(0, 0, 0, 0.12); /* Shadow sedikit lebih gelap agar terlihat di light mode */
+  --bg-top: #f2f2f7; /* Abu-abu iOS sangat muda agar kartu putih menonjol */
+  --bg-bottom: #ffffff;
+  --card: rgba(255, 255, 255, 0.85);
+  --text: #000000;
+  --border: rgba(0, 0, 0, 0.1); /* Border lebih tegas untuk light mode */
+  --input: rgba(0, 0, 0, 0.05);
+  --accent: #000000;
+  --shadow: rgba(
+    0,
+    0,
+    0,
+    0.08
+  ); /* Bayangan halus tapi lebar untuk light mode */
 }
 
 * {
-    -webkit-tap-highlight-color: transparent;
-    box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
 }
 
 body {
-    margin: 0;
-    padding: 0;
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: linear-gradient(to bottom, var(--bg-top) 0%, var(--bg-bottom) 30%, var(--bg-bottom) 100%) no-repeat;
-    background-attachment: fixed;
-    min-height: 100vh;
-    transition: background 0.4s ease;
+  margin: 0;
+  padding: 0;
+  color: var(--text);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Gradasi mulus ke atas */
+  background: linear-gradient(
+      to bottom,
+      var(--bg-top) 0%,
+      var(--bg-bottom) 30%,
+      var(--bg-bottom) 100%
+    )
+    no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
+  transition: background 0.4s ease; /* Transisi halus saat ganti tema */
 }
 
 /* --- HEADER --- */
 .header-seamless {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: transparent;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    padding-top: calc(env(safe-area-inset-top) + 1.5rem);
-    padding-bottom: 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: transparent;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding-top: calc(env(safe-area-inset-top) + 1.5rem);
+  padding-bottom: 1.5rem;
 }
 
 /* --- UPCOMING MISSION (DYNAMIC ISLAND) --- */
 #next-deadline-area {
-    pointer-events: none;
+  pointer-events: none;
 }
 
 .dynamic-island {
-    pointer-events: auto;
-    background: var(--accent) !important;
-    color: var(--bg-bottom) !important;
-    border-radius: 28px;
-    padding: 1.2rem 1.8rem !important;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 15px;
-    box-shadow: 0 20px 40px var(--shadow);
+  pointer-events: auto;
+  background: var(--accent) !important;
+  color: var(--bg-bottom) !important;
+  border-radius: 28px;
+  padding: 1.2rem 1.8rem !important;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  /* Bayangan lebih dramatis agar terlihat melayang */
+  box-shadow: 0 20px 40px var(--shadow);
 }
 
 .dynamic-island h2 {
-    font-size: clamp(1rem, 5vw, 1.4rem) !important;
-    font-weight: 900;
-    line-height: 1.1;
-    white-space: normal; 
-    word-break: break-word;
-    display: block;
-    margin: 0;
+  font-size: clamp(1rem, 5vw, 1.4rem) !important;
+  font-weight: 900;
+  line-height: 1.1;
+  white-space: normal;
+  word-break: break-word;
+  display: block;
+  margin: 0;
 }
 
 /* --- MISSION CONTROL & CARDS --- */
 .glass-card {
-    background: var(--card);
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
-    border-radius: 32px;
-    border: 1px solid var(--border);
-    box-shadow: 0 10px 30px var(--shadow);
-    padding: 1.5rem;
+  background: var(--card);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-radius: 32px;
+  border: 1px solid var(--border); /* Memberi tepian agar tidak hilang di light mode */
+  box-shadow: 0 10px 30px var(--shadow); /* Memberi efek kedalaman */
+  padding: 1.5rem;
 }
 
 .ios-input {
-    width: 100%;
-    background: var(--input);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 16px;
-    color: var(--text);
-    font-size: 15px;
-    outline: none;
-    transition: all 0.3s ease;
+  width: 100%;
+  background: var(--input);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  color: var(--text);
+  font-size: 15px;
+  outline: none;
+  transition: all 0.3s ease;
 }
 
+/* Hover & Focus state diperbaiki untuk Light/Dark */
 .ios-input:focus {
-    border-color: var(--accent);
-    background: var(--card);
+  border-color: var(--accent);
+  background: var(--card);
 }
 
 .select-btn {
-    width: 100%;
-    background: var(--input);
-    border: 1px solid var(--border);
-    padding: 14px;
-    border-radius: 14px;
-    font-size: 10px;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--text);
-    cursor: pointer;
+  width: 100%;
+  background: var(--input);
+  border: 1px solid var(--border);
+  padding: 14px;
+  border-radius: 14px;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text);
+  cursor: pointer;
 }
 
 .primary-btn {
-    width: 100%;
-    background: var(--text);
-    color: var(--bg-bottom);
-    padding: 20px;
-    border-radius: 20px;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    font-size: 11px;
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 10px 20px var(--shadow);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+  background: var(--text);
+  color: var(--bg-bottom);
+  padding: 20px;
+  border-radius: 20px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 11px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 10px 20px var(--shadow);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.primary-btn:active { 
-    transform: scale(0.96);
-    opacity: 0.9;
-}
-
-/* --- MISSION ITEM LIST (FIXED LEFT PADDING) --- */
-.mission-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    /* Memberikan ruang kiri lebih luas (2rem) agar teks tidak menempel ke pinggir */
-    padding: 1.4rem 2rem !important; 
-    background: var(--card);
-    border-radius: 24px;
-    margin-bottom: 16px;
-    border: 1px solid var(--border);
-    box-shadow: 0 8px 25px var(--shadow);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.mission-item:active {
-    transform: scale(0.98);
-}
-
-/* Memberikan garis indikator di sisi kiri sesuai kategori/prioritas agar tidak terlalu polos */
-.mission-item::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 20%;
-    height: 60%;
-    width: 4px;
-    border-radius: 0 4px 4px 0;
-    background: var(--accent);
-    opacity: 0.3;
-}
-
-.mission-item h3 {
-    font-size: 14px;
-    font-weight: 800;
-    text-transform: uppercase;
-    margin: 0;
-    letter-spacing: -0.01em;
-}
-
-.mission-item p {
-    font-size: 9px;
-    font-weight: 700;
-    opacity: 0.4;
-    text-transform: uppercase;
-    margin-bottom: 4px;
-    letter-spacing: 0.05em;
+.primary-btn:active {
+  transform: scale(0.96);
+  opacity: 0.9;
 }
 
 /* --- CALENDAR --- */
 .calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
 }
 
 .day-cell {
-    aspect-ratio: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    font-weight: 800;
-    border-radius: 12px;
-    background: var(--input);
-    color: var(--text);
-    cursor: pointer;
-    transition: all 0.2s;
-    border: 1px solid var(--border);
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  border-radius: 12px;
+  background: var(--input);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid var(--border); /* Struktur kotak lebih jelas */
 }
 
-.day-cell.pri-high { background: #ff3b30 !important; color: #fff !important; border: none; }
-.day-cell.pri-medium { background: #ff9500 !important; color: #fff !important; border: none; }
-.day-cell.pri-low { background: #34c759 !important; color: #fff !important; border: none; }
-.day-cell.cal-today { 
-    border: 2px solid var(--text); 
-    box-shadow: 0 0 10px var(--shadow);
+.day-cell.pri-high {
+  background: #ff3b30 !important;
+  color: #fff !important;
+  border: none;
+}
+.day-cell.pri-medium {
+  background: #ff9500 !important;
+  color: #fff !important;
+  border: none;
+}
+.day-cell.pri-low {
+  background: #34c759 !important;
+  color: #fff !important;
+  border: none;
+}
+.day-cell.cal-today {
+  border: 2px solid var(--text);
+  box-shadow: 0 0 10px var(--shadow);
 }
 
 /* --- MODALS --- */
 .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  position: fixed;
+  inset: 0;
+  background: rgba(
+    0,
+    0,
+    0,
+    0.6
+  ); /* Lebih transparan sedikit agar blur terlihat */
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .modal-card {
-    background: var(--card);
-    width: 90%;
-    max-width: 400px;
-    border-radius: 35px;
-    border: 1px solid var(--border);
-    box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+  background: var(--card);
+  width: 90%;
+  max-width: 400px;
+  border-radius: 35px;
+  border: 1px solid var(--border);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
 }
 
 /* --- ANIMATIONS --- */
 .fade-in {
-    animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(12px) scale(0.98); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
-.hidden { display: none !important; }
+.hidden {
+  display: none !important;
+}
