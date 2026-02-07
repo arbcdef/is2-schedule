@@ -5,15 +5,9 @@
   --card: rgba(28, 28, 30, 0.7);
   --text: #ffffff;
   --border: rgba(255, 255, 255, 0.1);
-  --input: rgba(44, 44, 46, 1); /* Warna solid khas iOS */
+  --input: #1c1c1e; /* Warna solid khas iOS agar box pasti muncul */
   --accent: #ffffff;
   --shadow: rgba(0, 0, 0, 0.6);
-  
-  --c-high: #ff3b30;
-  --c-medium: #ff9500;
-  --c-low: #8e8e93;
-  --c-today-empty: #007aff;
-  --c-today-task: #ffffff;
 }
 
 :root[data-theme="light"] {
@@ -22,7 +16,7 @@
   --card: rgba(255, 255, 255, 0.85);
   --text: #000000;
   --border: rgba(0, 0, 0, 0.1);
-  --input: rgba(235, 235, 245, 1);
+  --input: #e5e5ea;
   --accent: #000000;
   --shadow: rgba(0, 0, 0, 0.08);
 }
@@ -41,17 +35,16 @@ body {
   min-height: 100vh;
 }
 
-/* --- MISSION CONTROL --- */
+/* --- MISSION CONTROL CONTAINER --- */
 .glass-card {
   background: var(--card);
   backdrop-filter: blur(30px);
   border-radius: 32px;
   border: 1px solid var(--border);
   padding: 1.5rem;
-  margin-bottom: 2rem;
 }
 
-/* Penataan Grid untuk Kategori & Priority agar rapi */
+/* Container untuk Assignment & Priority agar berjejer */
 .mission-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -59,7 +52,8 @@ body {
   margin-bottom: 12px;
 }
 
-/* Base style untuk semua Box Input */
+/* --- BOX INPUT STYLING --- */
+/* Base style untuk memunculkan kotak */
 .ios-input {
   width: 100%;
   background: var(--input) !important;
@@ -72,52 +66,30 @@ body {
   outline: none;
   appearance: none;
   -webkit-appearance: none;
-  display: block;
 }
 
-/* Khusus Button agar terlihat seperti box yang bisa diklik */
+/* Khusus elemen Button agar teks berada di tengah box */
 button.ios-input {
   display: flex !important;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   cursor: pointer;
-  text-align: left;
   min-height: 54px;
+  text-align: center;
 }
 
-button.ios-input::after {
-  content: "▼";
-  font-size: 9px;
-  opacity: 0.3;
-}
-
-/* --- TANGGAL & TEXTAREA --- */
-.date-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
+/* --- DATE & TEXTAREA --- */
 input[type="date"].ios-input {
-  position: relative;
   min-height: 54px;
-}
-
-input[type="date"]::-webkit-calendar-picker-indicator {
-  position: absolute;
-  inset: 0;
-  width: 100%; height: 100%;
-  opacity: 0;
-  cursor: pointer;
 }
 
 textarea.ios-input {
   height: 120px;
   resize: none;
-  margin-bottom: 12px;
+  margin-top: 12px;
 }
 
+/* --- BUTTON UTAMA --- */
 .primary-btn {
   width: 100%;
   background: var(--text);
@@ -127,22 +99,8 @@ textarea.ios-input {
   font-weight: 800;
   text-transform: uppercase;
   border: none;
+  margin-top: 15px;
   cursor: pointer;
-}
-
-/* --- CALENDAR --- */
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
-}
-
-.day-cell {
-  aspect-ratio: 1;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 800; border-radius: 12px;
-  background: var(--input);
-  border: 1px solid var(--border);
 }
 
 .hidden { display: none !important; }
