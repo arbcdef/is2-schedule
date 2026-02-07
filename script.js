@@ -65,21 +65,29 @@ function renderCountdown() {
   }
 }
 
+// --- RENDER FEED: TANPA CHECKBOX, TEKS BESAR & PADDING AMAN ---
 function renderFeed() {
   const cont = document.getElementById("listData");
   cont.innerHTML = allTasks.length
     ? allTasks
         .map((t) => {
           const hasLink = t.task_link && t.task_link.startsWith("http");
-          return `<div class="glass-card p-4 flex justify-between items-center mb-2" style="border-left: 4px solid ${t.priority === "High" ? "#ff3b30" : t.priority === "Medium" ? "#ff9500" : "#8e8e93"}">
-            <div class="truncate flex-1">
-                <p class="text-[7px] font-black opacity-30 uppercase">${t.category} • ${t.tgl_deadline}</p>
-                <p class="font-bold truncate text-xs">${t.content}</p>
+          return `
+          <div class="glass-card flex justify-between items-center mb-3 ${t.is_done ? "opacity-30" : ""}" 
+               style="border-left: 6px solid ${t.priority === "High" ? "#ff3b30" : t.priority === "Medium" ? "#ff9500" : "#8e8e93"}">
+            
+            <div class="flex items-center truncate flex-1 ml-4"> 
+                <div class="truncate">
+                    <p class="task-meta">${t.category} • ${t.tgl_deadline}</p>
+                    <p class="task-title truncate">${t.content}</p>
+                </div>
             </div>
-            <div class="flex items-center gap-3 ml-2">
-                ${hasLink ? `<a href="${t.task_link}" target="_blank" class="text-[8px] font-black px-2 py-1 bg-white/10 rounded-md hover:bg-white/20 transition">OPEN</a>` : ""}
-                <button onclick="askDel(${t.id})" class="text-[8px] font-black opacity-20 hover:opacity-100 transition">DEL</button>
-            </div></div>`;
+
+            <div class="flex items-center gap-4 ml-4">
+                ${hasLink ? `<a href="${t.task_link}" target="_blank" class="text-[9px] font-black px-3 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition tracking-tighter">OPEN</a>` : ""}
+                <button onclick="askDel(${t.id})" class="text-[9px] font-black opacity-20 hover:opacity-100 transition">DEL</button>
+            </div>
+          </div>`;
         })
         .join("")
     : `<div class="p-10 text-center opacity-10 text-[8px] font-black uppercase">Hub Clear</div>`;
@@ -107,8 +115,7 @@ function renderCalendar() {
 
     let pClass = "";
     if (tasks.length === 1) {
-      if (checkDate === todayStr)
-        pClass = "task-today"; // Biru jika hari ini ada 1 tugas
+      if (checkDate === todayStr) pClass = "task-today";
       else
         pClass =
           tasks[0].priority === "High"
@@ -117,9 +124,9 @@ function renderCalendar() {
               ? "pri-medium"
               : "pri-low";
     } else if (tasks.length === 2) {
-      pClass = "task-double"; // Merah Gelap
+      pClass = "task-double";
     } else if (tasks.length >= 3) {
-      pClass = "task-triple"; // Ungu
+      pClass = "task-triple";
     }
 
     const dayEl = document.createElement("div");
@@ -156,19 +163,17 @@ async function simpanData() {
     t2 = document.getElementById("tglDeadline").value,
     link = document.getElementById("linkData").value;
   if (!isi || !t2) return;
-  await sb
-    .from("schedule")
-    .insert([
-      {
-        content: isi,
-        tgl_start: t1 || t2,
-        tgl_deadline: t2,
-        category: selectedKat,
-        priority: selectedPri,
-        is_done: false,
-        task_link: link,
-      },
-    ]);
+  await sb.from("schedule").insert([
+    {
+      content: isi,
+      tgl_start: t1 || t2,
+      tgl_deadline: t2,
+      category: selectedKat,
+      priority: selectedPri,
+      is_done: false,
+      task_link: link,
+    },
+  ]);
   document.getElementById("isiData").value = "";
   document.getElementById("linkData").value = "";
   muatData();
