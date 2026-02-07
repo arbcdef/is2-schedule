@@ -1,92 +1,245 @@
 /* --- ROOT & CORE --- */
 :root[data-theme="dark"] {
-    --bg: #000000;
-    --card: #1c1c1e;
-    --text: #ffffff;
-    --border: rgba(255, 255, 255, 0.1);
-    --input: rgba(255, 255, 255, 0.08);
-    --shadow: rgba(0, 0, 0, 0.5);
-    --accent: #007aff;
+  --bg-top: #0a0a0a;
+  --bg-bottom: #000000;
+  --card: rgba(20, 20, 20, 0.7);
+  --text: #ffffff;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.05);
+  --accent: #ffffff;
+  --shadow: rgba(0, 0, 0, 0.6); /* Bayangan pekat untuk dark mode */
 }
 
 :root[data-theme="light"] {
-    --bg: #f2f2f7;
-    --card: #ffffff;
-    --text: #000000;
-    --border: rgba(0, 0, 0, 0.08);
-    --input: rgba(0, 0, 0, 0.04);
-    --shadow: rgba(0, 0, 0, 0.1);
-    --accent: #007aff;
+  --bg-top: #f2f2f7; /* Abu-abu iOS sangat muda agar kartu putih menonjol */
+  --bg-bottom: #ffffff;
+  --card: rgba(255, 255, 255, 0.85);
+  --text: #000000;
+  --border: rgba(0, 0, 0, 0.1); /* Border lebih tegas untuk light mode */
+  --input: rgba(0, 0, 0, 0.05);
+  --accent: #000000;
+  --shadow: rgba(
+    0,
+    0,
+    0,
+    0.08
+  ); /* Bayangan halus tapi lebar untuk light mode */
 }
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+* {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
 
 body {
-    margin: 0; padding: 0;
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    transition: background 0.3s ease;
+  margin: 0;
+  padding: 0;
+  color: var(--text);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Gradasi mulus ke atas */
+  background: linear-gradient(
+      to bottom,
+      var(--bg-top) 0%,
+      var(--bg-bottom) 30%,
+      var(--bg-bottom) 100%
+    )
+    no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
+  transition: background 0.4s ease; /* Transisi halus saat ganti tema */
 }
 
-/* --- COMPONENTS --- */
+/* --- HEADER --- */
+.header-seamless {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: transparent;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding-top: calc(env(safe-area-inset-top) + 1.5rem);
+  padding-bottom: 1.5rem;
+}
+
+/* --- UPCOMING MISSION (DYNAMIC ISLAND) --- */
+#next-deadline-area {
+  pointer-events: none;
+}
+
+.dynamic-island {
+  pointer-events: auto;
+  background: var(--accent) !important;
+  color: var(--bg-bottom) !important;
+  border-radius: 28px;
+  padding: 1.2rem 1.8rem !important;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  /* Bayangan lebih dramatis agar terlihat melayang */
+  box-shadow: 0 20px 40px var(--shadow);
+}
+
+.dynamic-island h2 {
+  font-size: clamp(1rem, 5vw, 1.4rem) !important;
+  font-weight: 900;
+  line-height: 1.1;
+  white-space: normal;
+  word-break: break-word;
+  display: block;
+  margin: 0;
+}
+
+/* --- MISSION CONTROL & CARDS --- */
 .glass-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    padding: 20px;
-    box-shadow: 0 10px 30px var(--shadow);
+  background: var(--card);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-radius: 32px;
+  border: 1px solid var(--border); /* Memberi tepian agar tidak hilang di light mode */
+  box-shadow: 0 10px 30px var(--shadow); /* Memberi efek kedalaman */
+  padding: 1.5rem;
 }
 
 .ios-input {
-    width: 100%; background: var(--input); border: 1px solid var(--border);
-    color: var(--text); padding: 16px; border-radius: 16px; font-size: 15px; outline: none;
+  width: 100%;
+  background: var(--input);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  color: var(--text);
+  font-size: 15px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+/* Hover & Focus state diperbaiki untuk Light/Dark */
+.ios-input:focus {
+  border-color: var(--accent);
+  background: var(--card);
 }
 
 .select-btn {
-    width: 100%; background: var(--input); border: 1px solid var(--border);
-    padding: 14px; border-radius: 16px; color: var(--text); font-weight: 800;
-    font-size: 11px; text-transform: uppercase; cursor: pointer;
+  width: 100%;
+  background: var(--input);
+  border: 1px solid var(--border);
+  padding: 14px;
+  border-radius: 14px;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text);
+  cursor: pointer;
 }
 
 .primary-btn {
-    width: 100%; background: var(--text); color: var(--bg);
-    padding: 18px; border-radius: 18px; font-weight: 900; text-transform: uppercase;
-    border: none; cursor: pointer;
+  width: 100%;
+  background: var(--text);
+  color: var(--bg-bottom);
+  padding: 20px;
+  border-radius: 20px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 11px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 10px 20px var(--shadow);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.mission-item {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 15px 20px; background: var(--card); border-radius: 18px;
-    margin-bottom: 10px; border: 1px solid var(--border);
+.primary-btn:active {
+  transform: scale(0.96);
+  opacity: 0.9;
 }
 
-/* --- MODAL SYSTEM (ANTI-GEPENG) --- */
+/* --- CALENDAR --- */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.day-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  border-radius: 12px;
+  background: var(--input);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid var(--border); /* Struktur kotak lebih jelas */
+}
+
+.day-cell.pri-high {
+  background: #ff3b30 !important;
+  color: #fff !important;
+  border: none;
+}
+.day-cell.pri-medium {
+  background: #ff9500 !important;
+  color: #fff !important;
+  border: none;
+}
+.day-cell.pri-low {
+  background: #34c759 !important;
+  color: #fff !important;
+  border: none;
+}
+.day-cell.cal-today {
+  border: 2px solid var(--text);
+  box-shadow: 0 0 10px var(--shadow);
+}
+
+/* --- MODALS --- */
 .modal-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.8);
-    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-    z-index: 9999; display: none; align-items: center; justify-content: center;
-    padding: 20px; pointer-events: auto;
+  position: fixed;
+  inset: 0;
+  background: rgba(
+    0,
+    0,
+    0,
+    0.6
+  ); /* Lebih transparan sedikit agar blur terlihat */
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.modal-overlay.active { display: flex !important; }
-
-.modal-content {
-    background: var(--card); width: 100%; max-width: 320px;
-    border-radius: 28px; padding: 24px; border: 1px solid var(--border);
-    display: flex; flex-direction: column; align-items: stretch; gap: 12px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    animation: pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+.modal-card {
+  background: var(--card);
+  width: 90%;
+  max-width: 400px;
+  border-radius: 35px;
+  border: 1px solid var(--border);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
 }
 
-.modal-option-btn {
-    width: 100%; padding: 16px; background: var(--input);
-    border: 1px solid var(--border); border-radius: 16px;
-    color: var(--text); font-weight: 800; text-transform: uppercase;
-    font-size: 12px; cursor: pointer; text-align: center;
+/* --- ANIMATIONS --- */
+.fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.confirm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.btn-danger { background: #ff3b30 !important; color: white !important; border: none; }
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
 
-@keyframes pop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.hidden {
+  display: none !important;
+}
