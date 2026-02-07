@@ -8,6 +8,11 @@
   --input: rgba(255, 255, 255, 0.05);
   --accent: #ffffff;
   --shadow: rgba(0, 0, 0, 0.6);
+  
+  /* Status Colors */
+  --c-high: #ff3b30;
+  --c-medium: #ff9500;
+  --c-low: #34c759;
 }
 
 :root[data-theme="light"] {
@@ -19,6 +24,10 @@
   --input: rgba(0, 0, 0, 0.05);
   --accent: #000000;
   --shadow: rgba(0, 0, 0, 0.08);
+
+  --c-high: #ff3b30;
+  --c-medium: #ff9500;
+  --c-low: #34c759;
 }
 
 * {
@@ -36,7 +45,7 @@ body {
   transition: background 0.4s ease;
 }
 
-/* --- HEADER --- */
+/* --- HEADER & DYNAMIC ISLAND --- */
 .header-seamless {
   position: sticky; top: 0; z-index: 100;
   background: transparent;
@@ -45,10 +54,7 @@ body {
   padding-bottom: 1.5rem;
 }
 
-/* --- UPCOMING MISSION (DYNAMIC ISLAND) --- */
-#next-deadline-area { pointer-events: none; }
 .dynamic-island {
-  pointer-events: auto;
   background: var(--accent) !important;
   color: var(--bg-bottom) !important;
   border-radius: 28px;
@@ -57,7 +63,7 @@ body {
   box-shadow: 0 20px 40px var(--shadow);
 }
 
-/* --- MISSION CONTROL & CARDS --- */
+/* --- MISSION CONTROL & INPUT FIX --- */
 .glass-card {
   background: var(--card);
   backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
@@ -67,7 +73,6 @@ body {
   padding: 1.5rem;
 }
 
-/* FIX: Perbaikan Input & Select agar box muncul dan bisa diklik */
 .ios-input {
   width: 100%;
   background: var(--input);
@@ -78,11 +83,13 @@ body {
   font-size: 15px;
   outline: none;
   transition: all 0.3s ease;
-  appearance: none; /* Reset gaya browser default */
+  appearance: none;
   -webkit-appearance: none;
+  position: relative;
+  z-index: 1; /* Dasar z-index untuk input */
 }
 
-/* Style khusus untuk Dropdown (Select) */
+/* Dropdown Arrow Fix */
 select.ios-input {
   cursor: pointer;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='gray' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
@@ -91,22 +98,19 @@ select.ios-input {
   background-size: 14px;
 }
 
-/* FIX: Membuat Input Tanggal bisa ditekan di seluruh area box */
+/* CRITICAL FIX: Membuat Area Klik Tanggal Sangat Responsif */
 input[type="date"].ios-input {
-  position: relative;
   cursor: pointer;
+  min-height: 54px;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
   width: 100%; height: 100%;
-  opacity: 0; cursor: pointer;
-}
-
-.ios-input:focus {
-  border-color: var(--accent);
-  background: var(--card);
+  opacity: 0; 
+  cursor: pointer;
+  z-index: 10; /* Memastikan berada di paling atas area input */
 }
 
 .primary-btn {
@@ -122,8 +126,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   box-shadow: 0 10px 20px var(--shadow);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
-.primary-btn:active { transform: scale(0.96); opacity: 0.9; }
 
 /* --- CALENDAR SINKRON WARNA --- */
 .calendar-grid {
@@ -141,36 +143,36 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   cursor: pointer;
   transition: all 0.2s;
   border: 1px solid var(--border);
-  position: relative;
 }
 
-/* Warna kalender mengikuti kegiatannya (Sinkron dengan list atas) */
+/* State Warna Mengikuti Kegiatan (Sesuai Priority di List) */
 .day-cell.pri-high {
-  background: #ff3b30 !important; /* Merah untuk High */
+  background: var(--c-high) !important;
   color: #fff !important;
   border: none;
-  box-shadow: 0 4px 10px rgba(255, 59, 48, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 59, 48, 0.3);
 }
 
 .day-cell.pri-medium {
-  background: #ff9500 !important; /* Orange untuk Medium */
+  background: var(--c-medium) !important;
   color: #fff !important;
   border: none;
-  box-shadow: 0 4px 10px rgba(255, 149, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 149, 0, 0.3);
 }
 
 .day-cell.pri-low {
-  background: #34c759 !important; /* Hijau untuk Low */
+  background: var(--c-low) !important;
   color: #fff !important;
   border: none;
 }
 
 .day-cell.cal-today {
   border: 2px solid var(--accent);
-  box-shadow: 0 0 10px var(--shadow);
+  box-shadow: 0 0 12px var(--shadow);
+  z-index: 2;
 }
 
-/* --- MODALS --- */
+/* --- MODALS & ANIMATIONS --- */
 .modal-overlay {
   position: fixed; inset: 0;
   background: rgba(0, 0, 0, 0.6);
@@ -185,7 +187,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
 }
 
-/* --- ANIMATIONS --- */
 .fade-in { animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(12px) scale(0.98); }
