@@ -53,23 +53,17 @@
         <div class="flex items-center gap-4">
           <button
             onclick="toggleTheme()"
-            class="px-4 py-2 bg-white/5 rounded-full flex items-center gap-3 border border-white/5 transition hover:bg-white/10 active:scale-95"
+            class="px-4 py-2 bg-white/5 rounded-full flex items-center gap-2 border border-white/5 transition hover:bg-white/10 active:scale-95 cursor-pointer"
           >
-            <span id="theme-icon" class="text-xs">☀️</span>
-
-            <div class="w-[1px] h-3 bg-white/10"></div>
-
-            <div class="flex items-center gap-2">
-              <div
-                id="db-status-dot"
-                class="w-1.5 h-1.5 rounded-full bg-red-500"
-              ></div>
-              <span
-                id="db-status-text"
-                class="text-[8px] font-black uppercase tracking-widest opacity-30"
-                >Connecting</span
-              >
-            </div>
+            <div
+              id="db-status-dot"
+              class="w-1.5 h-1.5 rounded-full bg-red-500"
+            ></div>
+            <span
+              id="db-status-text"
+              class="text-[8px] font-black uppercase tracking-widest opacity-30 select-none"
+              >Connecting</span
+            >
           </button>
         </div>
       </div>
