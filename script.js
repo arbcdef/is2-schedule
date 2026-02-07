@@ -23,12 +23,11 @@ async function muatData() {
 
     allTasks = data || [];
     
-    // STATUS: ACTIVE (Hanya tulisan Active saja)
     if (statusDot) {
       statusDot.className = "w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e]";
     }
     if (statusText) {
-      statusText.innerText = "Active"; // Dipastikan tidak ada kata "HUB"
+      statusText.innerText = "Active"; // Fixed: Hanya "Active"
       statusText.style.color = ""; 
       statusText.style.opacity = "0.5";
     }
@@ -73,17 +72,17 @@ function renderCountdown() {
     let dayText = diffDays === 0 ? "DUE TODAY" : diffDays < 0 ? `${Math.abs(diffDays)} OVERDUE` : `${diffDays} DAYS LEFT`;
 
     area.innerHTML = `
-            <div class="dynamic-island p-6 flex justify-between items-center fade-in border border-white/10 shadow-2xl">
-                <div class="mr-4 flex-1">
+            <div class="dynamic-island fade-in">
+                <div class="flex-1">
                     <p class="text-[8px] font-black opacity-40 uppercase tracking-[0.2em] mb-1">Upcoming Mission</p>
-                    <h2 class="text-base font-black tracking-tight uppercase leading-tight" style="white-space: normal; word-break: break-word;">${upcoming.content}</h2>
+                    <h2 class="uppercase">${upcoming.content}</h2>
                 </div>
                 <div class="text-right"> 
                     <span class="text-lg font-black tracking-tighter uppercase whitespace-nowrap">${dayText}</span>
                 </div>
             </div>`;
   } else {
-    area.innerHTML = `<div class="glass-card p-6 border border-white/5 text-center fade-in"><p class="text-[9px] font-black opacity-20 uppercase tracking-[0.4em]">All Missions Secured</p></div>`;
+    area.innerHTML = `<div class="glass-card p-6 text-center fade-in"><p class="text-[9px] font-black opacity-20 uppercase tracking-[0.4em]">Hub Clear</p></div>`;
   }
 }
 
@@ -95,14 +94,14 @@ function renderFeed() {
     ? allTasks
         .map((t) => {
           const hasLink = t.task_link && t.task_link.startsWith("http");
-          // Checkbox dihapus, diganti dengan click handler pada teks judul
-          return `<div class="glass-card p-4 flex justify-between items-center ${t.is_done ? "opacity-30" : ""}" style="border-left: 4px solid ${t.priority === "High" ? "#ff3b30" : t.priority === "Medium" ? "#ff9500" : "#8e8e93"}">
+          // Checkbox dihilangkan, teks digeser dengan padding CSS
+          return `<div class="mission-item ${t.is_done ? "opacity-30" : ""}" style="border-left: 5px solid ${t.priority === "High" ? "#ff3b30" : t.priority === "Medium" ? "#ff9500" : "#8e8e93"}">
             <div class="flex-1 truncate cursor-pointer" onclick="toggleDone(${t.id}, ${t.is_done})">
                 <p class="text-[7px] font-black opacity-30 uppercase">${t.category} • ${t.tgl_deadline}</p>
                 <p class="font-bold truncate text-xs ${t.is_done ? 'line-through' : ''}">${t.content}</p>
             </div>
             <div class="flex items-center gap-3 ml-2">
-                ${hasLink ? `<a href="${t.task_link}" target="_blank" class="text-[8px] font-black px-2 py-1 bg-white/10 rounded-md hover:bg-white/20 transition tracking-tighter">OPEN LINK</a>` : ""}
+                ${hasLink ? `<a href="${t.task_link}" target="_blank" class="text-[8px] font-black px-2 py-1 bg-white/10 rounded-md hover:bg-white/20 transition">OPEN LINK</a>` : ""}
                 <button onclick="askDel(${t.id})" class="text-[8px] font-black opacity-10 hover:opacity-100 transition">DEL</button>
             </div></div>`;
         })
@@ -133,21 +132,31 @@ function renderCalendar() {
     );
     
     let pClass = "";
-    if (tasks.length === 1) {
+    const isToday = d === now.getDate() && m === now.getMonth() && y === now.getFullYear();
+
+    if (isToday) {
+        pClass = "today"; // Biru jika hari ini
+    } else if (tasks.length === 1) {
         const prio = tasks[0].priority.toLowerCase();
-        pClass = prio === "high" ? "pri-high" : prio === "medium" ? "pri-medium" : "pri-low";
-    } else if (tasks.length > 1) {
-        pClass = "pri-mixed";
+        // Single Task Colors
+        if (prio === "low") pClass = "low"; // Abu
+        else if (prio === "medium") pClass = "medium"; // Orange
+        else if (prio === "high") pClass = "high"; // Merah
+    } else if (tasks.length === 2) {
+        pClass = "double"; // Merah Gelap
+    } else if (tasks.length >= 3) {
+        pClass = "triple"; // Ungu
     }
 
     const dayEl = document.createElement("div");
-    dayEl.className = `day-cell ${pClass} ${d === now.getDate() && m === now.getMonth() ? "cal-today" : ""}`;
+    dayEl.className = `day-cell ${pClass}`;
     dayEl.innerText = d;
     dayEl.onclick = () => tasks.length && showCalendarDetail(new Date(y, m, d).toDateString(), tasks);
     cont.appendChild(dayEl);
   }
 }
 
+// ... Sisanya (showCalendarDetail, simpanData, dsb) tetap sama ...
 function showCalendarDetail(dateStr, tasks) {
   const modal = document.getElementById("calendar-detail-modal");
   const title = document.getElementById("detail-date-title");
