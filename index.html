@@ -11,10 +11,7 @@
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#000000" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta
-      name="apple-mobile-web-app-status-bar-style"
-      content="black-translucent"
-    />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="IS2 HUB" />
     <link rel="apple-touch-icon" href="icon-192.png" />
 
@@ -144,40 +141,43 @@
       </main>
     </div>
 
-    <div id="calendar-detail-modal" class="modal-overlay hidden" onclick="closeCalendarDetail()">
-      <div class="modal-card fade-in p-8" onclick="event.stopPropagation()">
-        <h3 id="detail-date-title" class="text-[10px] font-black opacity-30 uppercase tracking-[0.3em] mb-6 text-center">
+    <div id="calendar-detail-modal" class="modal-overlay" onclick="closeCalendarDetail()">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <h3 id="detail-date-title" class="text-[10px] font-black opacity-30 uppercase tracking-[0.3em] mb-4 text-center">
           Date Details
         </h3>
-        <div id="calendar-task-list" class="space-y-4 max-h-[40vh] overflow-y-auto"></div>
-        <button onclick="closeCalendarDetail()" class="w-full mt-8 py-4 bg-white/5 rounded-2xl font-black uppercase text-[10px] tracking-widest">
-          Close
+        <div id="calendar-task-list" class="space-y-3 max-h-[50vh] overflow-y-auto"></div>
+        <button onclick="closeCalendarDetail()" class="modal-option-btn mt-4 opacity-50">
+          Dismiss
         </button>
       </div>
     </div>
 
-    <div id="universal-modal" class="modal-overlay hidden" onclick="closeUniversalModal()">
-      <div class="modal-card fade-in overflow-hidden border border-white/10" onclick="event.stopPropagation()">
-        <div class="h-20 bg-green-500/20 flex items-center justify-center text-2xl">✓</div>
-        <div class="p-8 text-center">
-          <h3 class="text-lg font-black mb-2 uppercase tracking-tighter">Synchronized</h3>
-          <button onclick="closeUniversalModal()" class="primary-btn py-4 mt-4">Dismiss</button>
+    <div id="custom-modal" class="modal-overlay" onclick="closeModal()">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <p class="text-[10px] font-black opacity-20 uppercase text-center mb-2 tracking-widest">Select Option</p>
+        <div id="modal-options" class="flex flex-col gap-3">
+          </div>
+      </div>
+    </div>
+
+    <div id="delete-modal" class="modal-overlay" onclick="closeDeleteModal()">
+      <div class="modal-content text-center" onclick="event.stopPropagation()">
+        <p class="text-[10px] font-black opacity-30 uppercase tracking-widest mb-2">Attention</p>
+        <h3 class="text-lg font-black uppercase mb-6 tracking-tight">Remove This Mission?</h3>
+        <div class="confirm-grid">
+          <button onclick="closeDeleteModal()" class="modal-option-btn">No</button>
+          <button onclick="confirmDelete()" class="modal-option-btn btn-danger">Yes</button>
         </div>
       </div>
     </div>
 
-    <div id="custom-modal" class="modal-overlay hidden" onclick="closeModal()">
-      <div class="modal-card fade-in p-6" onclick="event.stopPropagation()">
-        <div id="modal-options" class="flex flex-col gap-2"></div>
-      </div>
-    </div>
-
-    <div id="delete-modal" class="modal-overlay hidden" onclick="closeDeleteModal()">
-      <div class="modal-card fade-in p-10 text-center" onclick="event.stopPropagation()">
-        <h3 class="text-lg font-black mb-6 uppercase tracking-widest">Remove?</h3>
-        <div class="grid grid-cols-2 gap-3">
-          <button onclick="closeDeleteModal()" class="py-4 bg-white/5 rounded-xl text-[9px] font-black uppercase">No</button>
-          <button onclick="confirmDelete()" class="py-4 bg-red-600 text-white rounded-xl text-[9px] font-black uppercase">Yes</button>
+    <div id="universal-modal" class="modal-overlay" onclick="closeUniversalModal()">
+      <div class="modal-content p-0 overflow-hidden" onclick="event.stopPropagation()">
+        <div class="h-24 bg-green-500 flex items-center justify-center text-4xl text-white">✓</div>
+        <div class="p-8 text-center">
+          <h3 class="text-xl font-black mb-4 uppercase tracking-tighter">Synchronized</h3>
+          <button onclick="closeUniversalModal()" class="primary-btn">Dismiss</button>
         </div>
       </div>
     </div>
