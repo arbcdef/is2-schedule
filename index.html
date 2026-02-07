@@ -1,20 +1,14 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id" data-theme="dark">
-  <head>
+<head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>IS2 HUB | ULTIMATE SYNC</title>
 
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#000000" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta
-      name="apple-mobile-web-app-status-bar-style"
-      content="black-translucent"
-    />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="IS2 HUB" />
     <link rel="apple-touch-icon" href="icon-192.png" />
 
@@ -23,249 +17,137 @@
     <link rel="stylesheet" href="style.css" />
 
     <script>
-      if ("service-worker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker
-            .register("/sw.js")
-            .then((reg) => console.log("Service Worker Active"))
-            .catch((err) => console.error("SW Registration Failed", err));
-        });
-      }
+        if ("service-worker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker
+                    .register("/sw.js")
+                    .then((reg) => console.log("Service Worker Active"))
+                    .catch((err) => console.error("SW Registration Failed", err));
+            });
+        }
     </script>
-  </head>
-  <body class="antialiased">
+</head>
+<body class="antialiased">
     <header class="header-seamless">
-      <div
-        class="max-w-6xl mx-auto flex justify-between items-center px-6 md:px-10"
-      >
-        <div>
-          <p
-            id="clock"
-            class="text-[10px] font-mono opacity-30 tracking-widest uppercase"
-          >
-            00:00:00
-          </p>
-          <h1 class="text-xl font-black uppercase tracking-tighter">
-            Information System 2 HUB
-          </h1>
+        <div class="max-w-6xl mx-auto flex justify-between items-center px-6 md:px-10">
+            <div>
+                <p id="clock" class="text-[10px] font-mono opacity-30 tracking-widest uppercase">00:00:00</p>
+                <h1 class="text-xl font-black uppercase tracking-tighter">Information System 2 HUB</h1>
+            </div>
+            <div class="flex items-center gap-4">
+                <button onclick="toggleTheme()" class="w-9 h-9 flex items-center justify-center bg-white/5 rounded-full transition hover:bg-white/10">
+                    <span id="theme-icon">☀️</span>
+                </button>
+                <div class="px-4 py-2 bg-white/5 rounded-full flex items-center gap-2 border border-white/5">
+                    <div id="db-status-dot" class="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+                    <span id="db-status-text" class="text-[8px] font-black uppercase tracking-widest opacity-50">Active</span>
+                </div>
+            </div>
         </div>
-        <div class="flex items-center gap-4">
-          <button
-            onclick="toggleTheme()"
-            class="w-9 h-9 flex items-center justify-center bg-white/5 rounded-full transition hover:bg-white/10"
-          >
-            <span id="theme-icon">☀️</span>
-          </button>
-          <div
-            class="px-4 py-2 bg-white/5 rounded-full flex items-center gap-2 border border-white/5"
-          >
-            <div
-              id="db-status-dot"
-              class="w-1.5 h-1.5 rounded-full bg-red-500"
-            ></div>
-            <span
-              id="db-status-text"
-              class="text-[8px] font-black uppercase tracking-widest opacity-30"
-              >Connecting</span
-            >
-          </div>
-        </div>
-      </div>
     </header>
 
-    <div class="max-w-6xl mx-auto p-6 md:p-10 mt-6 relative z-10">
-      <div
-        id="next-deadline-area"
-        class="mb-10 min-h-[100px] relative z-20"
-      ></div>
+    <div class="max-w-6xl mx-auto p-6 md:p-10 relative z-10">
+        <div id="next-deadline-area" class="mb-10 min-h-[80px] relative z-20 pointer-events-none"></div>
 
-      <main class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        <div class="lg:col-span-5 lg:sticky lg:top-24">
-          <section class="glass-card p-8 border border-white/5">
-            <h2
-              class="text-[10px] font-black opacity-20 uppercase tracking-[0.3em] mb-6"
-            >
-              Mission Control
-            </h2>
-            <div class="space-y-4">
-              <div class="grid grid-cols-2 gap-3">
-                <button
-                  id="btn-kategori"
-                  onclick="openSelect('kategori')"
-                  class="select-btn"
-                >
-                  Assignment
-                </button>
-                <button
-                  id="btn-priority"
-                  onclick="openSelect('priority')"
-                  class="select-btn"
-                >
-                  Medium
-                </button>
-              </div>
-              <div class="grid grid-cols-2 gap-3 relative">
-                <input
-                  type="text"
-                  id="tglMulai"
-                  placeholder="Start Date"
-                  class="ios-input cursor-pointer"
-                  readonly
-                  onclick="toggleDatePicker(event, 'start')"
-                />
-                <input
-                  type="text"
-                  id="tglDeadline"
-                  placeholder="Deadline"
-                  class="ios-input cursor-pointer"
-                  readonly
-                  onclick="toggleDatePicker(event, 'end')"
-                />
-                <div
-                  id="custom-datepicker"
-                  class="hidden absolute left-0 right-0 top-full mt-2 glass-card z-[999] p-5 border border-white/10 shadow-2xl"
-                >
-                  <div class="flex justify-between items-center mb-4">
-                    <button
-                      onclick="
-                        event.stopPropagation();
-                        changeMonth(-1);
-                      "
-                      class="text-[9px] font-black opacity-30"
-                    >
-                      PREV
-                    </button>
-                    <span
-                      id="currentMonthYear"
-                      class="text-[9px] font-black uppercase tracking-widest"
-                    ></span>
-                    <button
-                      onclick="
-                        event.stopPropagation();
-                        changeMonth(1);
-                      "
-                      class="text-[9px] font-black opacity-30"
-                    >
-                      NEXT
-                    </button>
-                  </div>
-                  <div
-                    id="datepicker-days"
-                    class="grid grid-cols-7 gap-1 text-center text-[10px] font-bold"
-                  ></div>
-                </div>
-              </div>
-              <textarea
-                id="isiData"
-                placeholder="What's the mission?"
-                class="ios-input h-24 pt-4 resize-none"
-              ></textarea>
-              <input
-                type="url"
-                id="linkData"
-                placeholder="https://link-tugas.com"
-                class="ios-input"
-              />
-              <button onclick="simpanData()" class="primary-btn">
-                Update Hub
-              </button>
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            <div class="lg:col-span-5">
+                <section class="glass-card relative z-30">
+                    <h2 class="text-[10px] font-black opacity-20 uppercase tracking-[0.3em] mb-6">Mission Control</h2>
+                    
+                    <div class="mission-control-container">
+                        <div class="control-row">
+                            <div class="input-group">
+                                <span class="input-label">Category</span>
+                                <button id="btn-kategori" onclick="openSelect('kategori')" class="select-btn">Assignment</button>
+                            </div>
+                            <div class="input-group">
+                                <span class="input-label">Priority</span>
+                                <button id="btn-priority" onclick="openSelect('priority')" class="select-btn">Medium</button>
+                            </div>
+                        </div>
+
+                        <div class="control-row">
+                            <div class="input-group">
+                                <span class="input-label">Start Date</span>
+                                <input type="text" id="tglMulai" placeholder="YYYY-MM-DD" class="ios-input cursor-pointer" readonly onclick="toggleDatePicker(event, 'start')" />
+                            </div>
+                            <div class="input-group">
+                                <span class="input-label">Deadline</span>
+                                <input type="text" id="tglDeadline" placeholder="YYYY-MM-DD" class="ios-input cursor-pointer" readonly onclick="toggleDatePicker(event, 'end')" />
+                            </div>
+                            
+                            <div id="custom-datepicker" class="hidden absolute left-0 right-0 top-full mt-2 glass-card z-[999] p-5 border border-white/10 shadow-2xl">
+                                <div class="flex justify-between items-center mb-4">
+                                    <button onclick="event.stopPropagation(); changeMonth(-1)" class="text-[9px] font-black opacity-30">PREV</button>
+                                    <span id="currentMonthYear" class="text-[9px] font-black uppercase tracking-widest"></span>
+                                    <button onclick="event.stopPropagation(); changeMonth(1)" class="text-[9px] font-black opacity-30">NEXT</button>
+                                </div>
+                                <div id="datepicker-days" class="grid grid-cols-7 gap-1 text-center text-[10px] font-bold"></div>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <span class="input-label">Mission Details</span>
+                            <textarea id="isiData" placeholder="What's the mission?" class="ios-input h-24 pt-4 resize-none"></textarea>
+                        </div>
+
+                        <div class="input-group">
+                            <span class="input-label">Resource Link</span>
+                            <input type="url" id="linkData" placeholder="https://link-tugas.com" class="ios-input" />
+                        </div>
+
+                        <button onclick="simpanData()" class="primary-btn">Update Hub</button>
+                    </div>
+                </section>
             </div>
-          </section>
-        </div>
 
-        <div class="lg:col-span-7 space-y-6">
-          <div id="listData" class="space-y-3"></div>
-          <section class="glass-card p-6 border border-white/5">
-            <h2
-              class="text-center font-black uppercase mb-6 tracking-[0.4em] text-[10px] opacity-20"
-            >
-              Timeline View
-            </h2>
-            <div id="calendar-container" class="calendar-grid"></div>
-          </section>
-        </div>
-      </main>
+            <div class="lg:col-span-7 space-y-6">
+                <div id="listData" class="space-y-3"></div>
+                
+                <section class="glass-card">
+                    <h2 class="text-center font-black uppercase mb-6 tracking-[0.4em] text-[10px] opacity-20">Timeline View</h2>
+                    <div id="calendar-container" class="calendar-grid"></div>
+                </section>
+            </div>
+        </main>
     </div>
 
-    <div
-      id="calendar-detail-modal"
-      class="modal-overlay hidden"
-      onclick="closeCalendarDetail()"
-    >
-      <div class="modal-card fade-in p-8" onclick="event.stopPropagation()">
-        <h3
-          id="detail-date-title"
-          class="text-[10px] font-black opacity-30 uppercase tracking-[0.3em] mb-6 text-center"
-        >
-          Date Details
-        </h3>
-        <div
-          id="calendar-task-list"
-          class="space-y-4 max-h-[40vh] overflow-y-auto"
-        ></div>
-        <button
-          onclick="closeCalendarDetail()"
-          class="w-full mt-8 py-4 bg-white/5 rounded-2xl font-black uppercase text-[10px] tracking-widest"
-        >
-          Close
-        </button>
-      </div>
+    <div id="calendar-detail-modal" class="modal-overlay" onclick="closeCalendarDetail()">
+        <div class="modal-card p-8" onclick="event.stopPropagation()">
+            <h3 id="detail-date-title" class="text-[10px] font-black opacity-30 uppercase tracking-[0.3em] mb-6 text-center">Date Details</h3>
+            <div id="calendar-task-list" class="space-y-4 max-h-[40vh] overflow-y-auto"></div>
+            <button onclick="closeCalendarDetail()" class="w-full mt-8 py-4 bg-white/5 rounded-2xl font-black uppercase text-[10px] tracking-widest">Close</button>
+        </div>
     </div>
 
-    <div
-      id="universal-modal"
-      class="modal-overlay hidden"
-      onclick="closeUniversalModal()"
-    >
-      <div
-        class="modal-card fade-in overflow-hidden border border-white/10"
-        onclick="event.stopPropagation()"
-      >
-        <div class="h-20 bg-white/5 flex items-center justify-center text-2xl">
-          ✓
+    <div id="custom-modal" class="modal-overlay" onclick="closeModal()">
+        <div class="modal-card p-6" onclick="event.stopPropagation()">
+            <p class="text-[10px] font-black opacity-30 uppercase tracking-widest mb-4 text-center">Select Option</p>
+            <div id="modal-options" class="flex flex-col gap-3"></div>
+            <button onclick="closeModal()" class="mt-4 opacity-20 text-[9px] font-bold uppercase tracking-widest text-center w-full">Cancel</button>
         </div>
-        <div class="p-8 text-center">
-          <h3 class="text-lg font-black mb-2">Synchronized</h3>
-          <button onclick="closeUniversalModal()" class="primary-btn py-4">
-            Dismiss
-          </button>
-        </div>
-      </div>
     </div>
 
-    <div id="custom-modal" class="modal-overlay hidden" onclick="closeModal()">
-      <div class="modal-card fade-in p-6" onclick="event.stopPropagation()">
-        <div id="modal-options" class="flex flex-col gap-2"></div>
-      </div>
+    <div id="delete-modal" class="modal-overlay" onclick="closeDeleteModal()">
+        <div class="modal-card p-10 text-center" onclick="event.stopPropagation()">
+            <h3 class="text-lg font-black mb-6">Remove Mission?</h3>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="closeDeleteModal()" class="py-4 bg-white/5 rounded-xl text-[9px] font-black uppercase">No</button>
+                <button onclick="confirmDelete()" class="py-4 bg-red-600 text-white rounded-xl text-[9px] font-black uppercase">Yes</button>
+            </div>
+        </div>
     </div>
 
-    <div
-      id="delete-modal"
-      class="modal-overlay hidden"
-      onclick="closeDeleteModal()"
-    >
-      <div
-        class="modal-card fade-in p-10 text-center"
-        onclick="event.stopPropagation()"
-      >
-        <h3 class="text-lg font-black mb-6">Remove?</h3>
-        <div class="grid grid-cols-2 gap-3">
-          <button
-            onclick="closeDeleteModal()"
-            class="py-4 bg-white/5 rounded-xl text-[9px] font-black uppercase"
-          >
-            No
-          </button>
-          <button
-            onclick="confirmDelete()"
-            class="py-4 bg-red-600 text-white rounded-xl text-[9px] font-black uppercase"
-          >
-            Yes
-          </button>
+    <div id="universal-modal" class="modal-overlay" onclick="closeUniversalModal()">
+        <div class="modal-card overflow-hidden border border-white/10 p-0" onclick="event.stopPropagation()">
+            <div class="h-20 bg-white/5 flex items-center justify-center text-2xl">✓</div>
+            <div class="p-8 text-center">
+                <h3 class="text-lg font-black mb-2">Synchronized</h3>
+                <button onclick="closeUniversalModal()" class="primary-btn py-4">Dismiss</button>
+            </div>
         </div>
-      </div>
     </div>
 
     <script src="script.js"></script>
-  </body>
+</body>
 </html>
