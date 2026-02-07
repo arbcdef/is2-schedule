@@ -7,16 +7,18 @@
     --border: rgba(255, 255, 255, 0.08);
     --input: rgba(255, 255, 255, 0.05);
     --accent: #ffffff;
+    --shadow: rgba(0, 0, 0, 0.6); /* Bayangan pekat untuk dark mode */
 }
 
 :root[data-theme="light"] {
-    --bg-top: #f5f5f7;
+    --bg-top: #f2f2f7; /* Abu-abu iOS sangat muda agar kartu putih menonjol */
     --bg-bottom: #ffffff;
-    --card: rgba(255, 255, 255, 0.8);
+    --card: rgba(255, 255, 255, 0.85);
     --text: #000000;
-    --border: rgba(0, 0, 0, 0.08);
-    --input: rgba(0, 0, 0, 0.04);
+    --border: rgba(0, 0, 0, 0.1); /* Border lebih tegas untuk light mode */
+    --input: rgba(0, 0, 0, 0.05);
     --accent: #000000;
+    --shadow: rgba(0, 0, 0, 0.08); /* Bayangan halus tapi lebar untuk light mode */
 }
 
 * {
@@ -29,18 +31,18 @@ body {
     padding: 0;
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    /* FIX: Gradasi mulus ke atas */
+    /* Gradasi mulus ke atas */
     background: linear-gradient(to bottom, var(--bg-top) 0%, var(--bg-bottom) 30%, var(--bg-bottom) 100%) no-repeat;
     background-attachment: fixed;
     min-height: 100vh;
+    transition: background 0.4s ease; /* Transisi halus saat ganti tema */
 }
 
-/* --- HEADER FIX --- */
+/* --- HEADER --- */
 .header-seamless {
     position: sticky;
     top: 0;
     z-index: 100;
-    /* Menghilangkan background agar gradasi body tembus ke atas */
     background: transparent;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -48,9 +50,9 @@ body {
     padding-bottom: 1.5rem;
 }
 
-/* --- UPCOMING MISSION (DYNAMIC ISLAND) FIX --- */
+/* --- UPCOMING MISSION (DYNAMIC ISLAND) --- */
 #next-deadline-area {
-    pointer-events: none; /* Agar tidak memblokir klik input dibawahnya */
+    pointer-events: none;
 }
 
 .dynamic-island {
@@ -63,25 +65,29 @@ body {
     justify-content: space-between;
     align-items: center;
     gap: 15px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    /* Bayangan lebih dramatis agar terlihat melayang */
+    box-shadow: 0 20px 40px var(--shadow);
 }
 
 .dynamic-island h2 {
-    /* FIX: Tulisan tidak terpotong */
     font-size: clamp(1rem, 5vw, 1.4rem) !important;
     font-weight: 900;
     line-height: 1.1;
     white-space: normal; 
     word-break: break-word;
     display: block;
+    margin: 0;
 }
 
-/* --- MISSION CONTROL & INPUTS --- */
+/* --- MISSION CONTROL & CARDS --- */
 .glass-card {
     background: var(--card);
     backdrop-filter: blur(30px);
     -webkit-backdrop-filter: blur(30px);
     border-radius: 32px;
+    border: 1px solid var(--border); /* Memberi tepian agar tidak hilang di light mode */
+    box-shadow: 0 10px 30px var(--shadow); /* Memberi efek kedalaman */
+    padding: 1.5rem;
 }
 
 .ios-input {
@@ -96,9 +102,10 @@ body {
     transition: all 0.3s ease;
 }
 
+/* Hover & Focus state diperbaiki untuk Light/Dark */
 .ios-input:focus {
-    border-color: rgba(255,255,255,0.2);
-    background: rgba(255,255,255,0.08);
+    border-color: var(--accent);
+    background: var(--card);
 }
 
 .select-btn {
@@ -112,6 +119,7 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--text);
+    cursor: pointer;
 }
 
 .primary-btn {
@@ -124,12 +132,18 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.2em;
     font-size: 11px;
-    transition: transform 0.2s;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 10px 20px var(--shadow);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.primary-btn:active { transform: scale(0.97); }
+.primary-btn:active { 
+    transform: scale(0.96);
+    opacity: 0.9;
+}
 
-/* --- CALENDAR COLOR FIX --- */
+/* --- CALENDAR --- */
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -148,20 +162,24 @@ body {
     color: var(--text);
     cursor: pointer;
     transition: all 0.2s;
+    border: 1px solid var(--border); /* Struktur kotak lebih jelas */
 }
 
-/* Penanda Warna Tugas (Penting) */
-.day-cell.pri-high { background: #ff3b30 !important; color: #fff !important; }
-.day-cell.pri-medium { background: #ff9500 !important; color: #fff !important; }
-.day-cell.pri-low { background: #34c759 !important; color: #fff !important; }
-.day-cell.cal-today { border: 2px solid var(--text); font-weight: 900; }
+.day-cell.pri-high { background: #ff3b30 !important; color: #fff !important; border: none; }
+.day-cell.pri-medium { background: #ff9500 !important; color: #fff !important; border: none; }
+.day-cell.pri-low { background: #34c759 !important; color: #fff !important; border: none; }
+.day-cell.cal-today { 
+    border: 2px solid var(--text); 
+    box-shadow: 0 0 10px var(--shadow);
+}
 
 /* --- MODALS --- */
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.85);
+    background: rgba(0,0,0,0.6); /* Lebih transparan sedikit agar blur terlihat */
     backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     z-index: 1000;
     display: flex;
     align-items: center;
@@ -174,16 +192,17 @@ body {
     max-width: 400px;
     border-radius: 35px;
     border: 1px solid var(--border);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.3);
 }
 
 /* --- ANIMATIONS --- */
 .fade-in {
-    animation: fadeIn 0.4s ease-out;
+    animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: translateY(12px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .hidden { display: none !important; }
