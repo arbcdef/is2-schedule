@@ -27,7 +27,7 @@ async function muatData() {
       statusDot.className = "w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e]";
     }
     if (statusText) {
-      statusText.innerText = "Active"; // Fixed: Hanya "Active"
+      statusText.innerText = "Active"; 
       statusText.style.color = ""; 
       statusText.style.opacity = "0.5";
     }
@@ -94,7 +94,6 @@ function renderFeed() {
     ? allTasks
         .map((t) => {
           const hasLink = t.task_link && t.task_link.startsWith("http");
-          // Checkbox dihilangkan, teks digeser dengan padding CSS
           return `<div class="mission-item ${t.is_done ? "opacity-30" : ""}" style="border-left: 5px solid ${t.priority === "High" ? "#ff3b30" : t.priority === "Medium" ? "#ff9500" : "#8e8e93"}">
             <div class="flex-1 truncate cursor-pointer" onclick="toggleDone(${t.id}, ${t.is_done})">
                 <p class="text-[7px] font-black opacity-30 uppercase">${t.category} • ${t.tgl_deadline}</p>
@@ -121,6 +120,7 @@ function renderCalendar() {
   const first = new Date(y, m, 1).getDay();
   const days = new Date(y, m + 1, 0).getDate();
   
+  // Padding hari kosong
   for (let i = 0; i < (first === 0 ? 6 : first - 1); i++) cont.innerHTML += "<div></div>";
   
   for (let d = 1; d <= days; d++) {
@@ -134,14 +134,14 @@ function renderCalendar() {
     let pClass = "";
     const isToday = d === now.getDate() && m === now.getMonth() && y === now.getFullYear();
 
+    // LOGIKA PEWARNAAN SESUAI REQUEST
     if (isToday) {
-        pClass = "today"; // Biru jika hari ini
+        pClass = "today"; // Biru
     } else if (tasks.length === 1) {
         const prio = tasks[0].priority.toLowerCase();
-        // Single Task Colors
-        if (prio === "low") pClass = "low"; // Abu
+        if (prio === "low") pClass = "low";      // Abu
         else if (prio === "medium") pClass = "medium"; // Orange
-        else if (prio === "high") pClass = "high"; // Merah
+        else if (prio === "high") pClass = "high";     // Merah
     } else if (tasks.length === 2) {
         pClass = "double"; // Merah Gelap
     } else if (tasks.length >= 3) {
@@ -156,7 +156,7 @@ function renderCalendar() {
   }
 }
 
-// ... Sisanya (showCalendarDetail, simpanData, dsb) tetap sama ...
+// FIX: MODAL POP-UP TENGAH
 function showCalendarDetail(dateStr, tasks) {
   const modal = document.getElementById("calendar-detail-modal");
   const title = document.getElementById("detail-date-title");
@@ -174,13 +174,18 @@ function showCalendarDetail(dateStr, tasks) {
             </div><p class="text-xs font-bold">${t.content}</p></div>`;
     })
     .join("");
+  
+  modal.classList.add("active"); // Munculkan dengan class active untuk pop-up tengah
   modal.classList.remove("hidden");
 }
 
 function closeCalendarDetail() {
-  document.getElementById("calendar-detail-modal").classList.add("hidden");
+  const modal = document.getElementById("calendar-detail-modal");
+  modal.classList.remove("active");
+  setTimeout(() => modal.classList.add("hidden"), 200);
 }
 
+// ... FUNGSI LAINNYA ...
 async function simpanData() {
   const isi = document.getElementById("isiData").value,
     t1 = document.getElementById("tglMulai").value,
@@ -297,9 +302,10 @@ async function toggleDone(id, s) {
 
 function toggleTheme() {
   const h = document.documentElement,
-    n = h.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    curr = h.getAttribute("data-theme"),
+    n = curr === "dark" ? "light" : "dark";
   h.setAttribute("data-theme", n);
-  const icon = document.getElementById("theme-icon") || document.querySelector("button[onclick='toggleTheme()']");
+  const icon = document.querySelector("button[onclick='toggleTheme()']");
   if (icon) icon.innerText = n === "dark" ? "☀️" : "🌙";
 }
 
