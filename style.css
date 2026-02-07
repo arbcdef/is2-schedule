@@ -24,14 +24,14 @@
 * {
   -webkit-tap-highlight-color: transparent;
   box-sizing: border-box;
+  /* Set global font ke Helvetica */
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 body {
   margin: 0;
   padding: 0;
   color: var(--text);
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: linear-gradient(
       to bottom,
       var(--bg-top) 0%,
@@ -60,7 +60,7 @@ body {
 .dynamic-island {
   background: var(--accent) !important;
   color: var(--bg-bottom) !important;
-  border-radius: 28px;
+  border-radius: 20px;
   padding: 1.2rem 1.8rem !important;
   display: flex;
   justify-content: space-between;
@@ -72,10 +72,26 @@ body {
   background: var(--card);
   backdrop-filter: blur(30px);
   -webkit-backdrop-filter: blur(30px);
-  border-radius: 32px;
+  border-radius: 20px;
   border: 1px solid var(--border);
   box-shadow: 0 10px 30px var(--shadow);
-  padding: 1.5rem;
+  padding: 1.5rem 2rem;
+}
+
+/* Judul Tugas: Lebih besar, Helvetica Bold, Jarak dari kiri aman */
+.task-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-top: 2px;
+}
+
+.task-meta {
+  font-size: 10px;
+  font-weight: 600;
+  opacity: 0.5;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .ios-input {
@@ -83,10 +99,11 @@ body {
   background: var(--input);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 16px;
+  padding: 18px;
   color: var(--text);
-  font-size: 15px;
+  font-size: 16px;
   outline: none;
+  font-family: inherit;
 }
 
 .select-btn {
@@ -94,11 +111,12 @@ body {
   background: var(--input);
   border: 1px solid var(--border);
   padding: 14px;
-  border-radius: 14px;
-  font-size: 10px;
-  font-weight: 900;
+  border-radius: 16px;
+  font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
   color: var(--text);
+  font-family: inherit;
 }
 
 .primary-btn {
@@ -106,19 +124,20 @@ body {
   background: var(--text);
   color: var(--bg-bottom);
   padding: 20px;
-  border-radius: 20px;
-  font-weight: 900;
+  border-radius: 18px;
+  font-weight: 700;
   text-transform: uppercase;
   border: none;
   cursor: pointer;
   transition: transform 0.2s;
+  font-family: inherit;
 }
 
 .primary-btn:active {
   transform: scale(0.96);
 }
 
-/* --- CALENDAR LOGIC COLORS --- */
+/* --- CALENDAR --- */
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -130,9 +149,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
-  font-weight: 800;
-  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 10px;
   background: var(--input);
   color: var(--text);
   cursor: pointer;
@@ -156,8 +175,6 @@ body {
   color: #fff !important;
   border: none;
 }
-
-/* Special Condition Colors */
 .day-cell.task-today {
   background: #007aff !important;
   color: #fff !important;
@@ -195,7 +212,7 @@ body {
   background: var(--card);
   width: 90%;
   max-width: 400px;
-  border-radius: 35px;
+  border-radius: 20px;
   border: 1px solid var(--border);
 }
 
