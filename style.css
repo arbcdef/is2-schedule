@@ -4,19 +4,19 @@
   --bg-bottom: #000000;
   --card: rgba(20, 20, 20, 0.7);
   --text: #ffffff;
-  --border: rgba(255, 255, 255, 0.08);
-  --input: rgba(255, 255, 255, 0.05);
+  --border: rgba(255, 255, 255, 0.12); /* Dipertegas agar box terlihat */
+  --input: rgba(40, 40, 40, 0.8);      /* Dibuat lebih solid */
   --accent: #ffffff;
   --shadow: rgba(0, 0, 0, 0.6);
   
   /* Status Colors */
-  --c-high: #ff3b30;       /* Merah */
-  --c-medium: #ff9500;     /* Orange */
-  --c-low: #8e8e93;        /* Abu-abu */
-  --c-today-empty: #007aff; /* Biru */
-  --c-today-task: #ffffff;  /* Putih */
-  --c-double: #8b0000;      /* Merah Gelap */
-  --c-triple: #5856d6;      /* Ungu */
+  --c-high: #ff3b30;
+  --c-medium: #ff9500;
+  --c-low: #8e8e93;
+  --c-today-empty: #007aff;
+  --c-today-task: #ffffff;
+  --c-double: #8b0000;
+  --c-triple: #5856d6;
 }
 
 :root[data-theme="light"] {
@@ -81,40 +81,49 @@ body {
   padding: 1.5rem;
 }
 
+/* Perbaikan visual utama untuk semua Box Input */
 .ios-input {
   width: 100%;
-  background: var(--input);
-  border: 1px solid var(--border);
+  background: var(--input) !important; /* Memaksa background agar box muncul */
+  border: 1px solid var(--border) !important;
   border-radius: 16px;
-  padding: 16px;
+  padding: 18px; /* Sedikit lebih lebar agar premium */
   color: var(--text);
   font-size: 15px;
+  font-weight: 500;
   outline: none;
   transition: all 0.3s ease;
   appearance: none;
   -webkit-appearance: none;
-  position: relative;
-  z-index: 1;
-  text-align: left; /* Memastikan teks di tombol rata kiri */
-}
-
-/* FIX: Box untuk Assignment & Priority Button */
-button.ios-input {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+}
+
+/* FIX KHUSUS: Box untuk Tombol Seleksi (Assignment & Priority) */
+button.ios-input {
   cursor: pointer;
+  justify-content: space-between;
+  text-align: left;
+  min-height: 56px;
+}
+
+/* Memberi indikator panah kecil agar terlihat seperti Dropdown */
+button.ios-input::after {
+  content: "▼";
+  font-size: 9px;
+  opacity: 0.3;
 }
 
 button.ios-input:active {
-  transform: scale(0.98);
-  background: rgba(255, 255, 255, 0.1);
+  transform: scale(0.97);
+  background: rgba(255, 255, 255, 0.15) !important;
 }
 
-/* CRITICAL FIX: Membuat Area Klik Tanggal Sangat Responsif */
+/* FIX: Input Tanggal agar simetris dengan Button */
 input[type="date"].ios-input {
   cursor: pointer;
-  min-height: 54px;
+  min-height: 56px;
+  position: relative;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
@@ -126,12 +135,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   z-index: 10;
 }
 
+/* --- BUTTON UTAMA --- */
 .primary-btn {
   width: 100%;
   background: var(--text);
   color: var(--bg-bottom);
-  padding: 20px;
-  border-radius: 20px;
+  padding: 22px;
+  border-radius: 22px;
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.2em; font-size: 11px;
@@ -140,7 +150,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* --- CALENDAR SKEMA WARNA BARU --- */
+/* --- CALENDAR SKEMA WARNA --- */
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -158,64 +168,19 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   border: 1px solid var(--border);
 }
 
-/* 1. Hari Ini Kosong (Biru) */
-.day-cell.cal-today-empty {
-  background: var(--c-today-empty) !important;
-  color: #ffffff !important;
-  border: none !important;
-  box-shadow: 0 0 15px rgba(0, 122, 255, 0.5);
-}
+/* Warna Status Kalender */
+.day-cell.cal-today-empty { background: var(--c-today-empty) !important; color: #fff !important; border: none; }
+.day-cell.cal-today-task { background: var(--c-today-task) !important; color: #000 !important; border: none; }
+.day-cell.pri-low { background: var(--c-low) !important; color: #fff !important; border: none; }
+.day-cell.pri-medium { background: var(--c-medium) !important; color: #fff !important; border: none; }
+.day-cell.pri-high { background: var(--c-high) !important; color: #fff !important; border: none; }
+.day-cell.pri-double { background: var(--c-double) !important; color: #fff !important; border: none; }
+.day-cell.pri-triple { background: var(--c-triple) !important; color: #fff !important; border: none; }
 
-/* 2. Hari Ini Ada Tugas (Putih) */
-.day-cell.cal-today-task {
-  background: var(--c-today-task) !important;
-  color: #000000 !important;
-  border: none !important;
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.7);
-}
-
-/* 3. Satu Tugas - Low (Abu) */
-.day-cell.pri-low {
-  background: var(--c-low) !important;
-  color: #fff !important;
-  border: none;
-}
-
-/* 4. Satu Tugas - Medium (Orange) */
-.day-cell.pri-medium {
-  background: var(--c-medium) !important;
-  color: #fff !important;
-  border: none;
-  box-shadow: 0 4px 12px rgba(255, 149, 0, 0.3);
-}
-
-/* 5. Satu Tugas - High (Merah) */
-.day-cell.pri-high {
-  background: var(--c-high) !important;
-  color: #fff !important;
-  border: none;
-  box-shadow: 0 4px 12px rgba(255, 59, 48, 0.3);
-}
-
-/* 6. Dua Tugas (Merah Gelap) */
-.day-cell.pri-double {
-  background: var(--c-double) !important;
-  color: #fff !important;
-  border: none;
-}
-
-/* 7. Tiga Tugas atau Lebih (Ungu) */
-.day-cell.pri-triple {
-  background: var(--c-triple) !important;
-  color: #fff !important;
-  border: none;
-  box-shadow: 0 4px 12px rgba(88, 86, 214, 0.3);
-}
-
-/* --- MODALS & ANIMATIONS --- */
+/* MODALS */
 .modal-overlay {
   position: fixed; inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
   z-index: 1000; display: flex; align-items: center; justify-content: center;
 }
@@ -224,13 +189,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   background: var(--card);
   width: 90%; max-width: 400px;
   border-radius: 35px; border: 1px solid var(--border);
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
-}
-
-.fade-in { animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(12px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
 }
 
 .hidden { display: none !important; }
