@@ -91,14 +91,14 @@
               <div class="grid grid-cols-2 gap-3">
                 <button
                   id="btn-kategori"
-                  onclick="openSelect('kategori')"
+                  onclick="openSelect(event, 'kategori')"
                   class="select-btn"
                 >
                   Assignment
                 </button>
                 <button
                   id="btn-priority"
-                  onclick="openSelect('priority')"
+                  onclick="openSelect(event, 'priority')"
                   class="select-btn"
                 >
                   Medium
@@ -212,29 +212,14 @@
       </div>
     </div>
 
-    <div
-      id="universal-modal"
-      class="modal-overlay hidden"
-      onclick="closeUniversalModal()"
-    >
-      <div
-        class="modal-card fade-in overflow-hidden border border-white/10"
-        onclick="event.stopPropagation()"
-      >
-        <div class="h-20 bg-white/5 flex items-center justify-center text-2xl">
-          ✓
-        </div>
-        <div class="p-8 text-center">
-          <h3 class="text-lg font-black mb-2">Synchronized</h3>
-          <button onclick="closeUniversalModal()" class="primary-btn py-4">
-            Dismiss
-          </button>
-        </div>
-      </div>
-    </div>
-
     <div id="custom-modal" class="modal-overlay hidden" onclick="closeModal()">
       <div class="modal-card fade-in p-6" onclick="event.stopPropagation()">
+        <h3
+          id="modal-title"
+          class="text-[10px] font-black opacity-30 uppercase tracking-[0.3em] mb-4 text-center"
+        >
+          Select Option
+        </h3>
         <div id="modal-options" class="flex flex-col gap-2"></div>
       </div>
     </div>
