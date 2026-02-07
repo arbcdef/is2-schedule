@@ -7,23 +7,34 @@
   --border: rgba(255, 255, 255, 0.08);
   --input: rgba(255, 255, 255, 0.05);
   --accent: #ffffff;
-  --shadow: rgba(0, 0, 0, 0.6); /* Bayangan pekat untuk dark mode */
+  --shadow: rgba(0, 0, 0, 0.6);
+  
+  /* Status Colors Dark */
+  --c-today: #007aff;
+  --c-low: #8e8e93;
+  --c-medium: #ff9500;
+  --c-high: #ff3b30;
+  --c-double: #8b0000;
+  --c-triple: #5856d6;
 }
 
 :root[data-theme="light"] {
-  --bg-top: #f2f2f7; /* Abu-abu iOS sangat muda agar kartu putih menonjol */
+  --bg-top: #f2f2f7;
   --bg-bottom: #ffffff;
   --card: rgba(255, 255, 255, 0.85);
   --text: #000000;
-  --border: rgba(0, 0, 0, 0.1); /* Border lebih tegas untuk light mode */
+  --border: rgba(0, 0, 0, 0.1);
   --input: rgba(0, 0, 0, 0.05);
   --accent: #000000;
-  --shadow: rgba(
-    0,
-    0,
-    0,
-    0.08
-  ); /* Bayangan halus tapi lebar untuk light mode */
+  --shadow: rgba(0, 0, 0, 0.08);
+
+  /* Status Colors Light */
+  --c-today: #007aff;
+  --c-low: #a2a2a7;
+  --c-medium: #ff9500;
+  --c-high: #ff3b30;
+  --c-double: #8b0000;
+  --c-triple: #5856d6;
 }
 
 * {
@@ -32,130 +43,56 @@
 }
 
 body {
-  margin: 0;
-  padding: 0;
+  margin: 0; padding: 0;
   color: var(--text);
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  /* Gradasi mulus ke atas */
-  background: linear-gradient(
-      to bottom,
-      var(--bg-top) 0%,
-      var(--bg-bottom) 30%,
-      var(--bg-bottom) 100%
-    )
-    no-repeat;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(to bottom, var(--bg-top) 0%, var(--bg-bottom) 30%, var(--bg-bottom) 100%) no-repeat;
   background-attachment: fixed;
   min-height: 100vh;
-  transition: background 0.4s ease; /* Transisi halus saat ganti tema */
+  transition: background 0.4s ease;
 }
 
-/* --- HEADER --- */
+/* --- HEADER & DYNAMIC ISLAND --- */
 .header-seamless {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: transparent;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  position: sticky; top: 0; z-index: 100;
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
   padding-top: calc(env(safe-area-inset-top) + 1.5rem);
   padding-bottom: 1.5rem;
 }
 
-/* --- UPCOMING MISSION (DYNAMIC ISLAND) --- */
-#next-deadline-area {
-  pointer-events: none;
-}
-
 .dynamic-island {
-  pointer-events: auto;
   background: var(--accent) !important;
   color: var(--bg-bottom) !important;
   border-radius: 28px;
   padding: 1.2rem 1.8rem !important;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 15px;
-  /* Bayangan lebih dramatis agar terlihat melayang */
+  display: flex; justify-content: space-between; align-items: center;
   box-shadow: 0 20px 40px var(--shadow);
 }
 
-.dynamic-island h2 {
-  font-size: clamp(1rem, 5vw, 1.4rem) !important;
-  font-weight: 900;
-  line-height: 1.1;
-  white-space: normal;
-  word-break: break-word;
-  display: block;
-  margin: 0;
-}
-
-/* --- MISSION CONTROL & CARDS --- */
+/* --- CARDS & INPUTS --- */
 .glass-card {
   background: var(--card);
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
+  backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
   border-radius: 32px;
-  border: 1px solid var(--border); /* Memberi tepian agar tidak hilang di light mode */
-  box-shadow: 0 10px 30px var(--shadow); /* Memberi efek kedalaman */
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 30px var(--shadow);
   padding: 1.5rem;
 }
 
 .ios-input {
-  width: 100%;
-  background: var(--input);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 16px;
-  color: var(--text);
-  font-size: 15px;
-  outline: none;
-  transition: all 0.3s ease;
-}
-
-/* Hover & Focus state diperbaiki untuk Light/Dark */
-.ios-input:focus {
-  border-color: var(--accent);
-  background: var(--card);
-}
-
-.select-btn {
-  width: 100%;
-  background: var(--input);
-  border: 1px solid var(--border);
-  padding: 14px;
-  border-radius: 14px;
-  font-size: 10px;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--text);
-  cursor: pointer;
+  width: 100%; background: var(--input);
+  border: 1px solid var(--border); border-radius: 16px;
+  padding: 16px; color: var(--text); outline: none;
 }
 
 .primary-btn {
-  width: 100%;
-  background: var(--text);
-  color: var(--bg-bottom);
-  padding: 20px;
-  border-radius: 20px;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  font-size: 11px;
-  border: none;
-  cursor: pointer;
+  width: 100%; background: var(--text); color: var(--bg-bottom);
+  padding: 20px; border-radius: 20px; font-weight: 900;
+  text-transform: uppercase; border: none; cursor: pointer;
   box-shadow: 0 10px 20px var(--shadow);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.primary-btn:active {
-  transform: scale(0.96);
-  opacity: 0.9;
-}
-
-/* --- CALENDAR --- */
+/* --- CALENDAR LOGIC (SINKRON DENGAN JS) --- */
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -164,82 +101,89 @@ body {
 
 .day-cell {
   aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 800;
-  border-radius: 12px;
-  background: var(--input);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800; border-radius: 12px;
+  background: var(--input); /* Default jika tidak ada tugas */
   color: var(--text);
   cursor: pointer;
-  transition: all 0.2s;
-  border: 1px solid var(--border); /* Struktur kotak lebih jelas */
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--border);
 }
 
-.day-cell.pri-high {
-  background: #ff3b30 !important;
+/* Hari Ini (Biru) */
+.day-cell.today {
+  background: var(--c-today) !important;
+  color: #fff !important;
+  box-shadow: 0 0 15px rgba(0, 122, 255, 0.5);
+  border: none;
+  z-index: 2;
+}
+
+/* Low Priority (Abu) */
+.day-cell.low {
+  background: var(--c-low) !important;
   color: #fff !important;
   border: none;
 }
-.day-cell.pri-medium {
-  background: #ff9500 !important;
+
+/* Medium Priority (Orange) */
+.day-cell.medium {
+  background: var(--c-medium) !important;
   color: #fff !important;
   border: none;
 }
-.day-cell.pri-low {
-  background: #34c759 !important;
+
+/* High Priority (Merah) */
+.day-cell.high {
+  background: var(--c-high) !important;
   color: #fff !important;
   border: none;
 }
-.day-cell.cal-today {
-  border: 2px solid var(--text);
-  box-shadow: 0 0 10px var(--shadow);
+
+/* Double Mission (Merah Gelap) */
+.day-cell.double {
+  background: var(--c-double) !important;
+  color: #fff !important;
+  border: none;
+}
+
+/* Triple Mission (Ungu) */
+.day-cell.triple {
+  background: var(--c-triple) !important;
+  color: #fff !important;
+  border: none;
 }
 
 /* --- MODALS --- */
 .modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(
-    0,
-    0,
-    0,
-    0.6
-  ); /* Lebih transparan sedikit agar blur terlihat */
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+  z-index: 1000; display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1; pointer-events: auto;
 }
 
 .modal-card {
   background: var(--card);
-  width: 90%;
-  max-width: 400px;
-  border-radius: 35px;
-  border: 1px solid var(--border);
+  width: 90%; max-width: 400px;
+  border-radius: 35px; border: 1px solid var(--border);
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+  transform: translateY(20px); transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .modal-card {
+  transform: translateY(0);
 }
 
 /* --- ANIMATIONS --- */
-.fade-in {
-  animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
+.fade-in { animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(12px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.hidden {
-  display: none !important;
-}
+.hidden { display: none !important; }
