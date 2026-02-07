@@ -7,18 +7,18 @@
     --border: rgba(255, 255, 255, 0.08);
     --input: rgba(255, 255, 255, 0.05);
     --accent: #ffffff;
-    --shadow: rgba(0, 0, 0, 0.6); /* Bayangan pekat untuk dark mode */
+    --shadow: rgba(0, 0, 0, 0.6);
 }
 
 :root[data-theme="light"] {
-    --bg-top: #f2f2f7; /* Abu-abu iOS sangat muda agar kartu putih menonjol */
+    --bg-top: #f2f2f7; 
     --bg-bottom: #ffffff;
     --card: rgba(255, 255, 255, 0.85);
     --text: #000000;
-    --border: rgba(0, 0, 0, 0.1); /* Border lebih tegas untuk light mode */
+    --border: rgba(0, 0, 0, 0.1); 
     --input: rgba(0, 0, 0, 0.05);
     --accent: #000000;
-    --shadow: rgba(0, 0, 0, 0.08); /* Bayangan halus tapi lebar untuk light mode */
+    --shadow: rgba(0, 0, 0, 0.12); /* Shadow sedikit lebih gelap agar terlihat di light mode */
 }
 
 * {
@@ -31,11 +31,10 @@ body {
     padding: 0;
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    /* Gradasi mulus ke atas */
     background: linear-gradient(to bottom, var(--bg-top) 0%, var(--bg-bottom) 30%, var(--bg-bottom) 100%) no-repeat;
     background-attachment: fixed;
     min-height: 100vh;
-    transition: background 0.4s ease; /* Transisi halus saat ganti tema */
+    transition: background 0.4s ease;
 }
 
 /* --- HEADER --- */
@@ -65,7 +64,6 @@ body {
     justify-content: space-between;
     align-items: center;
     gap: 15px;
-    /* Bayangan lebih dramatis agar terlihat melayang */
     box-shadow: 0 20px 40px var(--shadow);
 }
 
@@ -85,8 +83,8 @@ body {
     backdrop-filter: blur(30px);
     -webkit-backdrop-filter: blur(30px);
     border-radius: 32px;
-    border: 1px solid var(--border); /* Memberi tepian agar tidak hilang di light mode */
-    box-shadow: 0 10px 30px var(--shadow); /* Memberi efek kedalaman */
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 30px var(--shadow);
     padding: 1.5rem;
 }
 
@@ -102,7 +100,6 @@ body {
     transition: all 0.3s ease;
 }
 
-/* Hover & Focus state diperbaiki untuk Light/Dark */
 .ios-input:focus {
     border-color: var(--accent);
     background: var(--card);
@@ -143,6 +140,57 @@ body {
     opacity: 0.9;
 }
 
+/* --- MISSION ITEM LIST (FIXED LEFT PADDING) --- */
+.mission-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* Memberikan ruang kiri lebih luas (2rem) agar teks tidak menempel ke pinggir */
+    padding: 1.4rem 2rem !important; 
+    background: var(--card);
+    border-radius: 24px;
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 25px var(--shadow);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.mission-item:active {
+    transform: scale(0.98);
+}
+
+/* Memberikan garis indikator di sisi kiri sesuai kategori/prioritas agar tidak terlalu polos */
+.mission-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 20%;
+    height: 60%;
+    width: 4px;
+    border-radius: 0 4px 4px 0;
+    background: var(--accent);
+    opacity: 0.3;
+}
+
+.mission-item h3 {
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.mission-item p {
+    font-size: 9px;
+    font-weight: 700;
+    opacity: 0.4;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    letter-spacing: 0.05em;
+}
+
 /* --- CALENDAR --- */
 .calendar-grid {
     display: grid;
@@ -162,7 +210,7 @@ body {
     color: var(--text);
     cursor: pointer;
     transition: all 0.2s;
-    border: 1px solid var(--border); /* Struktur kotak lebih jelas */
+    border: 1px solid var(--border);
 }
 
 .day-cell.pri-high { background: #ff3b30 !important; color: #fff !important; border: none; }
@@ -177,7 +225,7 @@ body {
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.6); /* Lebih transparan sedikit agar blur terlihat */
+    background: rgba(0,0,0,0.6);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     z-index: 1000;
