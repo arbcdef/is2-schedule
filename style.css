@@ -21,12 +21,12 @@
 :root[data-theme="light"] {
   --bg-top: #f2f2f7;
   --bg-bottom: #ffffff;
-  --card: rgba(255, 255, 255, 0.9);
+  --card: #ffffff; /* Putih solid agar kontras dengan bg-top */
   --text: #000000;
   --border: rgba(0, 0, 0, 0.08);
-  --input: rgba(0, 0, 0, 0.05);
+  --input: rgba(0, 0, 0, 0.04);
   --accent: #000000;
-  --shadow: rgba(0, 0, 0, 0.12);
+  --shadow: rgba(0, 0, 0, 0.15); /* Shadow lebih tegas di Light Mode */
   /* Calendar Colors */
   --cal-default: rgba(0, 0, 0, 0.03);
   --cal-today: #007aff;
@@ -84,18 +84,19 @@ body {
   box-shadow: 0 20px 40px var(--shadow);
 }
 
-/* Memastikan tulisan tugas di Island tidak terpotong */
 .dynamic-island h2 {
     font-size: clamp(1rem, 5vw, 1.4rem) !important;
-    white-space: normal;
-    line-height: 1.2;
+    white-space: normal; /* Agar teks turun ke bawah jika panjang */
+    line-height: 1.1;
     font-weight: 900;
+    margin: 0;
+    max-width: 60%; /* Memberi ruang untuk teks 'DUE TODAY' */
 }
 
-/* --- MISSION CONTROL (FIX INPUT BUG) --- */
+/* --- MISSION CONTROL --- */
 .ios-input {
   width: 100%;
-  background: var(--input) !important; /* Memaksa background gelap/transparan */
+  background: var(--input) !important;
   border: 1px solid var(--border) !important;
   color: var(--text) !important;
   border-radius: 16px;
@@ -129,12 +130,17 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.2rem 1.8rem !important;
+    padding: 1.2rem 1.8rem !important; /* Padding kiri-kanan lega */
     background: var(--card);
     border-radius: 24px;
     margin-bottom: 14px;
     border: 1px solid var(--border);
     box-shadow: 0 8px 25px var(--shadow);
+}
+
+/* Menghilangkan Checkbox jika masih ada di HTML */
+.mission-item input[type="checkbox"] {
+    display: none;
 }
 
 /* --- CALENDAR SYSTEM --- */
@@ -159,7 +165,6 @@ body {
   border: 1px solid var(--border);
 }
 
-/* States Warna Kalender Sesuai Permintaan */
 .day-cell.today  { background: var(--cal-today) !important; color: #fff !important; border: none; box-shadow: 0 0 15px rgba(0, 122, 255, 0.4); }
 .day-cell.low    { background: var(--cal-low) !important; color: #fff !important; border: none; }
 .day-cell.medium { background: var(--cal-medium) !important; color: #fff !important; border: none; }
@@ -167,7 +172,40 @@ body {
 .day-cell.double { background: var(--cal-double) !important; color: #fff !important; border: none; }
 .day-cell.triple { background: var(--cal-triple) !important; color: #fff !important; border: none; }
 
-/* --- CARDS --- */
+/* --- MODAL POP-UP TENGAH --- */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--card);
+    width: 100%;
+    max-width: 340px;
+    border-radius: 32px;
+    border: 1px solid var(--border);
+    padding: 24px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+    animation: popCenter 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popCenter {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* --- CARDS & BUTTONS --- */
 .glass-card {
   background: var(--card);
   backdrop-filter: blur(30px);
@@ -191,9 +229,4 @@ body {
   border: none;
   cursor: pointer;
   box-shadow: 0 10px 30px var(--shadow);
-  transition: transform 0.2s active;
-}
-
-.primary-btn:active {
-    transform: scale(0.97);
 }
