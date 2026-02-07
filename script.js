@@ -13,20 +13,39 @@ let allTasks = [],
 async function muatData() {
   const statusDot = document.getElementById("db-status-dot");
   const statusText = document.getElementById("db-status-text");
+
   try {
     const { data, error } = await sb
       .from("schedule")
       .select("*")
       .order("tgl_deadline", { ascending: true });
+
     if (error) throw error;
+
     allTasks = data || [];
-    statusDot.className =
-      "w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e]";
-    statusText.innerText = "Active";
+
+    // UI: Status Active
+    if (statusDot) {
+      statusDot.className =
+        "w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e]";
+    }
+    if (statusText) {
+      statusText.innerText = "Active";
+      statusText.classList.replace("opacity-30", "opacity-60");
+    }
+
     renderAll();
   } catch (err) {
-    statusDot.className = "w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse";
-    statusText.innerText = "Offline";
+    // UI: Status Offline
+    if (statusDot) {
+      statusDot.className =
+        "w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_10px_#ef4444]";
+    }
+    if (statusText) {
+      statusText.innerText = "Offline";
+      statusText.classList.remove("opacity-30");
+      statusText.style.color = "#ef4444";
+    }
     renderAll();
   }
 }
@@ -42,16 +61,19 @@ function renderCountdown() {
   const upcoming = allTasks
     .filter((t) => !t.is_done)
     .sort((a, b) => new Date(a.tgl_deadline) - new Date(b.tgl_deadline))[0];
+
   if (upcoming) {
     const today = new Date().setHours(0, 0, 0, 0);
     const deadline = new Date(upcoming.tgl_deadline).setHours(0, 0, 0, 0);
     const diffDays = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+
     let dayText =
       diffDays === 0
         ? "DUE TODAY"
         : diffDays < 0
           ? `${Math.abs(diffDays)} OVERDUE`
           : `${diffDays} DAYS LEFT`;
+
     area.innerHTML = `
             <div class="dynamic-island fade-in">
                 <div class="flex-1 truncate mr-4">
@@ -65,7 +87,6 @@ function renderCountdown() {
   }
 }
 
-// --- RENDER FEED: TANPA CHECKBOX, TEKS BESAR & PADDING AMAN ---
 function renderFeed() {
   const cont = document.getElementById("listData");
   cont.innerHTML = allTasks.length
@@ -75,14 +96,12 @@ function renderFeed() {
           return `
           <div class="glass-card flex justify-between items-center mb-3 ${t.is_done ? "opacity-30" : ""}" 
                style="border-left: 6px solid ${t.priority === "High" ? "#ff3b30" : t.priority === "Medium" ? "#ff9500" : "#8e8e93"}">
-            
             <div class="flex items-center truncate flex-1 ml-4"> 
                 <div class="truncate">
                     <p class="task-meta">${t.category} • ${t.tgl_deadline}</p>
                     <p class="task-title truncate">${t.content}</p>
                 </div>
             </div>
-
             <div class="flex items-center gap-4 ml-4">
                 ${hasLink ? `<a href="${t.task_link}" target="_blank" class="text-[9px] font-black px-3 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition tracking-tighter">OPEN</a>` : ""}
                 <button onclick="askDel(${t.id})" class="text-[9px] font-black opacity-20 hover:opacity-100 transition">DEL</button>
@@ -123,11 +142,8 @@ function renderCalendar() {
             : tasks[0].priority === "Medium"
               ? "pri-medium"
               : "pri-low";
-    } else if (tasks.length === 2) {
-      pClass = "task-double";
-    } else if (tasks.length >= 3) {
-      pClass = "task-triple";
-    }
+    } else if (tasks.length === 2) pClass = "task-double";
+    else if (tasks.length >= 3) pClass = "task-triple";
 
     const dayEl = document.createElement("div");
     dayEl.className = `day-cell ${pClass} ${checkDate === todayStr ? "cal-today" : ""}`;
@@ -185,6 +201,7 @@ function toggleDatePicker(e, target) {
   document.getElementById("custom-datepicker").classList.toggle("hidden");
   renderPicker();
 }
+
 function selectDate(d) {
   document.getElementById(
     dateTarget === "start" ? "tglMulai" : "tglDeadline",
@@ -210,7 +227,8 @@ function renderPicker() {
   }
 }
 
-function openSelect(type) {
+function openSelect(e, type) {
+  e.stopPropagation();
   const m = document.getElementById("custom-modal"),
     opt = document.getElementById("modal-options");
   m.classList.remove("hidden");
@@ -248,6 +266,7 @@ function askDel(id) {
 function closeDeleteModal() {
   document.getElementById("delete-modal").classList.add("hidden");
 }
+
 async function confirmDelete() {
   await sb.from("schedule").delete().eq("id", delId);
   closeDeleteModal();
@@ -258,13 +277,17 @@ function toggleTheme() {
   const h = document.documentElement,
     n = h.getAttribute("data-theme") === "dark" ? "light" : "dark";
   h.setAttribute("data-theme", n);
-  document.getElementById("theme-icon").innerText = n === "dark" ? "☀️" : "🌙";
+  const themeIcon = document.getElementById("theme-icon");
+  if (themeIcon) {
+    themeIcon.innerText = n === "dark" ? "☀️" : "🌙";
+  }
 }
 
 function changeMonth(dir) {
   pDate.setMonth(pDate.getMonth() + dir);
   renderPicker();
 }
+
 setInterval(() => {
   document.getElementById("clock").innerText = new Date().toLocaleTimeString(
     "id-ID",
