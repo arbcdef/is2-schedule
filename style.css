@@ -24,7 +24,6 @@
 * {
   -webkit-tap-highlight-color: transparent;
   box-sizing: border-box;
-  /* Set global font ke Helvetica */
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
@@ -78,7 +77,6 @@ body {
   padding: 1.5rem 2rem;
 }
 
-/* Judul Tugas: Lebih besar, Helvetica Bold, Jarak dari kiri aman */
 .task-title {
   font-size: 1.2rem;
   font-weight: 700;
@@ -142,6 +140,12 @@ body {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 8px;
+  align-items: center;
+}
+
+/* Menangani baris navigasi bulan agar memenuhi lebar kalender */
+.calendar-grid > div.col-span-7 {
+  grid-column: span 7;
 }
 
 .day-cell {
@@ -157,6 +161,10 @@ body {
   cursor: pointer;
   border: 1px solid var(--border);
   transition: all 0.2s;
+}
+
+.day-cell:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 /* Priority Colors */
@@ -196,6 +204,24 @@ body {
   box-shadow: 0 0 10px var(--shadow);
 }
 
+/* Tombol Navigasi Kalender Custom */
+.calendar-nav-btn {
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--input);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 9px;
+  font-weight: 900;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.calendar-nav-btn:active {
+  transform: scale(0.9);
+  background: var(--border);
+}
+
 /* --- MODALS --- */
 .modal-overlay {
   position: fixed;
@@ -219,6 +245,7 @@ body {
 .fade-in {
   animation: fadeIn 0.4s ease;
 }
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -229,6 +256,7 @@ body {
     transform: translateY(0);
   }
 }
+
 .hidden {
   display: none !important;
 }
