@@ -8,6 +8,8 @@
   --input: rgba(255, 255, 255, 0.05);
   --accent: #ffffff;
   --shadow: rgba(0, 0, 0, 0.6);
+  /* Edit: Nav background dibuat lebih transparan untuk efek glass */
+  --nav-bg: rgba(255, 255, 255, 0.03);
 }
 
 :root[data-theme="light"] {
@@ -19,6 +21,8 @@
   --input: rgba(0, 0, 0, 0.05);
   --accent: #000000;
   --shadow: rgba(0, 0, 0, 0.08);
+  /* Edit: Nav background light mode yang lebih glassy */
+  --nav-bg: rgba(0, 0, 0, 0.03);
 }
 
 * {
@@ -43,6 +47,107 @@ body {
   transition: background 0.4s ease;
 }
 
+/* --- DYNAMIC ISLAND (TANPA PINGGIRAN ABU/SHADOW) --- */
+.dynamic-island {
+  background: var(--text) !important;
+  color: var(--bg-bottom) !important;
+  border-radius: 20px;
+  padding: 1.2rem 1.8rem !important;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: none !important;
+  border: none !important;
+  transition:
+    background 0.4s ease,
+    color 0.4s ease;
+}
+
+.dynamic-island .island-meta {
+  opacity: 0.6;
+}
+
+/* --- TASK META (PERBAIKAN TULISAN TERPOTONG) --- */
+.task-meta {
+  font-size: 8px;
+  font-weight: 600;
+  opacity: 0.5;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.task-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-top: 2px;
+  line-height: 1.2;
+}
+
+/* --- RAUL DRONCA NAV SYSTEM (GLASSMORPHISM UPDATED) --- */
+.nav-wrap {
+  background: var(--nav-bg);
+  /* Menambah blur lebih kuat agar konten di belakang terlihat artistik */
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  /* Border putih transparan agar garis pinggir terlihat seperti kaca */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 92%;
+  max-width: 380px;
+  margin: 0 auto;
+  padding: 5px;
+  border-radius: 500px;
+  position: relative;
+  /* Shadow dikurangi agar tidak terlihat kotor di atas glass */
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.nav {
+  display: flex;
+  gap: 2px;
+  position: relative;
+  z-index: 10;
+  width: 100%;
+}
+
+.nav a {
+  position: relative;
+  display: inline-block;
+  padding: 10px 0;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: color 0.3s;
+  z-index: 2;
+  flex: 1;
+  text-align: center;
+  /* Tambah opacity pada teks yang tidak aktif */
+  opacity: 0.5;
+}
+
+.nav a.active {
+  color: var(--bg-bottom);
+  opacity: 1;
+}
+
+.bubble {
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  background: var(--text);
+  border-radius: 500px;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  z-index: 1;
+  box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.2);
+}
+
 /* --- HEADER --- */
 .header-seamless {
   position: sticky;
@@ -55,41 +160,15 @@ body {
   padding-bottom: 1.5rem;
 }
 
-/* --- DYNAMIC ISLAND & CARDS --- */
-.dynamic-island {
-  background: var(--accent) !important;
-  color: var(--bg-bottom) !important;
-  border-radius: 20px;
-  padding: 1.2rem 1.8rem !important;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 20px 40px var(--shadow);
-}
-
+/* --- CARDS & UI (TANPA PINGGIRAN ABU/SHADOW) --- */
 .glass-card {
   background: var(--card);
   backdrop-filter: blur(30px);
   -webkit-backdrop-filter: blur(30px);
   border-radius: 20px;
   border: 1px solid var(--border);
-  box-shadow: 0 10px 30px var(--shadow);
+  box-shadow: none !important;
   padding: 1.5rem 2rem;
-}
-
-.task-title {
-  font-size: 1.2rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin-top: 2px;
-}
-
-.task-meta {
-  font-size: 10px;
-  font-weight: 600;
-  opacity: 0.5;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
 .ios-input {
@@ -114,7 +193,7 @@ body {
   font-weight: 700;
   text-transform: uppercase;
   color: var(--text);
-  font-family: inherit;
+  cursor: pointer;
 }
 
 .primary-btn {
@@ -128,24 +207,17 @@ body {
   border: none;
   cursor: pointer;
   transition: transform 0.2s;
-  font-family: inherit;
 }
 
 .primary-btn:active {
   transform: scale(0.96);
 }
 
-/* --- CALENDAR --- */
+/* --- CALENDAR CORE --- */
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 8px;
-  align-items: center;
-}
-
-/* Menangani baris navigasi bulan agar memenuhi lebar kalender */
-.calendar-grid > div.col-span-7 {
-  grid-column: span 7;
 }
 
 .day-cell {
@@ -161,74 +233,52 @@ body {
   cursor: pointer;
   border: 1px solid var(--border);
   transition: all 0.2s;
+  box-shadow: none !important;
 }
 
-.day-cell:hover {
-  background: rgba(255, 255, 255, 0.1);
+.day-cell.cal-today {
+  border: 2px solid var(--text) !important;
 }
 
-/* Priority Colors */
+/* --- CALENDAR PRIORITY COLORS (FIXED) --- */
 .day-cell.pri-low {
   background: #8e8e93 !important;
   color: #fff !important;
-  border: none;
+  border: none !important;
 }
 .day-cell.pri-medium {
   background: #ff9500 !important;
   color: #fff !important;
-  border: none;
+  border: none !important;
 }
 .day-cell.pri-high {
   background: #ff3b30 !important;
   color: #fff !important;
-  border: none;
+  border: none !important;
 }
 .day-cell.task-today {
   background: #007aff !important;
   color: #fff !important;
-  border: none;
+  border: none !important;
 }
 .day-cell.task-double {
   background: #800000 !important;
   color: #fff !important;
-  border: none;
+  border: none !important;
 }
 .day-cell.task-triple {
   background: #5856d6 !important;
   color: #fff !important;
-  border: none;
+  border: none !important;
 }
 
-.day-cell.cal-today {
-  border: 2px solid var(--text);
-  box-shadow: 0 0 10px var(--shadow);
-}
-
-/* Tombol Navigasi Kalender Custom */
-.calendar-nav-btn {
-  padding: 8px 12px;
-  border-radius: 10px;
-  background: var(--input);
-  border: 1px solid var(--border);
-  color: var(--text);
-  font-size: 9px;
-  font-weight: 900;
-  transition: all 0.2s;
-  cursor: pointer;
-}
-
-.calendar-nav-btn:active {
-  transform: scale(0.9);
-  background: var(--border);
-}
-
-/* --- MODALS --- */
+/* --- MODALS & ANIMATIONS --- */
 .modal-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(15px);
-  z-index: 1000;
+  z-index: 2000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -240,6 +290,7 @@ body {
   max-width: 400px;
   border-radius: 20px;
   border: 1px solid var(--border);
+  box-shadow: none !important;
 }
 
 .fade-in {
@@ -259,4 +310,8 @@ body {
 
 .hidden {
   display: none !important;
+}
+
+.pb-24 {
+  padding-bottom: 6rem;
 }
