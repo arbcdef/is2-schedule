@@ -20,10 +20,13 @@ if (localStorage.getItem("theme")) {
   );
 }
 
-// --- NEW SYSTEM: CUSTOM UI NOTIFICATIONS ---
+// --- NEW SYSTEM: CUSTOM UI NOTIFICATIONS (ANTI-SPAM FIXED) ---
 function showNotify(msg, type = "success") {
   const container = document.getElementById("toast-container");
   if (!container) return;
+
+  // FIX: Hapus isi container sebelum menambah yang baru agar tidak spam/menumpuk
+  container.innerHTML = "";
 
   const toast = document.createElement("div");
   const isError = type === "error";
@@ -38,11 +41,13 @@ function showNotify(msg, type = "success") {
   `;
 
   container.appendChild(toast);
+
+  // Durasi tampil sedikit dipercepat agar terasa lebih snappier
   setTimeout(() => {
     toast.style.opacity = "0";
     toast.style.transform = "translateX(20px)";
     setTimeout(() => toast.remove(), 500);
-  }, 3500);
+  }, 2500);
 }
 
 // Pengganti confirm() browser
