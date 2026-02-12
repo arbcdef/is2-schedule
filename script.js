@@ -25,7 +25,7 @@ function showNotify(msg, type = "success") {
   const container = document.getElementById("toast-container");
   if (!container) return;
 
-  // FIX: Hapus isi container sebelum menambah yang baru agar tidak spam/menumpuk
+  // Membersihkan notifikasi sebelumnya agar tidak menumpuk/spam
   container.innerHTML = "";
 
   const toast = document.createElement("div");
@@ -42,7 +42,6 @@ function showNotify(msg, type = "success") {
 
   container.appendChild(toast);
 
-  // Durasi tampil sedikit dipercepat agar terasa lebih snappier
   setTimeout(() => {
     toast.style.opacity = "0";
     toast.style.transform = "translateX(20px)";
@@ -553,7 +552,7 @@ function toggleTheme() {
   const activeLink = document.querySelector(".nav a.active");
   if (activeLink) moveNavBubble(activeLink);
   renderCountdown();
-  showNotify(`Mode set to ${n.toUpperCase()}`);
+  // Notifikasi dihapus di sini agar ganti tema lebih sunyi
 }
 
 function changeMonth(dir) {
