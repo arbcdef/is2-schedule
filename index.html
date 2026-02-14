@@ -79,7 +79,12 @@
         </h2>
 
         <div
-          class="glass-card mb-10 p-6 border border-white/5 relative overflow-hidden group/card"
+          id="gallery-grid"
+          class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-10"
+        ></div>
+
+        <div
+          class="glass-card p-6 border border-white/5 relative overflow-hidden group/card"
         >
           <div
             class="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover/card:opacity-100 transition-opacity duration-500"
@@ -138,11 +143,6 @@
             </button>
           </div>
         </div>
-
-        <div
-          id="gallery-grid"
-          class="grid grid-cols-2 md:grid-cols-3 gap-4"
-        ></div>
       </section>
 
       <section id="page-hub" class="page-section">
@@ -151,9 +151,24 @@
           class="mb-10 min-h-[100px] relative z-20"
         ></div>
 
-        <main class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          <div class="lg:col-span-5 lg:sticky lg:top-24">
-            <section class="glass-card p-8 border border-white/5">
+        <main class="flex flex-col gap-10">
+          <div class="space-y-10">
+            <div id="listData" class="space-y-3"></div>
+
+            <section class="glass-card p-6 border border-white/5">
+              <h2
+                class="text-center font-black uppercase mb-6 tracking-[0.4em] text-[10px] opacity-20"
+              >
+                Timeline View
+              </h2>
+              <div id="calendar-container" class="calendar-grid"></div>
+            </section>
+          </div>
+
+          <div id="mission-control-container">
+            <section
+              class="glass-card p-8 border border-white/5 max-w-2xl mx-auto"
+            >
               <h2
                 class="text-[10px] font-black opacity-20 uppercase tracking-[0.3em] mb-6"
               >
@@ -244,18 +259,6 @@
               </div>
             </section>
           </div>
-
-          <div class="lg:col-span-7 space-y-6">
-            <div id="listData" class="space-y-3"></div>
-            <section class="glass-card p-6 border border-white/5">
-              <h2
-                class="text-center font-black uppercase mb-6 tracking-[0.4em] text-[10px] opacity-20"
-              >
-                Timeline View
-              </h2>
-              <div id="calendar-container" class="calendar-grid"></div>
-            </section>
-          </div>
         </main>
       </section>
 
@@ -270,14 +273,14 @@
             <p class="text-xs font-black opacity-30 uppercase tracking-widest">
               Mata Kuliah A
             </p>
-            <h3 class="text-lg font-bold">COMING SOON
+            <h3 class="text-lg font-bold">COMING SOON</h3>
             <p class="text-sm opacity-60">COMING SOON@unikom.ac.id</p>
           </div>
           <div class="glass-card p-6 border border-white/5 flex flex-col gap-2">
             <p class="text-xs font-black opacity-30 uppercase tracking-widest">
               Mata Kuliah B
             </p>
-            <h3 class="text-lg font-bold">COMING SOON
+            <h3 class="text-lg font-bold">COMING SOON</h3>
             <p class="text-sm opacity-60">COMING SOON@unikom.ac.id</p>
           </div>
         </div>
