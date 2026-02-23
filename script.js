@@ -1,10 +1,13 @@
+/* --- CONFIG & INITIALIZATION --- */
 const SB_URL = "https://mycldrtubwstojeaumcg.supabase.co";
 const SB_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15Y2xkcnR1YndzdG9qZWF1bWNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNzQwNTksImV4cCI6MjA4NTg1MDA1OX0.GHgglJHGQqDDRY-IcvhQeZyYZmR48J3arnby8IxZo9I";
 const sb = supabase.createClient(SB_URL, SB_KEY);
 
+const tlMap = { "Assignment": "Tugas", "Schedule": "Jadwal", "Event": "Event", "Low": "Rendah", "Medium": "Sedang", "High": "Tinggi" };
+function tLoc(str) { return tlMap[str] || str; }
+
 let allTasks = [],
-  allPhotos = [],
   selectedKat = "Assignment",
   selectedPri = "Medium",
   pDate = new Date(),
@@ -12,97 +15,251 @@ let allTasks = [],
   delId = null,
   dateTarget = "start";
 
-// --- THEME INITIALIZATION ---
-if (localStorage.getItem("theme")) {
-  document.documentElement.setAttribute(
-    "data-theme",
-    localStorage.getItem("theme"),
+// Theme Init
+const savedTheme = localStorage.getItem("theme");
+if (savedTheme) document.documentElement.setAttribute("data-theme", savedTheme);
+
+/* --- ADMIN ACCESS CONTROL (PIN SYSTEM 2525) --- */
+const MASTER_PIN = "2525";
+
+function checkAdminSession() {
+  const isAdmin = localStorage.getItem("is_admin") === "true";
+  const currentPage = document.querySelector(".page-section:not(.hidden)")?.id;
+
+  const missionControl = document.getElementById("mission-control-container");
+  const lecturerEntry = document.getElementById("lecturer-entry-container");
+
+  const btnLogin = document.getElementById("btn-admin-gate");
+  const btnLogout = document.getElementById("btn-logout");
+
+  // Seleksi semua tombol hapus yang ada di DOM
+  const editButtons = document.querySelectorAll(
+    "button[onclick*='askDel'], button[onclick*='hapusFoto'], button[onclick*='hapusDosen']",
   );
+
+  // Reset visibility kontainer admin
+  [missionControl, lecturerEntry].forEach((el) =>
+    el?.classList.add("hidden"),
+  );
+
+  if (isAdmin) {
+    if (currentPage === "page-hub") missionControl?.classList.remove("hidden");
+    else if (currentPage === "page-contact")
+      lecturerEntry?.classList.remove("hidden");
+
+    btnLogin?.classList.add("hidden");
+    btnLogout?.classList.remove("hidden");
+    editButtons.forEach((btn) => btn.classList.remove("hidden"));
+  } else {
+    btnLogin?.classList.remove("hidden");
+    btnLogout?.classList.add("hidden");
+    editButtons.forEach((btn) => btn.classList.add("hidden"));
+  }
 }
 
-// --- NEW SYSTEM: CUSTOM UI NOTIFICATIONS (ANTI-SPAM FIXED) ---
+function openAdminGate() {
+  document.getElementById("auth-page").classList.remove("hidden");
+  document.getElementById("admin-pin").focus();
+}
+
+function closeAdminGate() {
+  document.getElementById("auth-page").classList.add("hidden");
+  document.getElementById("admin-pin").value = "";
+}
+
+function handlePinLogin() {
+  const pinInput = document.getElementById("admin-pin");
+  if (pinInput.value === MASTER_PIN) {
+    showNotify("Access Granted: Admin Mode");
+    localStorage.setItem("is_admin", "true");
+    closeAdminGate();
+    refreshAllData();
+  } else {
+    showNotify("Invalid PIN: Access Denied", "error");
+    pinInput.value = "";
+    const card = document.querySelector("#auth-page .modal-card");
+    card.classList.add("animate-shake");
+    setTimeout(() => card.classList.remove("animate-shake"), 500);
+  }
+}
+
+function handleLogout() {
+  localStorage.removeItem("is_admin");
+  showNotify("Session Terminated");
+  refreshAllData();
+}
+
+function refreshAllData() {
+  checkAdminSession();
+  muatData();
+  muatGallery();
+  muatDosen();
+}
+
+/* --- LECTURER LOGIC --- */
+async function muatDosen() {
+  const container = document.getElementById("lecturer-list");
+  if (!container) return;
+
+  try {
+    const { data, error } = await sb
+      .from("lecturers")
+      .select("*")
+      .order("nama_dosen", { ascending: true });
+
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      container.innerHTML = `<div class="p-10 text-center opacity-10 text-[8px] font-black uppercase tracking-[0.4em] col-span-full">No Lecturer Data</div>`;
+      return;
+    }
+
+    const isAdmin = localStorage.getItem("is_admin") === "true";
+
+    container.innerHTML = data
+      .map(
+        (d) => `
+            <div class="glass-card p-6 border border-white/5 flex flex-col gap-2 relative group">
+                <p class="text-xs font-black opacity-30 uppercase tracking-widest">${d.mata_kuliah}</p>
+                <h3 class="text-lg font-bold uppercase tracking-tight">${d.nama_dosen}</h3>
+                <div class="flex items-center justify-between mt-2">
+                    <a href="https://wa.me/${d.whatsapp}" target="_blank" class="text-[10px] font-black text-green-500 hover:opacity-70 transition">
+                        WHATSAPP: ${d.whatsapp}
+                    </a>
+                    ${isAdmin ? `<button onclick="hapusDosen('${d.id}')" class="text-[8px] font-black text-red-500 opacity-60 hover:opacity-100 transition">DELETE</button>` : ""}
+                </div>
+            </div>`,
+      )
+      .join("");
+
+    checkAdminSession();
+  } catch (err) {
+    console.error("Dosen Error:", err);
+  }
+}
+
+async function simpanDosen() {
+  const nama = document.getElementById("namaDosen").value;
+  const matkul = document.getElementById("matkulDosen").value;
+  const wa = document.getElementById("waDosen").value;
+  const btn = document.getElementById("btn-save-dosen");
+
+  if (!nama || !matkul || !wa)
+    return showNotify("Semua kolom dosen harus diisi", "error");
+
+  try {
+    btn.innerText = "SAVING...";
+    btn.disabled = true;
+
+    const { error } = await sb.from("lecturers").insert([
+      {
+        nama_dosen: nama,
+        mata_kuliah: matkul,
+        whatsapp: wa,
+      },
+    ]);
+
+    if (error) throw error;
+
+    showNotify("Lecturer data secured!");
+    document.getElementById("namaDosen").value = "";
+    document.getElementById("matkulDosen").value = "";
+    document.getElementById("waDosen").value = "";
+    muatDosen();
+  } catch (err) {
+    showNotify(err.message, "error");
+  } finally {
+    btn.innerText = "SAVE DATA";
+    btn.disabled = false;
+  }
+}
+
+async function hapusDosen(id) {
+  if (!id || id === "undefined" || id === "[object Object]") {
+    return showNotify("Error: Lecturer ID not found", "error");
+  }
+
+  customConfirm("Remove this lecturer from directory?", async () => {
+    try {
+      const { error } = await sb.from("lecturers").delete().eq("id", id);
+      if (error) throw error;
+      showNotify("Lecturer removed");
+      muatDosen();
+    } catch (err) {
+      showNotify("Failed to delete", "error");
+    }
+  });
+}
+
+/* --- UI NOTIFICATIONS & MODALS --- */
 function showNotify(msg, type = "success") {
   const container = document.getElementById("toast-container");
   if (!container) return;
-
-  // Membersihkan notifikasi sebelumnya agar tidak menumpuk/spam
   container.innerHTML = "";
-
-  const toast = document.createElement("div");
   const isError = type === "error";
-
+  const toast = document.createElement("div");
   toast.className = `glass-card flex items-center gap-3 p-4 mb-3 border-l-4 ${isError ? "border-red-500" : "border-green-500"} fade-in shadow-2xl min-w-[250px]`;
   toast.innerHTML = `
-    <div class="w-2 h-2 rounded-full ${isError ? "bg-red-500" : "bg-green-500"} animate-pulse"></div>
-    <div class="flex-1">
-      <p class="text-[9px] font-black uppercase tracking-widest opacity-40 mb-1">${type}</p>
-      <p class="text-[11px] font-bold leading-tight uppercase">${msg}</p>
-    </div>
-  `;
-
+        <div class="w-2 h-2 rounded-full ${isError ? "bg-red-500" : "bg-green-500"} animate-pulse"></div>
+        <div class="flex-1 text-left">
+            <p class="text-[9px] font-black uppercase tracking-widest opacity-40 mb-1">${type}</p>
+            <p class="text-[11px] font-bold leading-tight uppercase">${msg}</p>
+        </div>`;
   container.appendChild(toast);
-
   setTimeout(() => {
     toast.style.opacity = "0";
-    toast.style.transform = "translateX(20px)";
+    toast.style.transform = "translateY(-10px)";
     setTimeout(() => toast.remove(), 500);
   }, 2500);
 }
 
-// Pengganti confirm() browser
 function customConfirm(msg, callback) {
   const modal = document.getElementById("custom-confirm-modal");
   const msgText = document.getElementById("confirm-msg-text");
   const okBtn = document.getElementById("confirm-ok-btn");
-
   if (!modal) return;
   msgText.innerText = msg;
   modal.classList.remove("hidden");
-
   okBtn.onclick = () => {
     callback();
-    modal.classList.add("hidden");
+    closeConfirm();
   };
 }
 
 function closeConfirm() {
-  document.getElementById("custom-confirm-modal").classList.add("hidden");
+  document.getElementById("custom-confirm-modal")?.classList.add("hidden");
 }
 
-// --- CORE NAVIGATION LOGIC ---
-function switchPage(pageId, element) {
-  document.querySelectorAll(".page-section").forEach((section) => {
-    section.classList.add("hidden");
-  });
-
-  const targetPage = document.getElementById(pageId);
-  if (targetPage) targetPage.classList.remove("hidden");
-
-  document.querySelectorAll(".nav a").forEach((link) => {
-    link.classList.remove("active");
-  });
-  element.classList.add("active");
-
-  moveNavBubble(element);
-  window.scrollTo({ top: 0, behavior: "smooth" });
-
-  if (pageId === "page-gallery") muatGallery();
-}
-
+/* --- CORE NAVIGATION --- */
 function moveNavBubble(element) {
   const bubble = document.getElementById("nav-bubble-active");
   if (bubble && element) {
-    bubble.style.width = `${element.offsetWidth}px`;
-    bubble.style.left = `${element.offsetLeft}px`;
+    const rect = element.getBoundingClientRect();
+    const parentRect = element.parentElement.getBoundingClientRect();
+    bubble.style.width = `${rect.width}px`;
+    bubble.style.left = `${rect.left - parentRect.left}px`;
   }
 }
 
-window.addEventListener("resize", () => {
-  const activeLink = document.querySelector(".nav a.active");
-  if (activeLink) moveNavBubble(activeLink);
-});
+function switchPage(pageId, element) {
+  document
+    .querySelectorAll(".page-section")
+    .forEach((p) => p.classList.add("hidden"));
+  document.getElementById(pageId)?.classList.remove("hidden");
+  document
+    .querySelectorAll(".nav a")
+    .forEach((l) => l.classList.remove("active"));
+  element.classList.add("active");
 
-// --- DATA FETCHING (SCHEDULE) ---
+  moveNavBubble(element);
+  checkAdminSession();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+
+  if (pageId === "page-gallery") muatGallery();
+  if (pageId === "page-contact") muatDosen();
+}
+
+/* --- SUPABASE API CALLS --- */
 async function muatData() {
   const statusDot = document.getElementById("db-status-dot");
   const statusText = document.getElementById("db-status-text");
@@ -111,10 +268,8 @@ async function muatData() {
       .from("schedule")
       .select("*")
       .order("tgl_deadline", { ascending: true });
-
     if (error) throw error;
     allTasks = data || [];
-
     if (statusDot)
       statusDot.className =
         "w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e]";
@@ -135,111 +290,95 @@ async function muatData() {
   }
 }
 
-// --- NEW UI HELPER: PREVIEW IMAGE ---
-function previewImage(input) {
-  const container = document.getElementById("file-preview-container");
-  const img = document.getElementById("file-preview");
-  const placeholder = document.getElementById("upload-placeholder");
-  const nameDisplay = document.getElementById("file-name-display");
+async function simpanData() {
+  const isi = document.getElementById("isiData").value;
+  const t1 = document.getElementById("tglMulai").value;
+  const t2 = document.getElementById("tglDeadline").value;
+  const link = document.getElementById("linkData").value;
 
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      img.src = e.target.result;
-      container.classList.remove("hidden");
-      if (placeholder) placeholder.classList.add("opacity-50");
-      if (nameDisplay) nameDisplay.innerText = input.files[0].name;
-      showNotify("Photo selected", "success");
-    };
-    reader.readAsDataURL(input.files[0]);
-  } else {
-    if (container) container.classList.add("hidden");
-    if (placeholder) placeholder.classList.remove("opacity-50");
-    if (nameDisplay) nameDisplay.innerText = "Tap to select or drop photo";
+  if (!isi || !t2) return showNotify("Data mission tidak lengkap", "error");
+
+  const { error } = await sb.from("schedule").insert([
+    {
+      content: isi,
+      tgl_start: t1 || t2,
+      tgl_deadline: t2,
+      category: selectedKat,
+      priority: selectedPri,
+      is_done: false,
+      task_link: link || null,
+    },
+  ]);
+
+  if (error) showNotify(`Failed: ${error.message}`, "error");
+  else {
+    showNotify("Mission data uploaded!");
+    document.getElementById("isiData").value = "";
+    document.getElementById("linkData").value = "";
+    muatData();
   }
 }
 
-// --- GALLERY LOGIC (FIXED & OPTIMIZED) ---
+/* --- GALLERY LOGIC --- */
+async function muatGallery() {
+  const grid = document.getElementById("gallery-grid");
+  if (!grid) return;
+  try {
+    const { data, error } = await sb
+      .from("gallery")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+
+    const isAdmin = localStorage.getItem("is_admin") === "true";
+
+    grid.innerHTML =
+      data
+        ?.map(
+          (img) => `
+            <div class="glass-card p-2 aspect-square overflow-hidden group border border-white/5 relative">
+                <img src="${img.image_url}" class="w-full h-full object-cover rounded-xl grayscale group-hover:grayscale-0 transition-all duration-500" alt="Gallery Photo">
+                ${isAdmin ? `<button onclick="hapusFoto('${img.id}', '${img.file_path}')" class="absolute top-3 right-3 bg-red-500/80 text-white text-[8px] font-black px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">DELETE</button>` : ""}
+            </div>`,
+        )
+        .join("") || "";
+    checkAdminSession();
+  } catch (err) {
+    console.error("Gallery Error:", err);
+  }
+}
+
 async function uploadFoto() {
   const fileInput = document.getElementById("photo-input");
   const btn = document.getElementById("btn-upload-foto");
   const file = fileInput.files[0];
 
   if (!file) return showNotify("Please select a photo", "error");
-
   btn.innerText = "Uploading...";
   btn.disabled = true;
 
-  const cleanFileName = file.name.replace(/[^a-zA-Z0-9.]/g, "_");
-  const fileName = `${Date.now()}-${cleanFileName}`;
-
   try {
-    const { data: uploadData, error: uploadError } = await sb.storage
+    const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, "_")}`;
+    const { error: upErr } = await sb.storage
       .from("PHOTOS")
-      .upload(fileName, file, { cacheControl: "3600", upsert: false });
-
-    if (uploadError) throw new Error(`Storage: ${uploadError.message}`);
+      .upload(fileName, file);
+    if (upErr) throw upErr;
 
     const { data: urlData } = sb.storage.from("PHOTOS").getPublicUrl(fileName);
-    const photoUrl = urlData.publicUrl;
-
-    const { error: dbError } = await sb
+    const { error: dbErr } = await sb
       .from("gallery")
-      .insert([{ image_url: photoUrl, file_path: fileName }]);
-
-    if (dbError) throw new Error(`Database: ${dbError.message}`);
+      .insert([{ image_url: urlData.publicUrl, file_path: fileName }]);
+    if (dbErr) throw dbErr;
 
     fileInput.value = "";
-    const previewContainer = document.getElementById("file-preview-container");
-    const nameDisplay = document.getElementById("file-name-display");
-    const placeholder = document.getElementById("upload-placeholder");
-
-    if (previewContainer) previewContainer.classList.add("hidden");
-    if (nameDisplay) nameDisplay.innerText = "Tap to select or drop photo";
-    if (placeholder) placeholder.classList.remove("opacity-50");
-
+    document.getElementById("file-preview-container")?.classList.add("hidden");
     showNotify("Moment saved successfully!");
     muatGallery();
   } catch (err) {
-    console.error("Full Error Object:", err);
     showNotify(err.message, "error");
   } finally {
     btn.innerText = "Upload";
     btn.disabled = false;
-  }
-}
-
-async function muatGallery() {
-  const grid = document.getElementById("gallery-grid");
-  if (!grid) return;
-
-  try {
-    const { data, error } = await sb
-      .from("gallery")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (error) throw error;
-
-    if (data) {
-      grid.innerHTML = data
-        .map(
-          (img) => `
-                <div class="glass-card p-2 aspect-square overflow-hidden group border border-white/5 relative">
-                    <img src="${img.image_url}" 
-                         class="w-full h-full object-cover rounded-xl grayscale group-hover:grayscale-0 transition-all duration-500" 
-                         alt="Gallery Photo">
-                    <button onclick="hapusFoto(${img.id}, '${img.file_path}')" 
-                            class="absolute top-3 right-3 bg-red-500/80 text-white text-[8px] font-black px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
-                        DELETE
-                    </button>
-                </div>
-            `,
-        )
-        .join("");
-    }
-  } catch (err) {
-    console.error("Gallery Error:", err);
   }
 }
 
@@ -256,59 +395,50 @@ async function hapusFoto(id, path) {
   });
 }
 
+/* --- RENDERERS --- */
 function renderAll() {
   renderFeed();
   renderCalendar();
   renderCountdown();
+  checkAdminSession();
 }
 
-// --- RENDERING FUNCTIONS INTACT ---
 function renderCountdown() {
   const area = document.getElementById("next-deadline-area");
   if (!area) return;
-
   const upcoming = allTasks
     .filter((t) => !t.is_done)
     .sort((a, b) => new Date(a.tgl_deadline) - new Date(b.tgl_deadline))[0];
 
   if (upcoming) {
-    const today = new Date().setHours(0, 0, 0, 0);
-    const deadline = new Date(upcoming.tgl_deadline).setHours(0, 0, 0, 0);
+    const today = new Date().setHours(0, 0, 0, 0),
+      deadline = new Date(upcoming.tgl_deadline).setHours(0, 0, 0, 0);
     const diffDays = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
-
     const priColor =
       upcoming.priority === "High"
         ? "#ff3b30"
         : upcoming.priority === "Medium"
           ? "#ff9500"
           : "#8e8e93";
-
-    let dayText =
+    const dayText =
       diffDays === 0
         ? "DUE TODAY"
         : diffDays < 0
           ? `${Math.abs(diffDays)} OVERDUE`
           : `${diffDays} DAYS LEFT`;
 
-    const isMultiDay = upcoming.tgl_start !== upcoming.tgl_deadline;
-    const periodText = isMultiDay
-      ? `${upcoming.tgl_start} — ${upcoming.tgl_deadline}`
-      : upcoming.tgl_deadline;
-
     area.innerHTML = `
-      <div class="dynamic-island fade-in" style="border-left: 6px solid ${priColor};">
-          <div class="flex-1 truncate mr-4 text-left">
-              <p class="island-meta text-[8px] font-black uppercase tracking-widest mb-1 opacity-60">
-                <span style="color: ${priColor}">${upcoming.category}</span> • ${periodText}
-              </p>
-              <h2 class="text-sm font-black uppercase leading-tight truncate">${upcoming.content}</h2>
-          </div>
-          <div class="text-right">
-            <span class="text-lg font-black tracking-tighter uppercase">${dayText}</span>
-          </div>
-      </div>`;
+            <div class="dynamic-island fade-in" style="border-left: 6px solid ${priColor};">
+                <div class="flex-1 truncate mr-4 text-left">
+                    <p class="island-meta text-[8px] font-black uppercase tracking-widest mb-1 opacity-60">
+                        <span style="color: ${priColor}">${tLoc(upcoming.category)}</span> • ${upcoming.tgl_deadline}
+                    </p>
+                    <h2 class="text-sm font-black uppercase leading-tight truncate">${upcoming.content}</h2>
+                </div>
+                <div class="text-right"><span class="text-lg font-black tracking-tighter uppercase">${dayText}</span></div>
+            </div>`;
   } else {
-    area.innerHTML = `<div class="glass-card text-center opacity-20 text-[9px] font-black uppercase tracking-widest" style="box-shadow: none !important;">No Active Mission</div>`;
+    area.innerHTML = `<div class="glass-card text-center opacity-20 text-[9px] font-black uppercase tracking-widest">No Active Mission</div>`;
   }
 }
 
@@ -316,39 +446,37 @@ function renderFeed() {
   const cont = document.getElementById("listData");
   if (!cont) return;
 
+  const isAdmin = localStorage.getItem("is_admin") === "true";
+
   cont.innerHTML = allTasks.length
     ? allTasks
-        .map((t) => {
-          const hasLink = t.task_link && t.task_link.startsWith("http");
-          const shortDate = `${t.tgl_start.split("-").slice(1).join("/")} - ${t.tgl_deadline.split("-").slice(1).join("/")}`;
-
-          return `
-          <div class="glass-card flex justify-between items-center mb-3 ${t.is_done ? "opacity-30" : ""}" 
-               style="border-left: 6px solid ${t.priority === "High" ? "#ff3b30" : t.priority === "Medium" ? "#ff9500" : "#8e8e93"}; box-shadow: none !important;">
-            <div class="flex items-center truncate flex-1 ml-3"> 
-                <div class="truncate text-left w-full">
-                    <p class="task-meta">${t.category} • ${shortDate}</p>
-                    <p class="task-title truncate text-base font-bold">${t.content}</p>
+        .map(
+          (t) => `
+        <div class="glass-card flex justify-between items-center mb-3 ${t.is_done ? "opacity-30" : ""}" 
+             style="border-left: 6px solid ${t.priority === "High" ? "#ff3b30" : t.priority === "Medium" ? "#ff9500" : "#8e8e93"}">
+            <div class="flex items-center truncate flex-1 ml-3 text-left">
+                <div class="truncate">
+                    <p class="task-meta font-black uppercase text-[8px] opacity-40">${tLoc(t.category)} • ${t.tgl_deadline}</p>
+                    <p class="task-title truncate text-sm font-bold uppercase">${t.content}</p>
                 </div>
             </div>
             <div class="flex items-center gap-3 ml-2 shrink-0">
-                ${hasLink ? `<a href="${t.task_link}" target="_blank" class="text-[8px] font-black px-2.5 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition tracking-tighter">OPEN</a>` : ""}
-                <button onclick="askDel(${t.id})" class="text-[8px] font-black opacity-20 hover:opacity-100 transition">DEL</button>
+                ${t.task_link?.startsWith("http") ? `<a href="${t.task_link}" target="_blank" class="text-[8px] font-black px-2.5 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition">OPEN</a>` : ""}
+                ${isAdmin ? `<button onclick="askDel('${t.id}')" class="text-[8px] font-black opacity-30 hover:opacity-100 transition">DEL</button>` : ""}
             </div>
-          </div>`;
-        })
+        </div>`,
+        )
         .join("")
-    : `<div class="p-10 text-center opacity-10 text-[8px] font-black uppercase">Hub Clear</div>`;
+    : `<div class="p-10 text-center opacity-10 text-[8px] font-black uppercase tracking-[0.4em]">Hub Clear</div>`;
 }
 
 function renderCalendar() {
   const cont = document.getElementById("calendar-container");
   if (!cont) return;
-
-  const y = currentCalDate.getFullYear();
-  const m = currentCalDate.getMonth();
+  const y = currentCalDate.getFullYear(),
+    m = currentCalDate.getMonth();
   const todayStr = new Date().setHours(0, 0, 0, 0);
-  const monthNames = [
+  const months = [
     "January",
     "February",
     "March",
@@ -364,17 +492,15 @@ function renderCalendar() {
   ];
 
   cont.innerHTML = `
-    <div class="col-span-7 flex justify-between items-center mb-6 px-2">
-      <button onclick="changeCalMonth(-1)" class="text-[9px] font-black opacity-30 hover:opacity-100 transition">PREV</button>
-      <h3 class="text-[10px] font-black uppercase tracking-[0.3em]">${monthNames[m]} ${y}</h3>
-      <button onclick="changeCalMonth(1)" class="text-[9px] font-black opacity-30 hover:opacity-100 transition">NEXT</button>
-    </div>`;
+        <div class="col-span-7 flex justify-between items-center mb-6 px-2">
+            <button onclick="changeCalMonth(-1)" class="text-[9px] font-black opacity-30">PREV</button>
+            <h3 class="text-[10px] font-black uppercase tracking-[0.3em]">${months[m]} ${y}</h3>
+            <button onclick="changeCalMonth(1)" class="text-[9px] font-black opacity-30">NEXT</button>
+        </div>`;
 
-  const first = new Date(y, m, 1).getDay();
-  const days = new Date(y, m + 1, 0).getDate();
-
+  const first = new Date(y, m, 1).getDay(),
+    days = new Date(y, m + 1, 0).getDate();
   for (let i = 0; i < first; i++) cont.innerHTML += "<div></div>";
-
   for (let d = 1; d <= days; d++) {
     const checkDate = new Date(y, m, d).setHours(0, 0, 0, 0);
     const tasks = allTasks.filter(
@@ -385,20 +511,31 @@ function renderCalendar() {
 
     let pClass = "";
     if (checkDate === todayStr && tasks.length > 0) pClass = "task-today";
-    else if (tasks.length === 1) {
-      const pri = tasks[0].priority;
+    else if (tasks.length === 1)
       pClass =
-        pri === "High"
+        tasks[0].priority === "High"
           ? "pri-high"
-          : pri === "Medium"
+          : tasks[0].priority === "Medium"
             ? "pri-medium"
             : "pri-low";
-    } else if (tasks.length === 2) pClass = "task-double";
-    else if (tasks.length >= 3) pClass = "task-triple";
+    else if (tasks.length === 2) pClass = "task-double";
+    else if (tasks.length === 3) pClass = "task-triple";
+    else if (tasks.length >= 4) pClass = "task-quadruple";
 
     const dayEl = document.createElement("div");
-    dayEl.className = `day-cell ${pClass} ${checkDate === todayStr ? "cal-today" : ""}`;
-    dayEl.innerText = d;
+    dayEl.className = `day-cell ${pClass} ${checkDate === todayStr ? "cal-today" : ""} relative`;
+    
+    const dSpan = document.createElement("span");
+    dSpan.innerText = d;
+    dayEl.appendChild(dSpan);
+
+    if (tasks.length > 1) {
+      const badge = document.createElement("div");
+      badge.className = "absolute -top-1 -right-1 w-4 h-4 bg-white text-black rounded-full flex items-center justify-center text-[8px] font-black shadow-[0_2px_4px_rgba(0,0,0,0.5)] z-10 border border-white/20";
+      badge.innerText = tasks.length;
+      dayEl.appendChild(badge);
+    }
+
     dayEl.onclick = () =>
       tasks.length &&
       showCalendarDetail(new Date(y, m, d).toDateString(), tasks);
@@ -406,62 +543,27 @@ function renderCalendar() {
   }
 }
 
-function changeCalMonth(dir) {
-  currentCalDate.setMonth(currentCalDate.getMonth() + dir);
-  renderCalendar();
-}
+/* --- PICKERS & MODALS --- */
+function renderPicker() {
+  const cont = document.getElementById("datepicker-days"),
+    m = pDate.getMonth(),
+    y = pDate.getFullYear();
+  const title = document.getElementById("currentMonthYear");
+  if (title)
+    title.innerText = pDate.toLocaleString("en-US", {
+      month: "short",
+      year: "numeric",
+    });
 
-function showCalendarDetail(dateStr, tasks) {
-  document.getElementById("detail-date-title").innerText = dateStr;
-  document.getElementById("calendar-task-list").innerHTML = tasks
-    .map(
-      (t) => `
-    <div class="p-4 bg-white/5 rounded-2xl border border-white/5 text-left">
-        <span class="text-[7px] font-black uppercase ${t.priority === "High" ? "text-red-500" : t.priority === "Medium" ? "text-orange-500" : "text-gray-400"}">${t.priority}</span>
-        <p class="text-xs font-bold mt-1">${t.content}</p>
-    </div>`,
-    )
-    .join("");
-  document.getElementById("calendar-detail-modal").classList.remove("hidden");
-}
-
-function closeCalendarDetail() {
-  document.getElementById("calendar-detail-modal").classList.add("hidden");
-}
-
-async function simpanData() {
-  const isi = document.getElementById("isiData").value,
-    t1 = document.getElementById("tglMulai").value,
-    t2 = document.getElementById("tglDeadline").value,
-    link = document.getElementById("linkData").value;
-  if (!isi || !t2) return showNotify("Data mission tidak lengkap", "error");
-
-  const { error } = await sb.from("schedule").insert([
-    {
-      content: isi,
-      tgl_start: t1 || t2,
-      tgl_deadline: t2,
-      category: selectedKat,
-      priority: selectedPri,
-      is_done: false,
-      task_link: link,
-    },
-  ]);
-
-  if (error) showNotify("Failed to save data", "error");
-  else {
-    showNotify("Mission data uploaded!");
-    document.getElementById("isiData").value = "";
-    document.getElementById("linkData").value = "";
-    muatData();
+  const first = new Date(y, m, 1).getDay(),
+    days = new Date(y, m + 1, 0).getDate();
+  if (!cont) return;
+  cont.innerHTML = "";
+  for (let i = 0; i < first; i++) cont.innerHTML += "<div></div>";
+  for (let d = 1; d <= days; d++) {
+    const dStr = `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+    cont.innerHTML += `<div class="p-2 hover:bg-white/10 rounded-full cursor-pointer text-[10px]" onclick="selectDate('${dStr}')">${d}</div>`;
   }
-}
-
-function toggleDatePicker(e, target) {
-  e.stopPropagation();
-  dateTarget = target;
-  document.getElementById("custom-datepicker").classList.toggle("hidden");
-  renderPicker();
 }
 
 function selectDate(d) {
@@ -472,72 +574,47 @@ function selectDate(d) {
   showNotify(`Target date: ${d}`);
 }
 
-function renderPicker() {
-  const cont = document.getElementById("datepicker-days"),
-    m = pDate.getMonth(),
-    y = pDate.getFullYear();
-  document.getElementById("currentMonthYear").innerText = pDate.toLocaleString(
-    "en-US",
-    { month: "short", year: "numeric" },
-  );
-  const first = new Date(y, m, 1).getDay(),
-    days = new Date(y, m + 1, 0).getDate();
-  cont.innerHTML = "";
-  for (let i = 0; i < first; i++) cont.innerHTML += "<div></div>";
-  for (let d = 1; d <= days; d++) {
-    const dStr = `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-    cont.innerHTML += `<div class="p-2 hover:bg-white/10 rounded-full cursor-pointer text-[10px]" onclick="selectDate('${dStr}')">${d}</div>`;
-  }
-}
-
 function openSelect(e, type) {
   e.stopPropagation();
   const m = document.getElementById("custom-modal"),
     opt = document.getElementById("modal-options");
+  if (!m || !opt) return;
   m.classList.remove("hidden");
   opt.innerHTML = "";
   const items =
     type === "kategori"
-      ? ["Assignment", "Event", "Schedule"]
-      : ["Low", "Medium", "High"];
+      ? [{ t: "Tugas", v: "Assignment" }, { t: "Event", v: "Event" }, { t: "Jadwal", v: "Schedule" }]
+      : [{ t: "Rendah", v: "Low" }, { t: "Sedang", v: "Medium" }, { t: "Tinggi", v: "High" }];
   items.forEach((item) => {
     const b = document.createElement("button");
     b.className =
-      "py-4 bg-white/5 rounded-xl font-black text-[9px] uppercase hover:bg-white/10 text-current";
-    b.innerText = item;
+      "py-4 bg-white/5 rounded-xl font-black text-[9px] uppercase hover:bg-white/10";
+    b.innerText = item.t;
     b.onclick = () => {
       if (type === "kategori") {
-        selectedKat = item;
-        document.getElementById("btn-kategori").innerText = item;
+        selectedKat = item.v;
+        document.getElementById("btn-kategori").innerText = item.t;
       } else {
-        selectedPri = item;
-        document.getElementById("btn-priority").innerText = item;
+        selectedPri = item.v;
+        document.getElementById("btn-priority").innerText = item.t;
       }
       closeModal();
-      showNotify(`${type} changed to ${item}`);
+      showNotify(`${type} changed to ${item.t}`);
     };
     opt.appendChild(b);
   });
 }
 
-function closeModal() {
-  document.getElementById("custom-modal").classList.add("hidden");
-}
-
-function askDel(id) {
+/* --- UTILITIES & EVENTS --- */
+async function askDel(id) {
+  if (!id || id === "undefined") return;
   delId = id;
-  customConfirm("Terminate this mission data?", async () => {
-    await confirmDelete();
-  });
-}
-
-function closeDeleteModal() {
-  document.getElementById("delete-modal").classList.add("hidden");
+  customConfirm("Terminate this mission data?", confirmDelete);
 }
 
 async function confirmDelete() {
   const { error } = await sb.from("schedule").delete().eq("id", delId);
-  if (error) showNotify("Failed to delete", "error");
+  if (error) showNotify(`Failed: ${error.message}`, "error");
   else {
     showNotify("Mission data terminated");
     muatData();
@@ -545,33 +622,84 @@ async function confirmDelete() {
 }
 
 function toggleTheme() {
-  const h = document.documentElement,
-    n = h.getAttribute("data-theme") === "dark" ? "light" : "dark";
+  const h = document.documentElement;
+  const n = h.getAttribute("data-theme") === "dark" ? "light" : "dark";
   h.setAttribute("data-theme", n);
   localStorage.setItem("theme", n);
-  const activeLink = document.querySelector(".nav a.active");
-  if (activeLink) moveNavBubble(activeLink);
+  setTimeout(() => {
+    const active = document.querySelector(".nav a.active");
+    if (active) moveNavBubble(active);
+  }, 50);
   renderCountdown();
-  // Notifikasi dihapus di sini agar ganti tema lebih sunyi
 }
 
 function changeMonth(dir) {
   pDate.setMonth(pDate.getMonth() + dir);
   renderPicker();
 }
+function changeCalMonth(dir) {
+  currentCalDate.setMonth(currentCalDate.getMonth() + dir);
+  renderCalendar();
+}
+function closeModal() {
+  document.getElementById("custom-modal")?.classList.add("hidden");
+}
 
+function toggleDatePicker(e, target) {
+  e.stopPropagation();
+  dateTarget = target;
+  document.getElementById("custom-datepicker").classList.toggle("hidden");
+  renderPicker();
+}
+
+function showCalendarDetail(dateStr, tasks) {
+  document.getElementById("detail-date-title").innerText = dateStr;
+  document.getElementById("calendar-task-list").innerHTML = tasks
+    .map(
+      (t) => `
+        <div class="p-4 bg-white/5 rounded-2xl border border-white/5 text-left">
+            <span class="text-[7px] font-black uppercase ${t.priority === "High" ? "text-red-500" : t.priority === "Medium" ? "text-orange-500" : "text-gray-400"}">${tLoc(t.priority)}</span>
+            <p class="text-xs font-bold mt-1 uppercase">${t.content}</p>
+        </div>`,
+    )
+    .join("");
+  document.getElementById("calendar-detail-modal").classList.remove("hidden");
+}
+
+function closeCalendarDetail() {
+  document.getElementById("calendar-detail-modal")?.classList.add("hidden");
+}
+
+function previewImage(input) {
+  const container = document.getElementById("file-preview-container"),
+    preview = document.getElementById("file-preview"),
+    placeholder = document.getElementById("upload-placeholder");
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      preview.src = e.target.result;
+      container.classList.remove("hidden");
+      placeholder.classList.add("hidden");
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+// Clock
 setInterval(() => {
-  const clockEl = document.getElementById("clock");
-  if (clockEl)
-    clockEl.innerText = new Date().toLocaleTimeString("id-ID", {
-      hour12: false,
-    });
+  const clock = document.getElementById("clock");
+  if (clock)
+    clock.innerText = new Date().toLocaleTimeString("id-ID", { hour12: false });
 }, 1000);
 
-window.addEventListener("load", () => {
-  const activeLink = document.querySelector(".nav a.active");
-  if (activeLink) moveNavBubble(activeLink);
-  muatGallery();
+window.addEventListener("resize", () => {
+  const active = document.querySelector(".nav a.active");
+  if (active) moveNavBubble(active);
 });
 
-muatData();
+// INITIAL LOAD
+window.addEventListener("load", () => {
+  const active = document.querySelector(".nav a.active");
+  if (active) moveNavBubble(active);
+  refreshAllData();
+});
