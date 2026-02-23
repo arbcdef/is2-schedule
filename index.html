@@ -27,13 +27,50 @@
         window.addEventListener("load", () => {
           navigator.serviceWorker
             .register("/sw.js")
-            .then((reg) => console.log("Service Worker Active"))
+            .then(() => console.log("Service Worker Active"))
             .catch((err) => console.error("SW Registration Failed", err));
         });
       }
     </script>
   </head>
+
   <body class="antialiased pb-24">
+    <div id="auth-page" class="modal-overlay z-[10000] hidden">
+      <div
+        class="modal-card w-[90%] max-w-[300px] text-center p-8 border border-white/10 shadow-2xl relative"
+      >
+        <button
+          onclick="closeAdminGate()"
+          class="absolute top-4 right-4 opacity-30 hover:opacity-100 text-[10px] font-black"
+        >
+          ESC
+        </button>
+        <h2
+          class="text-[10px] font-black uppercase tracking-[0.3em] mb-8 opacity-50"
+        >
+          Admin Access
+        </h2>
+        <div class="space-y-4">
+          <input
+            type="password"
+            id="admin-pin"
+            placeholder="PIN"
+            class="ios-input text-center tracking-[1em] font-black"
+            maxlength="4"
+            inputmode="numeric"
+            onkeypress="if (event.key === 'Enter') handlePinLogin();"
+          />
+          <button
+            onclick="handlePinLogin()"
+            id="btn-login-pin"
+            class="primary-btn mt-2"
+          >
+            Login
+          </button>
+        </div>
+      </div>
+    </div>
+
     <header class="header-seamless">
       <div
         class="max-w-6xl mx-auto flex justify-between items-center px-6 md:px-10"
@@ -50,11 +87,10 @@
           </h1>
         </div>
 
-        <div class="flex items-center gap-4">
-          <button
-            onclick="toggleTheme()"
+        <div class="flex items-center gap-2">
+          <div
             class="px-4 py-2 bg-white/5 rounded-full flex items-center gap-2 border border-white/5 transition hover:bg-white/10 active:scale-95 cursor-pointer"
-            title="Toggle Theme"
+            onclick="toggleTheme()"
           >
             <div
               id="db-status-dot"
@@ -62,9 +98,28 @@
             ></div>
             <span
               id="db-status-text"
-              class="text-[8px] font-black uppercase tracking-widest opacity-30 select-none"
-              >Connecting</span
+              class="text-[8px] font-black uppercase tracking-widest opacity-30"
+              >Menghubungkan</span
             >
+          </div>
+
+          <button
+            id="btn-admin-gate"
+            onclick="openAdminGate()"
+            class="px-4 py-2 bg-white/5 rounded-full flex items-center gap-2 border border-white/5 transition hover:bg-white/10 active:scale-95 cursor-pointer"
+          >
+            <span
+              class="text-[8px] font-black uppercase tracking-widest opacity-60"
+              >Login</span
+            >
+          </button>
+
+          <button
+            id="btn-logout"
+            onclick="handleLogout()"
+            class="hidden px-4 py-2 bg-red-500/10 rounded-full border border-red-500/20 text-red-500 text-[8px] font-black uppercase tracking-widest"
+          >
+            Logout
           </button>
         </div>
       </div>
@@ -77,23 +132,22 @@
         >
           Visual Gallery
         </h2>
-
         <div
           id="gallery-grid"
           class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-10"
         ></div>
 
         <div
+          id="gallery-upload-container"
           class="glass-card p-6 border border-white/5 relative overflow-hidden group/card"
         >
           <div
             class="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover/card:opacity-100 transition-opacity duration-500"
           ></div>
-
           <p
             class="text-[9px] font-black opacity-30 uppercase tracking-widest mb-6 relative z-10"
           >
-            Add New Moment
+            Tambahkan Momen Baru
           </p>
 
           <div
@@ -107,10 +161,10 @@
                   <img
                     id="file-preview"
                     src="#"
+                    alt="Preview"
                     class="h-20 w-20 object-cover rounded-xl border border-white/20 shadow-2xl animate-in zoom-in duration-300"
                   />
                 </div>
-
                 <div id="upload-placeholder" class="text-center">
                   <div
                     class="text-2xl mb-2 opacity-20 group-hover/drop:scale-110 group-hover/drop:opacity-50 transition-all duration-300"
@@ -119,9 +173,9 @@
                   </div>
                   <p
                     id="file-name-display"
-                    class="text-[10px] font-bold uppercase tracking-widest opacity-30 group-hover/drop:opacity-60 transition-opacity"
+                    class="text-[10px] font-bold uppercase tracking-widest opacity-30 group-hover/drop:opacity-60"
                   >
-                    Tap to select or drop photo
+                    Ketuk untuk pilih atau letakkan foto
                   </p>
                 </div>
               </div>
@@ -133,11 +187,10 @@
                 onchange="previewImage(this)"
               />
             </label>
-
             <button
               onclick="uploadFoto()"
               id="btn-upload-foto"
-              class="primary-btn md:w-40 py-4 text-[10px] flex items-center justify-center gap-2 hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all"
+              class="primary-btn md:w-40 py-4 text-[10px]"
             >
               <span>UPLOAD</span>
             </button>
@@ -154,7 +207,6 @@
         <main class="flex flex-col gap-10">
           <div class="space-y-10">
             <div id="listData" class="space-y-3"></div>
-
             <section class="glass-card p-6 border border-white/5">
               <h2
                 class="text-center font-black uppercase mb-6 tracking-[0.4em] text-[10px] opacity-20"
@@ -165,10 +217,8 @@
             </section>
           </div>
 
-          <div id="mission-control-container">
-            <section
-              class="glass-card p-8 border border-white/5 max-w-2xl mx-auto"
-            >
+          <div id="mission-control-container" class="hidden space-y-6">
+            <section class="glass-card p-8 border border-white/5">
               <h2
                 class="text-[10px] font-black opacity-20 uppercase tracking-[0.3em] mb-6"
               >
@@ -181,21 +231,22 @@
                     onclick="openSelect(event, 'kategori')"
                     class="select-btn"
                   >
-                    Assignment
+                    Tugas
                   </button>
                   <button
                     id="btn-priority"
                     onclick="openSelect(event, 'priority')"
                     class="select-btn"
                   >
-                    Medium
+                    Sedang
                   </button>
                 </div>
+
                 <div class="grid grid-cols-2 gap-3 relative">
                   <input
                     type="text"
                     id="tglMulai"
-                    placeholder="Start Date"
+                    placeholder="Tanggal Mulai"
                     class="ios-input cursor-pointer"
                     readonly
                     onclick="toggleDatePicker(event, 'start')"
@@ -203,11 +254,12 @@
                   <input
                     type="text"
                     id="tglDeadline"
-                    placeholder="Deadline"
+                    placeholder="Tenggat Waktu"
                     class="ios-input cursor-pointer"
                     readonly
                     onclick="toggleDatePicker(event, 'end')"
                   />
+
                   <div
                     id="custom-datepicker"
                     class="hidden absolute left-0 right-0 top-full mt-2 glass-card z-[999] p-5 border border-white/10 shadow-2xl"
@@ -242,9 +294,10 @@
                     ></div>
                   </div>
                 </div>
+
                 <textarea
                   id="isiData"
-                  placeholder="What's the mission?"
+                  placeholder="Apa misinya?"
                   class="ios-input h-24 pt-4 resize-none"
                 ></textarea>
                 <input
@@ -254,7 +307,7 @@
                   class="ios-input"
                 />
                 <button onclick="simpanData()" class="primary-btn">
-                  Update Hub
+                  Simpan 
                 </button>
               </div>
             </section>
@@ -268,20 +321,53 @@
         >
           Lecturer Directory
         </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
-          <div class="glass-card p-6 border border-white/5 flex flex-col gap-2">
-            <p class="text-xs font-black opacity-30 uppercase tracking-widest">
-              Mata Kuliah A
-            </p>
-            <h3 class="text-lg font-bold">COMING SOON</h3>
-            <p class="text-sm opacity-60">COMING SOON@unikom.ac.id</p>
-          </div>
-          <div class="glass-card p-6 border border-white/5 flex flex-col gap-2">
-            <p class="text-xs font-black opacity-30 uppercase tracking-widest">
-              Mata Kuliah B
-            </p>
-            <h3 class="text-lg font-bold">COMING SOON</h3>
-            <p class="text-sm opacity-60">COMING SOON@unikom.ac.id</p>
+
+        <div id="lecturer-entry-container" class="hidden space-y-6 mb-10">
+          <section class="glass-card p-8 border border-white/5 text-left">
+            <h2
+              class="text-[10px] font-black opacity-20 uppercase tracking-[0.3em] mb-6"
+            >
+              Lecturer Entry
+            </h2>
+            <div class="space-y-4">
+              <input
+                type="text"
+                id="namaDosen"
+                placeholder="Nama Dosen"
+                class="ios-input"
+              />
+              <input
+                type="text"
+                id="matkulDosen"
+                placeholder="Mata Kuliah"
+                class="ios-input"
+              />
+              <input
+                type="number"
+                id="waDosen"
+                placeholder="Nomor WhatsApp"
+                class="ios-input"
+              />
+              <button
+                onclick="simpanDosen()"
+                id="btn-save-dosen"
+                class="primary-btn bg-blue-600/20 text-blue-400 border border-blue-500/30"
+              >
+                Simpan
+              </button>
+            </div>
+          </section>
+        </div>
+
+        <div
+          id="lecturer-list"
+          class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left"
+        >
+          <div
+            class="glass-card p-6 border border-white/5 flex flex-col gap-2 opacity-40"
+          >
+            <p class="text-xs font-black uppercase tracking-widest">Sistem</p>
+            <h3 class="text-lg font-bold">LOADING DIRECTORY...</h3>
           </div>
         </div>
       </section>
@@ -290,11 +376,12 @@
         <div
           class="flex flex-col items-center justify-center min-h-[50vh] text-center"
         >
-          <div
-            class="w-12 h-12 border-2 border-white/10 border-t-white rounded-full animate-spin mb-6"
-          ></div>
+          <div class="flex items-center gap-2 mb-6 text-white/40">
+            <span class="text-2xl font-mono font-bold">></span>
+            <div class="w-4 h-6 bg-white/40 animate-pulse"></div>
+          </div>
           <h2 class="text-xl font-black uppercase tracking-[0.2em] opacity-40">
-            kela ey ker di jien hola
+            kela nyak, keneh mikir dijien naon ey
           </h2>
         </div>
       </section>
@@ -332,7 +419,7 @@
         ></div>
         <button
           onclick="closeCalendarDetail()"
-          class="w-full mt-8 py-4 bg-white/5 rounded-2xl font-black uppercase text-[10px] tracking-widest"
+          class="w-full mt-8 py-4 bg-white/5 rounded-2xl font-black uppercase text-[10px]"
         >
           Close
         </button>
@@ -350,38 +437,6 @@
         <div id="modal-options" class="flex flex-col gap-2"></div>
       </div>
     </div>
-
-    <div
-      id="delete-modal"
-      class="modal-overlay hidden"
-      onclick="closeDeleteModal()"
-    >
-      <div
-        class="modal-card fade-in p-10 text-center"
-        onclick="event.stopPropagation()"
-      >
-        <h3 class="text-lg font-black mb-6">Remove?</h3>
-        <div class="grid grid-cols-2 gap-3">
-          <button
-            onclick="closeDeleteModal()"
-            class="py-4 bg-white/5 rounded-xl text-[9px] font-black uppercase"
-          >
-            No
-          </button>
-          <button
-            onclick="confirmDelete()"
-            class="py-4 bg-red-600 text-white rounded-xl text-[9px] font-black uppercase"
-          >
-            Yes
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div
-      id="toast-container"
-      class="fixed top-6 right-6 z-[9999] flex flex-col items-end pointer-events-none"
-    ></div>
 
     <div
       id="custom-confirm-modal"
@@ -415,18 +470,18 @@
         </h3>
         <p
           id="confirm-msg-text"
-          class="text-[10px] opacity-60 mb-8 font-bold uppercase leading-relaxed"
+          class="text-[10px] opacity-60 mb-8 font-bold uppercase"
         ></p>
         <div class="grid grid-cols-2 gap-3">
           <button
             onclick="closeConfirm()"
-            class="py-3 bg-white/5 rounded-xl text-[9px] font-black uppercase hover:bg-white/10 transition"
+            class="py-3 bg-white/5 rounded-xl text-[9px] font-black uppercase"
           >
             No
           </button>
           <button
             id="confirm-ok-btn"
-            class="py-3 bg-red-600 text-white rounded-xl text-[9px] font-black uppercase shadow-[0_0_20px_rgba(220,38,38,0.4)]"
+            class="py-3 bg-red-600 text-white rounded-xl text-[9px] font-black uppercase shadow-lg"
           >
             Yes
           </button>
@@ -434,53 +489,11 @@
       </div>
     </div>
 
+    <div
+      id="toast-container"
+      class="fixed top-6 right-6 z-[9999] flex flex-col items-end pointer-events-none"
+    ></div>
+
     <script src="script.js"></script>
-
-    <script>
-      function previewImage(input) {
-        const container = document.getElementById("file-preview-container");
-        const img = document.getElementById("file-preview");
-        const placeholder = document.getElementById("upload-placeholder");
-        const nameDisplay = document.getElementById("file-name-display");
-
-        if (input.files && input.files[0]) {
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            img.src = e.target.result;
-            container.classList.remove("hidden");
-            placeholder.classList.add("opacity-50");
-            nameDisplay.innerText = input.files[0].name;
-          };
-          reader.readAsDataURL(input.files[0]);
-        } else {
-          container.classList.add("hidden");
-          placeholder.classList.remove("opacity-50");
-          nameDisplay.innerText = "Tap to select or drop photo";
-        }
-      }
-
-      function switchPage(pageId, element) {
-        document
-          .querySelectorAll(".page-section")
-          .forEach((p) => p.classList.add("hidden"));
-        document.getElementById(pageId).classList.remove("hidden");
-        document
-          .querySelectorAll(".nav a")
-          .forEach((a) => a.classList.remove("active"));
-        element.classList.add("active");
-        const bubble = document.getElementById("nav-bubble-active");
-        bubble.style.width = element.offsetWidth + "px";
-        bubble.style.left = element.offsetLeft + "px";
-      }
-
-      window.addEventListener("load", () => {
-        const activeLink = document.querySelector(".nav a.active");
-        if (activeLink) {
-          const bubble = document.getElementById("nav-bubble-active");
-          bubble.style.width = activeLink.offsetWidth + "px";
-          bubble.style.left = activeLink.offsetLeft + "px";
-        }
-      });
-    </script>
   </body>
 </html>
