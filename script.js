@@ -28,17 +28,18 @@ function checkAdminSession() {
 
   const missionControl = document.getElementById("mission-control-container");
   const lecturerEntry = document.getElementById("lecturer-entry-container");
+  const infoAdmin = document.getElementById("info-admin-container");
 
   const btnLogin = document.getElementById("btn-admin-gate");
   const btnLogout = document.getElementById("btn-logout");
 
-  // Seleksi semua tombol hapus yang ada di DOM
+  // Seleksi semua tombol hapus yang ada di DOM (kecuali hapusFoto di Gallery karena publik boleh hapus)
   const editButtons = document.querySelectorAll(
-    "button[onclick*='askDel'], button[onclick*='hapusFoto'], button[onclick*='hapusDosen']",
+    "button[onclick*='askDel'], button[onclick*='hapusDosen'], button[onclick*='hapusInfo']",
   );
 
   // Reset visibility kontainer admin
-  [missionControl, lecturerEntry].forEach((el) =>
+  [missionControl, lecturerEntry, infoAdmin].forEach((el) =>
     el?.classList.add("hidden"),
   );
 
@@ -46,6 +47,8 @@ function checkAdminSession() {
     if (currentPage === "page-hub") missionControl?.classList.remove("hidden");
     else if (currentPage === "page-contact")
       lecturerEntry?.classList.remove("hidden");
+    else if (currentPage === "page-info")
+      infoAdmin?.classList.remove("hidden");
 
     btnLogin?.classList.add("hidden");
     btnLogout?.classList.remove("hidden");
@@ -94,6 +97,7 @@ function refreshAllData() {
   muatData();
   muatGallery();
   muatDosen();
+  muatInfo();
 }
 
 /* --- LECTURER LOGIC --- */
@@ -257,6 +261,7 @@ function switchPage(pageId, element) {
 
   if (pageId === "page-gallery") muatGallery();
   if (pageId === "page-contact") muatDosen();
+  if (pageId === "page-info") muatInfo();
 }
 
 /* --- SUPABASE API CALLS --- */
@@ -330,15 +335,13 @@ async function muatGallery() {
       .order("created_at", { ascending: false });
     if (error) throw error;
 
-    const isAdmin = localStorage.getItem("is_admin") === "true";
-
     grid.innerHTML =
       data
         ?.map(
           (img) => `
             <div class="glass-card p-2 aspect-square overflow-hidden group border border-white/5 relative">
                 <img src="${img.image_url}" class="w-full h-full object-cover rounded-xl grayscale group-hover:grayscale-0 transition-all duration-500" alt="Gallery Photo">
-                ${isAdmin ? `<button onclick="hapusFoto('${img.id}', '${img.file_path}')" class="absolute top-3 right-3 bg-red-500/80 text-white text-[8px] font-black px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">DELETE</button>` : ""}
+                <button onclick="hapusFoto('${img.id}', '${img.file_path}')" class="absolute top-3 right-3 bg-red-500/80 text-white text-[8px] font-black px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">DELETE</button>
             </div>`,
         )
         .join("") || "";
@@ -346,6 +349,42 @@ async function muatGallery() {
   } catch (err) {
     console.error("Gallery Error:", err);
   }
+}
+
+async function compressImage(file, max_width = 1280) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        
+        let width = img.width;
+        let height = img.height;
+        
+        if (width > max_width) {
+          height = Math.round((height * max_width) / width);
+          width = max_width;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        canvas.toBlob((blob) => {
+          resolve(new File([blob], file.name, {
+            type: "image/jpeg",
+            lastModified: Date.now()
+          }));
+        }, "image/jpeg", 0.7); // 0.7 adalah kualitas kompresi (70%)
+      };
+      img.onerror = (err) => reject(err);
+    };
+    reader.onerror = (err) => reject(err);
+  });
 }
 
 async function uploadFoto() {
@@ -358,10 +397,15 @@ async function uploadFoto() {
   btn.disabled = true;
 
   try {
-    const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, "_")}`;
+    const compressedFile = await compressImage(file);
+    
+    // Gunakan ekstensi .jpg karena hasil kompresi di atas adalah JPEG
+    const baseName = file.name.replace(/[^a-zA-Z0-9]/g, "_").split(".")[0];
+    const fileName = `${Date.now()}-${baseName}.jpg`;
+    
     const { error: upErr } = await sb.storage
       .from("PHOTOS")
-      .upload(fileName, file);
+      .upload(fileName, compressedFile);
     if (upErr) throw upErr;
 
     const { data: urlData } = sb.storage.from("PHOTOS").getPublicUrl(fileName);
@@ -389,6 +433,127 @@ async function hapusFoto(id, path) {
       await sb.from("gallery").delete().eq("id", id);
       showNotify("Moment deleted", "success");
       muatGallery();
+    } catch (err) {
+      showNotify("Failed to delete", "error");
+    }
+  });
+}
+
+/* --- INFORMATION BOARD LOGIC --- */
+async function muatInfo() {
+  const container = document.getElementById("info-list");
+  if (!container) return;
+
+  try {
+    const { data, error } = await sb
+      .from("announcements")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      container.innerHTML = `<div class="p-10 text-center opacity-10 text-[8px] font-black uppercase tracking-[0.4em] col-span-full">No Announcements</div>`;
+      return;
+    }
+
+    const isAdmin = localStorage.getItem("is_admin") === "true";
+
+    container.innerHTML = data
+      .map(
+        (d) => `
+            <div class="glass-card p-6 border border-white/5 flex flex-col gap-3 relative group">
+                <div class="flex justify-between items-start gap-4">
+                  <div>
+                    <h3 class="text-lg font-bold uppercase tracking-tight text-blue-400">${d.title}</h3>
+                    <p class="text-xs opacity-70 mt-2 whitespace-pre-wrap leading-relaxed">${d.description}</p>
+                    ${d.file_url ? `<div class="mt-4"><a href="${d.file_url}" target="_blank" class="inline-flex items-center gap-2 px-4 py-3 bg-white/10 rounded-xl text-[9px] border border-white/5 font-black uppercase tracking-widest hover:bg-white/20 transition">📄 Buka Lampiran</a></div>` : ""}
+                  </div>
+                  ${isAdmin ? `<button onclick="hapusInfo('${d.id}', '${d.file_path || ''}')" class="text-[8px] font-black text-red-500 opacity-60 hover:opacity-100 transition shrink-0">DELETE</button>` : ""}
+                </div>
+                <div class="text-[8px] font-black opacity-30 uppercase tracking-widest mt-2 border-t border-white/5 pt-2">
+                  Dipublikasi: ${new Date(d.created_at).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" })}
+                </div>
+            </div>`,
+      )
+      .join("");
+
+    checkAdminSession();
+  } catch (err) {
+    console.error("Info Error:", err);
+  }
+}
+
+async function simpanInfo() {
+  const title = document.getElementById("infoTitle").value;
+  const desc = document.getElementById("infoDesc").value;
+  const fileInput = document.getElementById("info-file");
+  const btn = document.getElementById("btn-save-info");
+  const file = fileInput.files[0];
+
+  if (!title || !desc)
+    return showNotify("Judul dan detail informasi harus diisi", "error");
+
+  try {
+    btn.innerText = "SAVING...";
+    btn.disabled = true;
+
+    let fileUrl = null;
+    let filePath = null;
+
+    if (file) {
+      const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, "_")}`;
+      const { error: upErr } = await sb.storage
+        .from("FILES")
+        .upload(fileName, file);
+      if (upErr) throw upErr;
+
+      const { data: urlData } = sb.storage.from("FILES").getPublicUrl(fileName);
+      fileUrl = urlData.publicUrl;
+      filePath = fileName;
+    }
+
+    const { error } = await sb.from("announcements").insert([
+      {
+        title: title,
+        description: desc,
+        file_url: fileUrl,
+        file_path: filePath
+      },
+    ]);
+
+    if (error) throw error;
+
+    showNotify("Information published!");
+    document.getElementById("infoTitle").value = "";
+    document.getElementById("infoDesc").value = "";
+    if(fileInput) fileInput.value = "";
+    const nameDisplay = document.getElementById("info-file-name");
+    if(nameDisplay) nameDisplay.innerText = "Pilih File (Opsional)";
+    muatInfo();
+  } catch (err) {
+    showNotify(err.message, "error");
+  } finally {
+    btn.innerText = "Publikasi Info";
+    btn.disabled = false;
+  }
+}
+
+async function hapusInfo(id, filePath) {
+  if (!id || id === "undefined" || id === "[object Object]") {
+    return showNotify("Error: Info ID not found", "error");
+  }
+
+  customConfirm("Remove this information?", async () => {
+    try {
+      if (filePath && filePath !== "undefined" && filePath !== "null") {
+        await sb.storage.from("FILES").remove([filePath]);
+      }
+      
+      const { error } = await sb.from("announcements").delete().eq("id", id);
+      if (error) throw error;
+      showNotify("Information removed");
+      muatInfo();
     } catch (err) {
       showNotify("Failed to delete", "error");
     }
@@ -697,9 +862,32 @@ window.addEventListener("resize", () => {
   if (active) moveNavBubble(active);
 });
 
+// SUPABASE REALTIME (Live Updates)
+function setupRealtime() {
+  sb.channel('realtime-hub')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'schedule' }, payload => {
+      muatData();
+      const st = payload.eventType;
+      if (st !== 'DELETE') showNotify("Sistem: Data jadwal diperbarui");
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'announcements' }, payload => {
+      muatInfo();
+      const st = payload.eventType;
+      if (st !== 'DELETE') showNotify("Sistem: Papan informasi diperbarui");
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'gallery' }, payload => {
+      muatGallery();
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'lecturers' }, payload => {
+      muatDosen();
+    })
+    .subscribe();
+}
+
 // INITIAL LOAD
 window.addEventListener("load", () => {
   const active = document.querySelector(".nav a.active");
   if (active) moveNavBubble(active);
   refreshAllData();
+  setupRealtime();
 });
