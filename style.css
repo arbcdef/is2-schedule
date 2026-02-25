@@ -1,4 +1,3 @@
-/* --- Root Variables: Theme System --- */
 :root[data-theme="dark"] {
   --bg-top: #0a0a0a;
   --bg-bottom: #000000;
@@ -23,7 +22,6 @@
   --nav-bg: rgba(0, 0, 0, 0.03);
 }
 
-/* --- Global Reset & Base Styles --- */
 * {
   -webkit-tap-highlight-color: transparent;
   box-sizing: border-box;
@@ -49,7 +47,6 @@ body {
   line-height: 1.5;
 }
 
-/* --- Layout Components --- */
 .header-seamless {
   position: sticky;
   top: 0;
@@ -75,7 +72,6 @@ body {
     background 0.3s ease;
 }
 
-/* --- Navigation System --- */
 .nav-wrap {
   background: var(--nav-bg);
   backdrop-filter: blur(15px);
@@ -130,7 +126,6 @@ body {
   box-shadow: 0 0 15px var(--accent);
 }
 
-/* --- Dynamic Island & Tasks --- */
 .dynamic-island {
   background: var(--text) !important;
   color: var(--bg-bottom) !important;
@@ -164,7 +159,6 @@ body {
   line-height: 1.3;
 }
 
-/* --- Form & Input Elements --- */
 .ios-input {
   width: 100%;
   background: var(--input);
@@ -219,7 +213,6 @@ body {
   transform: scale(0.97) opacity(0.8);
 }
 
-/* --- Calendar System --- */
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -250,7 +243,6 @@ body {
   outline-offset: 2px;
 }
 
-/* Calendar Priority Colors */
 .day-cell.pri-low {
   background: #8e8e93 !important;
   color: #fff !important;
@@ -287,7 +279,6 @@ body {
   border: none !important;
 }
 
-/* --- Modal & Overlays --- */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -311,7 +302,6 @@ body {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
 }
 
-/* --- Utilities & Animations --- */
 .fade-in {
   animation: fadeIn 0.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
