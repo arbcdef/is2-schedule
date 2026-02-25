@@ -1,4 +1,3 @@
-/* --- CONFIG & INITIALIZATION --- */
 const SB_URL = "https://mycldrtubwstojeaumcg.supabase.co";
 const SB_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15Y2xkcnR1YndzdG9qZWF1bWNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNzQwNTksImV4cCI6MjA4NTg1MDA1OX0.GHgglJHGQqDDRY-IcvhQeZyYZmR48J3arnby8IxZo9I";
@@ -15,11 +14,9 @@ let allTasks = [],
   delId = null,
   dateTarget = "start";
 
-// Theme Init
 const savedTheme = localStorage.getItem("theme");
 if (savedTheme) document.documentElement.setAttribute("data-theme", savedTheme);
 
-/* --- ADMIN ACCESS CONTROL (PIN SYSTEM 2525) --- */
 const MASTER_PIN = "2525";
 
 function checkAdminSession() {
@@ -33,12 +30,10 @@ function checkAdminSession() {
   const btnLogin = document.getElementById("btn-admin-gate");
   const btnLogout = document.getElementById("btn-logout");
 
-  // Seleksi semua tombol hapus yang ada di DOM (kecuali hapusFoto di Gallery karena publik boleh hapus)
   const editButtons = document.querySelectorAll(
     "button[onclick*='askDel'], button[onclick*='hapusDosen'], button[onclick*='hapusInfo']",
   );
 
-  // Reset visibility kontainer admin
   [missionControl, lecturerEntry, infoAdmin].forEach((el) =>
     el?.classList.add("hidden"),
   );
@@ -100,7 +95,6 @@ function refreshAllData() {
   muatInfo();
 }
 
-/* --- LECTURER LOGIC --- */
 async function muatDosen() {
   const container = document.getElementById("lecturer-list");
   if (!container) return;
@@ -195,7 +189,6 @@ async function hapusDosen(id) {
   });
 }
 
-/* --- UI NOTIFICATIONS & MODALS --- */
 function showNotify(msg, type = "success") {
   const container = document.getElementById("toast-container");
   if (!container) return;
@@ -234,7 +227,6 @@ function closeConfirm() {
   document.getElementById("custom-confirm-modal")?.classList.add("hidden");
 }
 
-/* --- CORE NAVIGATION --- */
 function moveNavBubble(element) {
   const bubble = document.getElementById("nav-bubble-active");
   if (bubble && element) {
@@ -264,7 +256,6 @@ function switchPage(pageId, element) {
   if (pageId === "page-info") muatInfo();
 }
 
-/* --- SUPABASE API CALLS --- */
 async function muatData() {
   const statusDot = document.getElementById("db-status-dot");
   const statusText = document.getElementById("db-status-text");
@@ -324,7 +315,6 @@ async function simpanData() {
   }
 }
 
-/* --- GALLERY LOGIC --- */
 async function muatGallery() {
   const grid = document.getElementById("gallery-grid");
   if (!grid) return;
@@ -379,7 +369,7 @@ async function compressImage(file, max_width = 1280) {
             type: "image/jpeg",
             lastModified: Date.now()
           }));
-        }, "image/jpeg", 0.7); // 0.7 adalah kualitas kompresi (70%)
+        }, "image/jpeg", 0.7);
       };
       img.onerror = (err) => reject(err);
     };
@@ -399,7 +389,6 @@ async function uploadFoto() {
   try {
     const compressedFile = await compressImage(file);
     
-    // Gunakan ekstensi .jpg karena hasil kompresi di atas adalah JPEG
     const baseName = file.name.replace(/[^a-zA-Z0-9]/g, "_").split(".")[0];
     const fileName = `${Date.now()}-${baseName}.jpg`;
     
@@ -439,7 +428,6 @@ async function hapusFoto(id, path) {
   });
 }
 
-/* --- INFORMATION BOARD LOGIC --- */
 async function muatInfo() {
   const container = document.getElementById("info-list");
   if (!container) return;
@@ -560,7 +548,6 @@ async function hapusInfo(id, filePath) {
   });
 }
 
-/* --- RENDERERS --- */
 function renderAll() {
   renderFeed();
   renderCalendar();
@@ -708,7 +695,6 @@ function renderCalendar() {
   }
 }
 
-/* --- PICKERS & MODALS --- */
 function renderPicker() {
   const cont = document.getElementById("datepicker-days"),
     m = pDate.getMonth(),
@@ -770,7 +756,6 @@ function openSelect(e, type) {
   });
 }
 
-/* --- UTILITIES & EVENTS --- */
 async function askDel(id) {
   if (!id || id === "undefined") return;
   delId = id;
@@ -850,7 +835,6 @@ function previewImage(input) {
   }
 }
 
-// Clock
 setInterval(() => {
   const clock = document.getElementById("clock");
   if (clock)
@@ -862,7 +846,6 @@ window.addEventListener("resize", () => {
   if (active) moveNavBubble(active);
 });
 
-// SUPABASE REALTIME (Live Updates)
 function setupRealtime() {
   sb.channel('realtime-hub')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'schedule' }, payload => {
@@ -884,7 +867,6 @@ function setupRealtime() {
     .subscribe();
 }
 
-// INITIAL LOAD
 window.addEventListener("load", () => {
   const active = document.querySelector(".nav a.active");
   if (active) moveNavBubble(active);
