@@ -246,11 +246,12 @@ function closeConfirm() {
 /* --- CORE NAVIGATION --- */
 function moveNavBubble(element) {
   const bubble = document.getElementById("nav-bubble-active");
-  if (bubble && element) {
+  const wrap = document.querySelector(".nav-wrap");
+  if (bubble && element && wrap) {
     const rect = element.getBoundingClientRect();
-    const parentRect = element.parentElement.getBoundingClientRect();
+    const wrapRect = wrap.getBoundingClientRect();
     bubble.style.width = `${rect.width}px`;
-    bubble.style.left = `${rect.left - parentRect.left}px`;
+    bubble.style.left = `${rect.left - wrapRect.left}px`;
   }
 }
 
