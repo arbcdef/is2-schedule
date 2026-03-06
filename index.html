@@ -204,6 +204,126 @@
           class="mb-10 min-h-[100px] relative z-20"
         ></div>
 
+        <div id="mission-control-container" class="hidden space-y-6 mb-10">
+          <section class="glass-card p-8 border border-white/5 text-left">
+            <h2
+              class="text-[10px] font-black opacity-20 uppercase tracking-[0.3em] mb-6"
+            >
+              Mission Control
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <!-- Type & Importance -->
+              <div class="space-y-4">
+                <div class="form-group">
+                  <span class="form-label">Kategori Misi</span>
+                  <button
+                    id="btn-kategori"
+                    onclick="openSelect(event, 'kategori')"
+                    class="select-btn"
+                  >
+                    Tugas
+                  </button>
+                </div>
+                <div class="form-group">
+                  <span class="form-label">Prioritas</span>
+                  <button
+                    id="btn-priority"
+                    onclick="openSelect(event, 'priority')"
+                    class="select-btn"
+                  >
+                    Sedang
+                  </button>
+                </div>
+              </div>
+
+              <!-- Time Management -->
+              <div class="space-y-4">
+                <div class="form-group relative">
+                  <span class="form-label">Tanggal Mulai</span>
+                  <input
+                    type="text"
+                    id="tglMulai"
+                    placeholder="Mulai"
+                    class="ios-input cursor-pointer"
+                    readonly
+                    onclick="toggleDatePicker(event, 'start')"
+                  />
+                </div>
+                <div class="form-group relative">
+                  <span class="form-label">Tenggat Waktu</span>
+                  <input
+                    type="text"
+                    id="tglDeadline"
+                    placeholder="Deadline"
+                    class="ios-input cursor-pointer"
+                    readonly
+                    onclick="toggleDatePicker(event, 'end')"
+                  />
+                  <!-- Shared Datepicker -->
+                  <div
+                    id="custom-datepicker"
+                    class="hidden absolute left-0 right-0 top-full mt-2 glass-card z-[999] p-5 border border-white/10 shadow-2xl"
+                  >
+                    <div class="flex justify-between items-center mb-4">
+                      <button
+                        onclick="event.stopPropagation(); changeMonth(-1);"
+                        class="text-[9px] font-black opacity-30"
+                      >
+                        PREV
+                      </button>
+                      <span
+                        id="currentMonthYear"
+                        class="text-[9px] font-black uppercase tracking-widest"
+                      ></span>
+                      <button
+                        onclick="event.stopPropagation(); changeMonth(1);"
+                        class="text-[9px] font-black opacity-30"
+                      >
+                        NEXT
+                      </button>
+                    </div>
+                    <div
+                      id="datepicker-days"
+                      class="grid grid-cols-7 gap-1 text-center text-[10px] font-bold"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Content & Resources -->
+              <div class="space-y-4">
+                <div class="form-group">
+                  <span class="form-label">Detail Misi</span>
+                  <textarea
+                    id="isiData"
+                    placeholder="Deskripsi tugas/misi..."
+                    class="ios-input h-16 pt-3 resize-none"
+                  ></textarea>
+                </div>
+                <div class="form-group">
+                  <span class="form-label">Link Resource</span>
+                  <input
+                    type="url"
+                    id="linkData"
+                    placeholder="https://..."
+                    class="ios-input"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-8">
+              <button
+                onclick="simpanData()"
+                id="btn-save-hub"
+                class="primary-btn py-5"
+              >
+                Launch Mission
+              </button>
+            </div>
+          </section>
+        </div>
+
         <main class="flex flex-col gap-10">
           <div class="space-y-10">
             <div id="listData" class="space-y-3"></div>
@@ -217,101 +337,6 @@
             </section>
           </div>
 
-          <div id="mission-control-container" class="hidden space-y-6">
-            <section class="glass-card p-8 border border-white/5">
-              <h2
-                class="text-[10px] font-black opacity-20 uppercase tracking-[0.3em] mb-6"
-              >
-                Mission Control
-              </h2>
-              <div class="space-y-4">
-                <div class="grid grid-cols-2 gap-3">
-                  <button
-                    id="btn-kategori"
-                    onclick="openSelect(event, 'kategori')"
-                    class="select-btn"
-                  >
-                    Tugas
-                  </button>
-                  <button
-                    id="btn-priority"
-                    onclick="openSelect(event, 'priority')"
-                    class="select-btn"
-                  >
-                    Sedang
-                  </button>
-                </div>
-
-                <div class="grid grid-cols-2 gap-3 relative">
-                  <input
-                    type="text"
-                    id="tglMulai"
-                    placeholder="Tanggal Mulai"
-                    class="ios-input cursor-pointer"
-                    readonly
-                    onclick="toggleDatePicker(event, 'start')"
-                  />
-                  <input
-                    type="text"
-                    id="tglDeadline"
-                    placeholder="Tenggat Waktu"
-                    class="ios-input cursor-pointer"
-                    readonly
-                    onclick="toggleDatePicker(event, 'end')"
-                  />
-
-                  <div
-                    id="custom-datepicker"
-                    class="hidden absolute left-0 right-0 top-full mt-2 glass-card z-[999] p-5 border border-white/10 shadow-2xl"
-                  >
-                    <div class="flex justify-between items-center mb-4">
-                      <button
-                        onclick="
-                          event.stopPropagation();
-                          changeMonth(-1);
-                        "
-                        class="text-[9px] font-black opacity-30"
-                      >
-                        PREV
-                      </button>
-                      <span
-                        id="currentMonthYear"
-                        class="text-[9px] font-black uppercase tracking-widest"
-                      ></span>
-                      <button
-                        onclick="
-                          event.stopPropagation();
-                          changeMonth(1);
-                        "
-                        class="text-[9px] font-black opacity-30"
-                      >
-                        NEXT
-                      </button>
-                    </div>
-                    <div
-                      id="datepicker-days"
-                      class="grid grid-cols-7 gap-1 text-center text-[10px] font-bold"
-                    ></div>
-                  </div>
-                </div>
-
-                <textarea
-                  id="isiData"
-                  placeholder="Apa misinya?"
-                  class="ios-input h-24 pt-4 resize-none"
-                ></textarea>
-                <input
-                  type="url"
-                  id="linkData"
-                  placeholder="https://link-tugas.com"
-                  class="ios-input"
-                />
-                <button onclick="simpanData()" class="primary-btn">
-                  Simpan 
-                </button>
-              </div>
-            </section>
-          </div>
         </main>
       </section>
 
