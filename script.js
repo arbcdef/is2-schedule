@@ -1,3 +1,4 @@
+/* --- CONFIG & INITIALIZATION --- */
 const SB_URL = "https://mycldrtubwstojeaumcg.supabase.co";
 const SB_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15Y2xkcnR1YndzdG9qZWF1bWNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNzQwNTksImV4cCI6MjA4NTg1MDA1OX0.GHgglJHGQqDDRY-IcvhQeZyYZmR48J3arnby8IxZo9I";
@@ -12,11 +13,18 @@ let allTasks = [],
   pDate = new Date(),
   currentCalDate = new Date(),
   delId = null,
-  dateTarget = "start";
+  dateTarget = "start",
+  selectedDay = "Senin",
+  selectedStartTime = "08:00",
+  selectedEndTime = "10:00",
+  timeTarget = "start",
+  selectedSKS = "";
 
+// Theme Init
 const savedTheme = localStorage.getItem("theme");
 if (savedTheme) document.documentElement.setAttribute("data-theme", savedTheme);
 
+/* --- ADMIN ACCESS CONTROL (PIN SYSTEM 2525) --- */
 const MASTER_PIN = "2525";
 
 function checkAdminSession() {
@@ -26,15 +34,18 @@ function checkAdminSession() {
   const missionControl = document.getElementById("mission-control-container");
   const lecturerEntry = document.getElementById("lecturer-entry-container");
   const infoAdmin = document.getElementById("info-admin-container");
+  const scheduleAdmin = document.getElementById("schedule-admin-container");
 
   const btnLogin = document.getElementById("btn-admin-gate");
   const btnLogout = document.getElementById("btn-logout");
 
+  // Seleksi semua tombol hapus yang ada di DOM (kecuali hapusFoto di Gallery karena publik boleh hapus)
   const editButtons = document.querySelectorAll(
     "button[onclick*='askDel'], button[onclick*='hapusDosen'], button[onclick*='hapusInfo']",
   );
 
-  [missionControl, lecturerEntry, infoAdmin].forEach((el) =>
+  // Reset visibility kontainer admin
+  [missionControl, lecturerEntry, infoAdmin, scheduleAdmin].forEach((el) =>
     el?.classList.add("hidden"),
   );
 
@@ -44,6 +55,8 @@ function checkAdminSession() {
       lecturerEntry?.classList.remove("hidden");
     else if (currentPage === "page-info")
       infoAdmin?.classList.remove("hidden");
+    else if (currentPage === "page-schedule")
+      scheduleAdmin?.classList.remove("hidden");
 
     btnLogin?.classList.add("hidden");
     btnLogout?.classList.remove("hidden");
@@ -93,8 +106,10 @@ function refreshAllData() {
   muatGallery();
   muatDosen();
   muatInfo();
+  muatJadwal();
 }
 
+/* --- LECTURER LOGIC --- */
 async function muatDosen() {
   const container = document.getElementById("lecturer-list");
   if (!container) return;
@@ -189,6 +204,7 @@ async function hapusDosen(id) {
   });
 }
 
+/* --- UI NOTIFICATIONS & MODALS --- */
 function showNotify(msg, type = "success") {
   const container = document.getElementById("toast-container");
   if (!container) return;
@@ -227,6 +243,7 @@ function closeConfirm() {
   document.getElementById("custom-confirm-modal")?.classList.add("hidden");
 }
 
+/* --- CORE NAVIGATION --- */
 function moveNavBubble(element) {
   const bubble = document.getElementById("nav-bubble-active");
   if (bubble && element) {
@@ -254,8 +271,10 @@ function switchPage(pageId, element) {
   if (pageId === "page-gallery") muatGallery();
   if (pageId === "page-contact") muatDosen();
   if (pageId === "page-info") muatInfo();
+  if (pageId === "page-schedule") muatJadwal();
 }
 
+/* --- SUPABASE API CALLS --- */
 async function muatData() {
   const statusDot = document.getElementById("db-status-dot");
   const statusText = document.getElementById("db-status-text");
@@ -315,6 +334,7 @@ async function simpanData() {
   }
 }
 
+/* --- GALLERY LOGIC --- */
 async function muatGallery() {
   const grid = document.getElementById("gallery-grid");
   if (!grid) return;
@@ -369,7 +389,7 @@ async function compressImage(file, max_width = 1280) {
             type: "image/jpeg",
             lastModified: Date.now()
           }));
-        }, "image/jpeg", 0.7);
+        }, "image/jpeg", 0.7); // 0.7 adalah kualitas kompresi (70%)
       };
       img.onerror = (err) => reject(err);
     };
@@ -389,6 +409,7 @@ async function uploadFoto() {
   try {
     const compressedFile = await compressImage(file);
     
+    // Gunakan ekstensi .jpg karena hasil kompresi di atas adalah JPEG
     const baseName = file.name.replace(/[^a-zA-Z0-9]/g, "_").split(".")[0];
     const fileName = `${Date.now()}-${baseName}.jpg`;
     
@@ -428,6 +449,7 @@ async function hapusFoto(id, path) {
   });
 }
 
+/* --- INFORMATION BOARD LOGIC --- */
 async function muatInfo() {
   const container = document.getElementById("info-list");
   if (!container) return;
@@ -548,6 +570,137 @@ async function hapusInfo(id, filePath) {
   });
 }
 
+/* --- JADWAL KULIAH LOGIC --- */
+async function muatJadwal() {
+  const grid = document.getElementById("schedule-main-grid");
+  if (!grid) return;
+
+  try {
+    const { data, error } = await sb
+      .from("class_schedules")
+      .select("*")
+      .order("time_start", { ascending: true });
+
+    if (error) {
+      if (error.code === "PGRST204") {
+         console.warn("Table class_schedules not found. Please create it in Supabase.");
+      }
+      throw error;
+    }
+
+    renderSchedule(data || []);
+  } catch (err) {
+    console.error("Jadwal Error:", err);
+  }
+}
+
+async function simpanJadwal() {
+  const subject = document.getElementById("scheduleSubject").value;
+  const lecturer = document.getElementById("scheduleLecturer").value;
+  const room = document.getElementById("scheduleRoom").value;
+  const btn = document.getElementById("btn-save-schedule");
+
+  if (!subject || !selectedStartTime || !selectedEndTime || selectedDay === "Pilih Hari")
+    return showNotify("Lengkapi data jadwal (Hari, Matkul, Waktu)", "error");
+
+  try {
+    btn.innerText = "SAVING...";
+    btn.disabled = true;
+
+    const { error } = await sb.from("class_schedules").insert([
+      {
+        day: selectedDay,
+        subject: subject,
+        lecturer: lecturer,
+        time_start: selectedStartTime,
+        time_end: selectedEndTime,
+        room: room,
+        sks: selectedSKS
+      },
+    ]);
+
+    if (error) throw error;
+
+    showNotify("Jadwal berhasil ditambahkan!");
+    document.getElementById("scheduleSubject").value = "";
+    document.getElementById("scheduleLecturer").value = "";
+    document.getElementById("scheduleRoom").value = "";
+    document.getElementById("btn-schedule-start").innerText = "Jam Mulai";
+    document.getElementById("btn-schedule-end").innerText = "Jam Selesai";
+    document.getElementById("btn-schedule-sks").innerText = "Pilih SKS";
+    selectedStartTime = "";
+    selectedEndTime = "";
+    selectedSKS = "";
+    muatJadwal();
+  } catch (err) {
+    showNotify(err.message, "error");
+  } finally {
+    btn.innerText = "Tambah Jadwal";
+    btn.disabled = false;
+  }
+}
+
+async function hapusJadwal(id) {
+  customConfirm("Hapus jadwal kuliah ini?", async () => {
+    try {
+      const { error } = await sb.from("class_schedules").delete().eq("id", id);
+      if (error) throw error;
+      showNotify("Jadwal dihapus");
+      muatJadwal();
+    } catch (err) {
+      showNotify("Gagal menghapus jadwal", "error");
+    }
+  });
+}
+
+function renderSchedule(data) {
+  const days = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+  const isAdmin = localStorage.getItem("is_admin") === "true";
+
+  // Reset columns
+  days.forEach(day => {
+    const col = document.getElementById(`col-${day}`);
+    if (col) col.innerHTML = "";
+  });
+
+  data.forEach(item => {
+    const col = document.getElementById(`col-${item.day}`);
+    if (col) {
+      const card = document.createElement("div");
+      card.className = `schedule-card ${isAdmin ? 'admin-mode' : ''}`;
+      card.innerHTML = `
+        <div class="time-badge">${item.time_start} - ${item.time_end}</div>
+        <h3 class="subject-name">${item.subject}</h3>
+        
+        <div class="info-row">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+          <span>${item.room || '-'} • ${item.sks || '?'} SKS</span>
+        </div>
+        
+        <div class="info-row">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span>${item.lecturer || '-'}</span>
+        </div>
+
+        ${isAdmin ? `<button onclick="hapusJadwal('${item.id}')" class="btn-del-schedule">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+        </button>` : ""}
+      `;
+      col.appendChild(card);
+    }
+  });
+}
+
+/* --- RENDERERS --- */
 function renderAll() {
   renderFeed();
   renderCalendar();
@@ -695,6 +848,7 @@ function renderCalendar() {
   }
 }
 
+/* --- PICKERS & MODALS --- */
 function renderPicker() {
   const cont = document.getElementById("datepicker-days"),
     m = pDate.getMonth(),
@@ -730,21 +884,47 @@ function openSelect(e, type) {
   const m = document.getElementById("custom-modal"),
     opt = document.getElementById("modal-options");
   if (!m || !opt) return;
+  if (type === "startTime" || type === "endTime") {
+    timeTarget = type === "startTime" ? "start" : "end";
+    openManualTimePicker();
+    return;
+  }
+
   m.classList.remove("hidden");
   opt.innerHTML = "";
-  const items =
-    type === "kategori"
-      ? [{ t: "Tugas", v: "Assignment" }, { t: "Event", v: "Event" }, { t: "Jadwal", v: "Schedule" }]
-      : [{ t: "Rendah", v: "Low" }, { t: "Sedang", v: "Medium" }, { t: "Tinggi", v: "High" }];
+  
+  let items = [];
+  if (type === "kategori") {
+    items = [{ t: "Tugas", v: "Assignment" }, { t: "Event", v: "Event" }, { t: "Jadwal", v: "Schedule" }];
+  } else if (type === "day") {
+    items = [{ t: "Senin", v: "Senin" }, { t: "Selasa", v: "Selasa" }, { t: "Rabu", v: "Rabu" }, { t: "Kamis", v: "Kamis" }, { t: "Jumat", v: "Jumat" }, { t: "Sabtu", v: "Sabtu" }];
+  } else if (type === "priority") {
+    items = [{ t: "Rendah", v: "Low" }, { t: "Sedang", v: "Medium" }, { t: "Tinggi", v: "High" }];
+  } else if (type === "sks") {
+    items = [{ t: "1 SKS", v: "1" }, { t: "2 SKS", v: "2" }, { t: "3 SKS", v: "3" }, { t: "4 SKS", v: "4" }, { t: "6 SKS", v: "6" }];
+  }
+
   items.forEach((item) => {
     const b = document.createElement("button");
     b.className =
-      "py-4 bg-white/5 rounded-xl font-black text-[9px] uppercase hover:bg-white/10";
+      "py-4 bg-white/5 rounded-xl font-black text-[9px] uppercase hover:bg-white/10 shrink-0";
     b.innerText = item.t;
     b.onclick = () => {
       if (type === "kategori") {
         selectedKat = item.v;
         document.getElementById("btn-kategori").innerText = item.t;
+      } else if (type === "day") {
+        selectedDay = item.v;
+        document.getElementById("btn-schedule-day").innerText = item.t;
+      } else if (type === "startTime") {
+        selectedStartTime = item.v;
+        document.getElementById("btn-schedule-start").innerText = item.t;
+      } else if (type === "endTime") {
+        selectedEndTime = item.v;
+        document.getElementById("btn-schedule-end").innerText = item.t;
+      } else if (type === "sks") {
+        selectedSKS = item.v;
+        document.getElementById("btn-schedule-sks").innerText = item.t;
       } else {
         selectedPri = item.v;
         document.getElementById("btn-priority").innerText = item.t;
@@ -756,6 +936,7 @@ function openSelect(e, type) {
   });
 }
 
+/* --- UTILITIES & EVENTS --- */
 async function askDel(id) {
   if (!id || id === "undefined") return;
   delId = id;
@@ -793,6 +974,55 @@ function changeCalMonth(dir) {
 }
 function closeModal() {
   document.getElementById("custom-modal")?.classList.add("hidden");
+}
+
+/* --- MANUAL TIME PICKER LOGIC --- */
+function openManualTimePicker() {
+  const modal = document.getElementById("time-picker-modal");
+  const title = document.getElementById("time-picker-title");
+  
+  title.innerText = timeTarget === "start" ? "Set Start Time" : "Set End Time";
+  
+  // Pre-fill with existing values
+  const current = timeTarget === "start" ? selectedStartTime : selectedEndTime;
+  if(current && current.includes(":")) {
+    const [h, m] = current.split(":");
+    document.getElementById("input-hour").value = h;
+    document.getElementById("input-minute").value = m;
+  }
+  
+  modal.classList.remove("hidden");
+  document.getElementById("input-hour").focus();
+}
+
+function closeTimePicker() {
+  document.getElementById("time-picker-modal").classList.add("hidden");
+}
+
+function confirmManualTime() {
+  let h = document.getElementById("input-hour").value;
+  let m = document.getElementById("input-minute").value;
+  
+  if(h === "" || m === "") return showNotify("Please enter hour and minute", "error");
+  
+  // Format padding
+  h = String(h).padStart(2, '0');
+  m = String(m).padStart(2, '0');
+  
+  if (parseInt(h) > 23 || parseInt(m) > 59) return showNotify("Invalid time format", "error");
+  
+  const timeStr = `${h}:${m}`;
+  
+  if (timeTarget === "start") {
+    selectedStartTime = timeStr;
+    document.getElementById("btn-schedule-start").innerText = timeStr;
+  } else {
+    selectedEndTime = timeStr;
+    document.getElementById("btn-schedule-end").innerText = timeStr;
+  }
+  
+  closeTimePicker();
+  showNotify(`Time set to ${timeStr}`);
 }
 
 function toggleDatePicker(e, target) {
@@ -835,6 +1065,7 @@ function previewImage(input) {
   }
 }
 
+// Clock
 setInterval(() => {
   const clock = document.getElementById("clock");
   if (clock)
@@ -846,6 +1077,7 @@ window.addEventListener("resize", () => {
   if (active) moveNavBubble(active);
 });
 
+// SUPABASE REALTIME (Live Updates)
 function setupRealtime() {
   sb.channel('realtime-hub')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'schedule' }, payload => {
@@ -867,6 +1099,7 @@ function setupRealtime() {
     .subscribe();
 }
 
+// INITIAL LOAD
 window.addEventListener("load", () => {
   const active = document.querySelector(".nav a.active");
   if (active) moveNavBubble(active);
