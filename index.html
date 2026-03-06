@@ -130,7 +130,7 @@
         <h2
           class="text-[10px] font-black opacity-20 uppercase tracking-[0.3em] mb-8 text-center"
         >
-          Gallery
+          Visual Gallery
         </h2>
         <div
           id="gallery-grid"
@@ -147,7 +147,7 @@
           <p
             class="text-[9px] font-black opacity-30 uppercase tracking-widest mb-6 relative z-10"
           >
-            Tambahkan Foto
+            Tambahkan Momen Baru
           </p>
 
           <div
@@ -422,6 +422,158 @@
           </div>
         </div>
       </section>
+
+      <section id="page-schedule" class="page-section hidden">
+        <h2
+          class="text-[10px] font-black opacity-20 uppercase tracking-[0.3em] mb-8 text-center"
+        >
+          Jadwal Kuliah
+        </h2>
+
+        <div id="schedule-admin-container" class="hidden space-y-6 mb-10">
+          <section class="glass-card p-8 border border-white/5 text-left">
+            <h2
+              class="text-[10px] font-black opacity-20 uppercase tracking-[0.3em] mb-6"
+            >
+              Add Schedule Item
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <!-- Academic Info -->
+              <div class="space-y-4">
+                <div class="form-group">
+                  <span class="form-label">Mata Kuliah</span>
+                  <input
+                    type="text"
+                    id="scheduleSubject"
+                    placeholder="Contoh: Pemrograman Web"
+                    class="ios-input"
+                  />
+                </div>
+                <div class="form-group">
+                  <span class="form-label">Hari Kuliah</span>
+                  <button
+                    id="btn-schedule-day"
+                    onclick="openSelect(event, 'day')"
+                    class="select-btn"
+                  >
+                    Pilih Hari
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Time & Credits -->
+              <div class="space-y-4">
+                <div class="form-group">
+                  <span class="form-label">Rentang Waktu</span>
+                  <div class="grid grid-cols-2 gap-2">
+                    <button
+                      id="btn-schedule-start"
+                      onclick="openSelect(event, 'startTime')"
+                      class="select-btn"
+                    >
+                      Mulai
+                    </button>
+                    <button
+                      id="btn-schedule-end"
+                      onclick="openSelect(event, 'endTime')"
+                      class="select-btn"
+                    >
+                      Selesai
+                    </button>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <span class="form-label">Beban SKS</span>
+                  <button
+                    id="btn-schedule-sks"
+                    onclick="openSelect(event, 'sks')"
+                    class="select-btn"
+                  >
+                    Pilih SKS
+                  </button>
+                </div>
+              </div>
+
+              <!-- Logistics -->
+              <div class="space-y-4">
+                <div class="form-group">
+                  <span class="form-label">Nama Dosen</span>
+                  <input
+                    type="text"
+                    id="scheduleLecturer"
+                    placeholder="Nama Pengajar"
+                    class="ios-input"
+                  />
+                </div>
+                <div class="form-group">
+                  <span class="form-label">Lokasi / Ruangan</span>
+                  <input
+                    type="text"
+                    id="scheduleRoom"
+                    placeholder="Contoh: Lab Komputer 1"
+                    class="ios-input"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-10">
+              <button
+                onclick="simpanJadwal()"
+                id="btn-save-schedule"
+                class="primary-btn py-5"
+              >
+                Simpan Jadwal Baru
+              </button>
+            </div>
+          </section>
+        </div>
+
+        <div class="schedule-grid-wrap">
+          <div class="schedule-grid" id="schedule-main-grid">
+            <!-- Background Grid Lines -->
+            <div class="schedule-grid-lines">
+               <div class="grid-line"></div>
+               <div class="grid-line"></div>
+               <div class="grid-line"></div>
+               <div class="grid-line"></div>
+               <div class="grid-line"></div>
+               <div class="grid-line"></div>
+               <div class="grid-line"></div>
+               <div class="grid-line"></div>
+            </div>
+
+            <!-- Header Hari -->
+            <div class="schedule-header">Time</div>
+            <div class="schedule-header">Senin</div>
+            <div class="schedule-header">Selasa</div>
+            <div class="schedule-header">Rabu</div>
+            <div class="schedule-header">Kamis</div>
+            <div class="schedule-header">Jumat</div>
+            <div class="schedule-header">Sabtu</div>
+
+            <!-- Content Area -->
+            <!-- Time Column -->
+            <div class="schedule-time-col">
+                <div class="time-slot-label">08:00</div>
+                <div class="time-slot-label">10:00</div>
+                <div class="time-slot-label">12:00</div>
+                <div class="time-slot-label">14:00</div>
+                <div class="time-slot-label">16:00</div>
+                <div class="time-slot-label">18:00</div>
+                <div class="time-slot-label">20:00</div>
+            </div>
+            
+            <!-- Day Columns -->
+            <div id="col-Senin" class="schedule-day-col"></div>
+            <div id="col-Selasa" class="schedule-day-col"></div>
+            <div id="col-Rabu" class="schedule-day-col"></div>
+            <div id="col-Kamis" class="schedule-day-col"></div>
+            <div id="col-Jumat" class="schedule-day-col"></div>
+            <div id="col-Sabtu" class="schedule-day-col"></div>
+          </div>
+        </div>
+      </section>
     </div>
 
     <div class="fixed bottom-8 left-0 right-0 z-[1000] flex justify-center">
@@ -432,6 +584,7 @@
           <a href="#" onclick="switchPage('page-hub', this)" class="active"
             >Hub</a
           >
+          <a href="#" onclick="switchPage('page-schedule', this)">Schedule</a>
           <a href="#" onclick="switchPage('page-contact', this)">Contact</a>
           <a href="#" onclick="switchPage('page-info', this)">Info</a>
         </nav>
@@ -523,6 +676,52 @@
             Yes
           </button>
         </div>
+      </div>
+    </div>
+
+    <div
+      id="time-picker-modal"
+      class="modal-overlay hidden"
+      onclick="closeTimePicker()"
+    >
+      <div
+        class="modal-card fade-in p-8 text-center"
+        onclick="event.stopPropagation()"
+      >
+        <h3
+          id="time-picker-title"
+          class="text-[10px] font-black opacity-30 uppercase tracking-[0.3em] mb-8"
+        >
+          Select Time
+        </h3>
+        <div class="flex items-center justify-center gap-4 mb-10">
+          <div class="flex flex-col gap-2">
+            <p class="text-[8px] font-black opacity-30 uppercase">Hour</p>
+            <input
+              type="number"
+              id="input-hour"
+              class="ios-input text-center text-2xl w-20 font-black"
+              placeholder="00"
+              min="0"
+              max="23"
+            />
+          </div>
+          <span class="text-2xl font-black mt-4">:</span>
+          <div class="flex flex-col gap-2">
+            <p class="text-[8px] font-black opacity-30 uppercase">Minute</p>
+            <input
+              type="number"
+              id="input-minute"
+              class="ios-input text-center text-2xl w-20 font-black"
+              placeholder="00"
+              min="0"
+              max="59"
+            />
+          </div>
+        </div>
+        <button onclick="confirmManualTime()" class="primary-btn">
+          Confirm Time
+        </button>
       </div>
     </div>
 
