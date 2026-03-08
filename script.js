@@ -255,24 +255,51 @@ function moveNavBubble(element) {
   }
 }
 
-function switchPage(pageId, element) {
-  document
-    .querySelectorAll(".page-section")
-    .forEach((p) => p.classList.add("hidden"));
-  document.getElementById(pageId)?.classList.remove("hidden");
-  document
-    .querySelectorAll(".nav a")
-    .forEach((l) => l.classList.remove("active"));
+async function switchPage(pageId, element) {
+  const currentNav = document.querySelector(".nav a.active");
+  if (currentNav === element) return;
+
+  const sections = document.querySelectorAll(".page-section");
+  const currentPage = Array.from(sections).find(p => !p.classList.contains("hidden"));
+  const targetPage = document.getElementById(pageId);
+
+  // Nav Item Styling
+  document.querySelectorAll(".nav a").forEach(l => l.classList.remove("active"));
   element.classList.add("active");
+  if (element) moveNavBubble(element);
 
-  moveNavBubble(element);
-  checkAdminSession();
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  if (currentPage) {
+    currentPage.classList.add("page-exit");
+    await new Promise(r => setTimeout(r, 350));
+    currentPage.classList.add("hidden");
+    currentPage.classList.remove("page-exit", "visible");
+  }
 
-  if (pageId === "page-gallery") muatGallery();
-  if (pageId === "page-contact") muatDosen();
-  if (pageId === "page-info") muatInfo();
-  if (pageId === "page-schedule") muatJadwal();
+  if (targetPage) {
+    targetPage.classList.remove("hidden");
+    targetPage.classList.add("page-enter");
+    
+    // Stagger preparation: find children to animate
+    // We add a class to the target page to trigger stagger from CSS
+    targetPage.classList.add("stagger-container");
+    
+    window.scrollTo({ top: 0 }); 
+    checkAdminSession();
+
+    // Data pre-loading
+    if (pageId === "page-gallery") muatGallery();
+    if (pageId === "page-contact") muatDosen();
+    if (pageId === "page-info") muatInfo();
+    if (pageId === "page-schedule") muatJadwal();
+
+    // Trigger animations
+    requestAnimationFrame(() => {
+        targetPage.classList.add("visible");
+    });
+
+    await new Promise(r => setTimeout(r, 600));
+    targetPage.classList.remove("page-enter");
+  }
 }
 
 /* --- SUPABASE API CALLS --- */
@@ -658,7 +685,7 @@ function renderSchedule(data) {
   const days = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
   const isAdmin = localStorage.getItem("is_admin") === "true";
   const startHour = 7;
-  const pixelsPerHour = 80;
+  const pixelsPerHour = 110;
 
   // Reset columns
   days.forEach(day => {
@@ -1139,4 +1166,27 @@ window.addEventListener("load", () => {
   if (active) moveNavBubble(active);
   refreshAllData();
   setupRealtime();
+  initScrollAnimations();
 });
+
+/* --- SCROLL REVEAL ANIMATIONS --- */
+function initScrollAnimations() {
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px"
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add("visible");
+            }
+        });
+    }, observerOptions);
+
+    const revealElements = document.querySelectorAll(".glass-card, .schedule-card");
+    revealElements.forEach(el => {
+        el.classList.add("scroll-reveal");
+        observer.observe(el);
+    });
+}
