@@ -1,3 +1,4 @@
+/* --- Root Variables: Theme System --- */
 :root[data-theme="dark"] {
   --bg-top: #0a0a0a;
   --bg-bottom: #000000;
@@ -422,7 +423,7 @@ body {
 }
 
 .time-slot-label {
-  height: 100px;
+  height: 80px; /* Adjusted height for more slots */
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -434,10 +435,10 @@ body {
 
 .schedule-day-col {
   background: rgba(255, 255, 255, 0.01);
-  min-height: 800px;
+  min-height: 880px; /* 11 slots * 80px */
   position: relative;
   border-right: 0.5px solid var(--border);
-  padding: 10px;
+  padding: 0; /* Remove padding to ensure absolute positioning is precise */
 }
 
 .schedule-day-col:last-child {
@@ -457,7 +458,7 @@ body {
 }
 
 .grid-line {
-  height: 100px;
+  height: 80px; /* Adjusted to match labels */
   border-bottom: 0.5px solid var(--border);
   width: 100%;
 }
@@ -466,13 +467,17 @@ body {
   background: var(--card);
   border: 1px solid var(--border);
   border-top: 3px solid var(--accent);
-  border-radius: 14px;
-  padding: 1rem;
-  margin-bottom: 0.8rem;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border-radius: 12px;
+  padding: 0.8rem;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1);
   cursor: pointer;
-  position: relative;
+  position: absolute; /* Enable time-based positioning */
+  left: 5px;
+  right: 5px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .schedule-card:hover {
@@ -496,12 +501,16 @@ body {
 }
 
 .schedule-card .subject-name {
-  font-size: 14px;
+  font-size: 11px; /* Smaller for absolute layout */
   font-weight: 850;
   line-height: 1.2;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   color: var(--text);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .schedule-card .info-row {
@@ -576,7 +585,7 @@ body {
 
   .schedule-grid {
     display: grid !important;
-    min-width: 900px !important; /* Fixed width to force layout stability */
+    min-width: 900px !important;
     border-radius: 16px;
     grid-template-columns: 60px repeat(6, 1fr) !important;
   }
