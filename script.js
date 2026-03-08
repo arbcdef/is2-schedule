@@ -657,6 +657,8 @@ async function hapusJadwal(id) {
 function renderSchedule(data) {
   const days = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
   const isAdmin = localStorage.getItem("is_admin") === "true";
+  const startHour = 7;
+  const pixelsPerHour = 80;
 
   // Reset columns
   days.forEach(day => {
@@ -666,9 +668,23 @@ function renderSchedule(data) {
 
   data.forEach(item => {
     const col = document.getElementById(`col-${item.day}`);
-    if (col) {
+    if (col && item.time_start && item.time_end) {
+      // Calculate Position
+      const [sh, sm] = item.time_start.split(":").map(Number);
+      const [eh, em] = item.time_end.split(":").map(Number);
+      
+      const startMinutes = (sh - startHour) * 60 + sm;
+      const endMinutes = (eh - startHour) * 60 + em;
+      const duration = endMinutes - startMinutes;
+
+      const topPos = (startMinutes / 60) * pixelsPerHour;
+      const heightPos = (duration / 60) * pixelsPerHour;
+
       const card = document.createElement("div");
       card.className = `schedule-card ${isAdmin ? 'admin-mode' : ''}`;
+      card.style.top = `${topPos}px`;
+      card.style.height = `${heightPos}px`;
+      
       card.innerHTML = `
         <div class="time-badge">${item.time_start} - ${item.time_end}</div>
         <h3 class="subject-name">${item.subject}</h3>
@@ -686,10 +702,11 @@ function renderSchedule(data) {
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
             <circle cx="12" cy="7" r="4"></circle>
           </svg>
-          <span>${item.lecturer || '-'}</span>
+          <span class="truncate">${item.lecturer || '-'}</span>
         </div>
 
-        ${isAdmin ? `<button onclick="hapusJadwal('${item.id}')" class="btn-del-schedule">
+        ${isAdmin ? `
+        <button onclick="hapusJadwal('${item.id}')" class="btn-del-schedule">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="3 6 5 6 21 6"></polyline>
             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -717,27 +734,43 @@ function renderCountdown() {
     .sort((a, b) => new Date(a.tgl_deadline) - new Date(b.tgl_deadline))[0];
 
   if (upcoming) {
-    const today = new Date().setHours(0, 0, 0, 0),
-      deadline = new Date(upcoming.tgl_deadline).setHours(0, 0, 0, 0);
-    const diffDays = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+    const today = new Date().setHours(0, 0, 0, 0);
+    const tStart = new Date(upcoming.tgl_start).setHours(0, 0, 0, 0);
+    const tEnd = new Date(upcoming.tgl_deadline).setHours(0, 0, 0, 0);
+    
     const priColor =
       upcoming.priority === "High"
         ? "#ff3b30"
         : upcoming.priority === "Medium"
           ? "#ff9500"
           : "#8e8e93";
-    const dayText =
-      diffDays === 0
-        ? "DUE TODAY"
-        : diffDays < 0
-          ? `${Math.abs(diffDays)} OVERDUE`
-          : `${diffDays} DAYS LEFT`;
+
+    let dayText = "";
+    let subStatus = "";
+
+    if (today < tStart) {
+      const diff = Math.ceil((tStart - today) / (1000 * 60 * 60 * 24));
+      dayText = `${diff} DAYS TO START`;
+      subStatus = `Starts: ${upcoming.tgl_start}`;
+    } else {
+      const diff = Math.ceil((tEnd - today) / (1000 * 60 * 60 * 24));
+      if (diff > 0) {
+        dayText = `${diff} DAYS LEFT`;
+        subStatus = `Deadline: ${upcoming.tgl_deadline}`;
+      } else if (diff === 0) {
+        dayText = "DUE TODAY";
+        subStatus = `Deadline: ${upcoming.tgl_deadline}`;
+      } else {
+        dayText = `${Math.abs(diff)} OVERDUE`;
+        subStatus = `Ended: ${upcoming.tgl_deadline}`;
+      }
+    }
 
     area.innerHTML = `
             <div class="dynamic-island fade-in" style="border-left: 6px solid ${priColor};">
                 <div class="flex-1 truncate mr-4 text-left">
                     <p class="island-meta text-[8px] font-black uppercase tracking-widest mb-1 opacity-60">
-                        <span style="color: ${priColor}">${tLoc(upcoming.category)}</span> • ${upcoming.tgl_deadline}
+                        <span style="color: ${priColor}">${tLoc(upcoming.category)}</span> • ${subStatus}
                     </p>
                     <h2 class="text-sm font-black uppercase leading-tight truncate">${upcoming.content}</h2>
                 </div>
