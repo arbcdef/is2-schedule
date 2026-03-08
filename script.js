@@ -268,37 +268,52 @@ async function switchPage(pageId, element) {
   element.classList.add("active");
   if (element) moveNavBubble(element);
 
-  if (currentPage) {
-    currentPage.classList.add("page-exit");
-    await new Promise(r => setTimeout(r, 350));
-    currentPage.classList.add("hidden");
-    currentPage.classList.remove("page-exit", "visible");
-  }
+  // If GSAP is loaded, use premium native-app like transitions
+  if (typeof gsap !== 'undefined') {
+      if (currentPage) {
+        // Exit animation
+        await gsap.to(currentPage, {
+            opacity: 0,
+            y: -15,
+            scale: 0.98,
+            duration: 0.3,
+            ease: "power2.inOut"
+        });
+        currentPage.classList.add("hidden");
+        gsap.set(currentPage, { clearProps: "all" }); // reset for future
+      }
 
-  if (targetPage) {
-    targetPage.classList.remove("hidden");
-    targetPage.classList.add("page-enter");
-    
-    // Stagger preparation: find children to animate
-    // We add a class to the target page to trigger stagger from CSS
-    targetPage.classList.add("stagger-container");
-    
-    window.scrollTo({ top: 0 }); 
-    checkAdminSession();
+      if (targetPage) {
+        targetPage.classList.remove("hidden");
+        
+        window.scrollTo({ top: 0 }); 
+        checkAdminSession();
 
-    // Data pre-loading
-    if (pageId === "page-gallery") muatGallery();
-    if (pageId === "page-contact") muatDosen();
-    if (pageId === "page-info") muatInfo();
-    if (pageId === "page-schedule") muatJadwal();
+        // Data pre-loading
+        if (pageId === "page-gallery") muatGallery();
+        if (pageId === "page-contact") muatDosen();
+        if (pageId === "page-info") muatInfo();
+        if (pageId === "page-schedule") muatJadwal();
 
-    // Trigger animations
-    requestAnimationFrame(() => {
-        targetPage.classList.add("visible");
-    });
+        // Entrance animation
+        gsap.fromTo(targetPage, 
+            { opacity: 0, scale: 0.98 },
+            { opacity: 1, scale: 1, duration: 0.4, ease: "power2.out" }
+        );
 
-    await new Promise(r => setTimeout(r, 600));
-    targetPage.classList.remove("page-enter");
+        // Stagger page components uniquely depending on what is visible
+        const animateTargets = targetPage.querySelectorAll(":scope > div, :scope > h2, .glass-card");
+        if(animateTargets.length > 0) {
+            gsap.fromTo(animateTargets, 
+                { opacity: 0, y: 30 },
+                { opacity: 1, y: 0, duration: 0.6, stagger: 0.05, ease: "power3.out", delay: 0.05, clearProps: "transform" }
+            );
+        }
+      }
+  } else {
+      // Fallback if plugin fails to load
+      if (currentPage) currentPage.classList.add("hidden");
+      if (targetPage) targetPage.classList.remove("hidden");
   }
 }
 
@@ -1166,27 +1181,58 @@ window.addEventListener("load", () => {
   if (active) moveNavBubble(active);
   refreshAllData();
   setupRealtime();
-  initScrollAnimations();
+  initPremiumAnimations();
 });
 
-/* --- SCROLL REVEAL ANIMATIONS --- */
-function initScrollAnimations() {
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: "0px 0px -50px 0px"
-    };
+/* --- PREMIUM PLUGINS (Lenis + GSAP) --- */
+let globalScrollObserver = null;
 
-    const observer = new IntersectionObserver((entries) => {
+function initPremiumAnimations() {
+  // 1. Lenis Smooth Scroll (Hardware Accelerated)
+  if (typeof Lenis !== 'undefined') {
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smooth: true,
+      touchMultiplier: 1.5
+    });
+
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+  }
+
+  // 2. Setup GSAP Hardware Observer
+  if (typeof gsap !== 'undefined') {
+    globalScrollObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.classList.add("visible");
+                gsap.to(entry.target, {
+                    y: 0,
+                    opacity: 1,
+                    scale: 1,
+                    duration: 0.8,
+                    ease: "power3.out",
+                    overwrite: "auto"
+                });
+                globalScrollObserver.unobserve(entry.target);
             }
         });
-    }, observerOptions);
+    }, { threshold: 0.1, rootMargin: "0px 0px -20px 0px" });
 
-    const revealElements = document.querySelectorAll(".glass-card, .schedule-card");
-    revealElements.forEach(el => {
-        el.classList.add("scroll-reveal");
-        observer.observe(el);
-    });
+    // Observe initial static elements
+    observeElements(".glass-card, .page-section > h2");
+  }
+}
+
+// Utility to attach observers to dynamically loaded elements
+function observeElements(selector) {
+  if (!globalScrollObserver) return;
+  const els = document.querySelectorAll(selector);
+  els.forEach(el => {
+    gsap.set(el, { y: 30, opacity: 0, scale: 0.98 });
+    globalScrollObserver.observe(el);
+  });
 }
