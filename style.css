@@ -29,7 +29,7 @@
 }
 
 html {
-  overflow-y: scroll; /* Force vertical scrollbar to prevent horizontal jumps when switching pages */
+  overflow-y: scroll;
 }
 
 * {
@@ -273,6 +273,29 @@ body {
 .day-cell.cal-today {
   outline: 2px solid var(--text);
   outline-offset: 2px;
+}
+
+/* --- Calendar Indicators --- */
+.task-today {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.pri-high { background: rgba(255, 59, 48, 0.15); border-color: rgba(255, 59, 48, 0.4); color: #ff3b30; }
+.pri-medium { background: rgba(255, 149, 0, 0.15); border-color: rgba(255, 149, 0, 0.4); color: #ff9500; }
+.pri-low { background: rgba(52, 199, 89, 0.15); border-color: rgba(52, 199, 89, 0.4); color: #34c759; }
+
+.task-double {
+  background: linear-gradient(135deg, rgba(255, 59, 48, 0.15), rgba(255, 149, 0, 0.15));
+  border-color: rgba(255, 149, 0, 0.4);
+}
+.task-triple {
+  background: linear-gradient(135deg, rgba(255, 59, 48, 0.15), rgba(90, 200, 250, 0.15));
+  border-color: rgba(90, 200, 250, 0.4);
+}
+.task-quadruple {
+  background: linear-gradient(135deg, rgba(255, 59, 48, 0.15), rgba(175, 82, 222, 0.15));
+  border-color: rgba(175, 82, 222, 0.4);
 }
 
 .modal-overlay {
