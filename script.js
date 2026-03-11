@@ -136,9 +136,9 @@ async function muatDosen() {
                 <p class="text-xs font-black opacity-30 uppercase tracking-widest">${d.mata_kuliah}</p>
                 <h3 class="text-lg font-bold uppercase tracking-tight">${d.nama_dosen}</h3>
                 <div class="flex items-center justify-between mt-2">
-                    <a href="https://wa.me/${d.whatsapp}" target="_blank" class="text-[10px] font-black text-green-500 hover:opacity-70 transition">
+                    <button onclick="showWaAlert('${d.whatsapp}')" class="text-[10px] font-black text-green-500 hover:opacity-70 transition text-left uppercase">
                         WHATSAPP: ${d.whatsapp}
-                    </a>
+                    </button>
                     ${isAdmin ? `<button onclick="hapusDosen('${d.id}')" class="text-[8px] font-black text-red-500 opacity-60 hover:opacity-100 transition">DELETE</button>` : ""}
                 </div>
             </div>`,
@@ -241,6 +241,21 @@ function customConfirm(msg, callback) {
 
 function closeConfirm() {
   document.getElementById("custom-confirm-modal")?.classList.add("hidden");
+}
+
+function showWaAlert(waNumber) {
+  const modal = document.getElementById("wa-alert-modal");
+  const okBtn = document.getElementById("wa-alert-ok-btn");
+  if (!modal) return;
+  modal.classList.remove("hidden");
+  okBtn.onclick = () => {
+    window.open(`https://wa.me/${waNumber}`, '_blank');
+    closeWaAlert();
+  };
+}
+
+function closeWaAlert() {
+  document.getElementById("wa-alert-modal")?.classList.add("hidden");
 }
 
 /* --- CORE NAVIGATION --- */
@@ -392,8 +407,9 @@ async function muatGallery() {
       data
         ?.map(
           (img) => `
-            <div class="glass-card p-2 aspect-square overflow-hidden group border border-white/5 relative">
-                <img src="${img.image_url}" class="w-full h-full object-cover rounded-xl grayscale group-hover:grayscale-0 transition-all duration-500" alt="Gallery Photo">
+            <div class="gallery-item glass-card p-2 aspect-square overflow-hidden group border border-white/5 relative cursor-pointer">
+                <img src="${img.image_url}" class="w-full h-full object-cover rounded-xl grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:scale-110" alt="Gallery Photo">
+                <div class="absolute inset-0 rounded-xl bg-black/0 group-hover:bg-black/10 transition-all duration-500 pointer-events-none"></div>
                 <button onclick="hapusFoto('${img.id}', '${img.file_path}')" class="absolute top-3 right-3 bg-red-500/80 text-white text-[8px] font-black px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">DELETE</button>
             </div>`,
         )
@@ -891,8 +907,7 @@ function renderCalendar() {
     );
 
     let pClass = "";
-    if (checkDate === todayStr && tasks.length > 0) pClass = "task-today";
-    else if (tasks.length === 1)
+    if (tasks.length === 1)
       pClass =
         tasks[0].priority === "High"
           ? "pri-high"
