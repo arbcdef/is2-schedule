@@ -200,7 +200,7 @@
         </div>
       </section>
 
-      <section id="page-hub" class="page-section">
+      <section id="page-hub" class="page-section hidden">
         <div
           id="next-deadline-area"
           class="mb-10 min-h-[100px] relative z-20"
@@ -451,7 +451,7 @@
         </div>
       </section>
 
-      <section id="page-schedule" class="page-section hidden">
+      <section id="page-schedule" class="page-section">
         <h2
           class="text-[10px] font-black opacity-20 uppercase tracking-[0.3em] mb-8 text-center"
         >
@@ -618,12 +618,12 @@
         <div id="nav-bubble-active" class="bubble active"></div>
         <nav class="nav">
           <a href="#" onclick="switchPage('page-gallery', this)">Gallery</a>
-          <a href="#" onclick="switchPage('page-hub', this)" class="active"
-            >Hub</a
+          <a href="#" onclick="switchPage('page-hub', this)">Tasks</a>
+          <a href="#" onclick="switchPage('page-schedule', this)" class="active"
+            >Schedule</a
           >
-          <a href="#" onclick="switchPage('page-schedule', this)">Schedule</a>
           <a href="#" onclick="switchPage('page-contact', this)">Contact</a>
-          <a href="#" onclick="switchPage('page-info', this)">Info</a>
+          <a href="#" onclick="switchPage('page-info', this)">Board</a>
         </nav>
       </div>
     </div>
@@ -711,6 +711,56 @@
             class="py-3 bg-red-600 text-white rounded-xl text-[9px] font-black uppercase shadow-lg"
           >
             Yes
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="wa-alert-modal"
+      class="modal-overlay hidden"
+      onclick="closeWaAlert()"
+    >
+      <div
+        class="modal-card fade-in p-10 text-center max-w-xs"
+        onclick="event.stopPropagation()"
+      >
+        <div
+          class="w-12 h-12 bg-orange-500/20 text-orange-500 rounded-full flex items-center justify-center mx-auto mb-4"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-6 h-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="3"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
+          </svg>
+        </div>
+        <h3 class="text-sm font-black uppercase tracking-widest mb-2">
+          ALERT!
+        </h3>
+        <p class="text-[10px] opacity-60 mb-8 font-bold uppercase">
+          Hubungi ketika darurat
+        </p>
+        <div class="grid grid-cols-2 gap-3">
+          <button
+            onclick="closeWaAlert()"
+            class="py-3 bg-white/5 rounded-xl text-[9px] font-black uppercase"
+          >
+            Batal
+          </button>
+          <button
+            id="wa-alert-ok-btn"
+            class="py-3 bg-green-600 text-white rounded-xl text-[9px] font-black uppercase shadow-lg"
+          >
+            Lanjutkan
           </button>
         </div>
       </div>
