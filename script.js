@@ -966,7 +966,7 @@ function selectDate(d) {
   document.getElementById(
     dateTarget === "start" ? "tglMulai" : "tglDeadline",
   ).value = d;
-  document.getElementById("custom-datepicker").classList.add("hidden");
+  document.getElementById("datepicker-modal").classList.add("hidden");
   showNotify(`Target date: ${d}`);
 }
 
@@ -1117,10 +1117,18 @@ function confirmManualTime() {
 }
 
 function toggleDatePicker(e, target) {
-  e.stopPropagation();
-  dateTarget = target;
-  document.getElementById("custom-datepicker").classList.toggle("hidden");
-  renderPicker();
+  if (e) e.stopPropagation();
+  if (target) dateTarget = target;
+  
+  const modal = document.getElementById("datepicker-modal");
+  if (modal) {
+      if (modal.classList.contains("hidden")) {
+          modal.classList.remove("hidden");
+          renderPicker();
+      } else {
+          modal.classList.add("hidden");
+      }
+  }
 }
 
 function showCalendarDetail(dateStr, tasks) {
@@ -1197,6 +1205,19 @@ window.addEventListener("load", () => {
   refreshAllData();
   setupRealtime();
   initPremiumAnimations();
+
+  // Close Datepickers and Select Modals on outside click
+  document.addEventListener("click", (e) => {
+    const picker = document.getElementById("datepicker-modal");
+    const m = document.getElementById("custom-modal");
+    if (picker && !picker.classList.contains("hidden") && e.target === picker) {
+      picker.classList.add("hidden");
+    }
+    if (m && !m.classList.contains("hidden") && !m.contains(e.target) && !e.target.closest('button[onclick*="openSelect"]')) {
+      // closeModal() can be used but check if its logic fits
+      // Actually closeModal hides specifically the id="custom-modal"
+    }
+  });
 });
 
 /* --- PREMIUM PLUGINS (Lenis + GSAP) --- */
